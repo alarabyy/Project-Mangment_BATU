@@ -1,0 +1,150 @@
+:host {
+  display: block;
+  background-color: transparent;
+  width: 100%;
+  padding: 4rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* --- Upgraded "Neural Network" Animated Background --- */
+.neural-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+/* Canvas element will be dynamically injected here */
+
+/* --- Header & Typing Animation --- */
+.help-center-container { max-width: 960px; margin: 0 auto; }
+.help-center-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+.help-center-header h1 {
+  color: var(--primary-accent);
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+}
+#typing-subtitle {
+  color: var(--subtle-text-color);
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  min-height: 1.5rem; /* Prevents layout shift */
+  border-right: 2px solid var(--subtle-text-color);
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: blink-caret 0.75s step-end infinite;
+}
+@keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--subtle-text-color); } }
+
+/* --- Topic Cards with Glow Effect --- */
+.topic-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+.topic-card {
+  position: relative;
+  background-color: var(--surface-color);
+  padding: 2rem;
+  border-radius: var(--border-radius-large);
+  border: 1px solid var(--border-color-translucent);
+  text-align: center;
+  transition: all 0.3s var(--easing-curve-elegant);
+  overflow: hidden; /* Important for glow effect */
+}
+.glow-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, var(--primary-accent-translucent) 0%, transparent 40%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.topic-card:hover .glow-effect { opacity: 1; }
+.topic-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--primary-accent);
+}
+.card-icon, .topic-card h3, .topic-card p {
+  position: relative; /* Ensure content is above the glow */
+  z-index: 2;
+}
+.card-icon {
+  margin: 0 auto 1.5rem;
+  width: 60px;
+  height: 60px;
+  background-color: var(--primary-accent-translucent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-accent);
+}
+.card-icon svg { width: 32px; height: 32px; }
+.topic-card h3 { color: var(--text-color); margin-bottom: 0.5rem; }
+.topic-card p { color: var(--subtle-text-color); font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Accordion Styling with Animated Icons --- */
+.detailed-guides h2 { text-align: center; color: var(--primary-accent); margin-bottom: 2rem; font-size: 2rem; }
+.accordion-item {
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-color-translucent);
+  margin-bottom: 1rem;
+}
+.accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  font-weight: var(--font-weight-semibold);
+  list-style: none;
+}
+.accordion-header::-webkit-details-marker { display: none; }
+.header-icon-wrapper {
+  color: var(--primary-accent);
+  transition: transform 0.4s var(--easing-curve-bounce);
+}
+.accordion-item[open] .header-icon-wrapper { transform: rotate(360deg); }
+.header-icon-wrapper svg { width: 28px; height: 28px; }
+.accordion-header::after {
+  content: '+';
+  font-size: 2rem;
+  color: var(--primary-accent);
+  transition: transform 0.3s ease;
+  margin-left: auto;
+}
+.accordion-item[open] > .accordion-header::after { transform: rotate(45deg); }
+.accordion-content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+  padding: 0 1rem 0 4.5rem; /* Align with header text */
+  color: var(--subtle-text-color);
+}
+.accordion-item[open] > .accordion-content { max-height: 1000px; padding: 0 1rem 2rem 4.5rem; }
+.accordion-content p, .accordion-content ol, .accordion-content ul { margin-bottom: 1rem; }
+.accordion-content ul, .accordion-content ol { padding-left: 1.5rem; }
+.accordion-content h4 { color: var(--primary-accent); margin-top: 1rem; }
+.code-block { background-color: var(--primary-accent-translucent); border: 1px solid var(--border-color-translucent); border-radius: var(--border-radius-base); padding: 1.5rem; margin: 1.5rem 0; color: #a3d9b1; }
+.code-block pre { margin: 0; font-family: 'Fira Code', monospace; }
+.alert-box { background-color: rgba(35, 209, 96, 0.1); border-left: 4px solid var(--primary-accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0; }
+.alert-box strong { color: var(--primary-accent); }
+
+/* --- Footer & Animations --- */
+.help-center-footer { text-align: center; margin-top: 4rem; color: var(--subtle-text-color); font-size: 0.9rem; }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }

@@ -1,0 +1,50 @@
+<main class="container">
+  <header class="header">
+    <div class="header-content">
+      <i class="fas fa-plus-circle header-icon"></i>
+      <h1 class="header-title">Add New Category</h1>
+    </div>
+    <button (click)="cancel()" class="btn btn-secondary" title="Back to Categories List">
+      <i class="fas fa-arrow-alt-circle-left"></i>
+      <span>Back to List</span>
+    </button>
+  </header>
+
+  <!-- Add Form -->
+  <div class="form-container fade-in">
+    <form (ngSubmit)="createCategory()" class="category-form">
+      <div class="form-group">
+        <label for="name">Category Name</label>
+        <input type="text" id="name" name="name" [(ngModel)]="newCategory.name" required class="form-input"
+               placeholder="e.g., Science, Arts, Sports" minlength="3" maxlength="100">
+        <!-- Add Angular form validation messages here if using Reactive Forms or template-driven with NgForm -->
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" [(ngModel)]="newCategory.description" required class="form-input"
+                  placeholder="Provide a brief description of the new category." rows="4" minlength="10"></textarea>
+      </div>
+
+      <div *ngIf="saveSuccess" class="success-message">
+        <i class="fas fa-check-circle"></i>
+        Category added successfully! Redirecting...
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message state-container" style="border:none; padding: 1rem; margin-top: 1.5rem;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p class="state-text">{{ errorMessage }}</p>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving">
+          <span *ngIf="!isSaving"><i class="fas fa-plus"></i> Add Category</span>
+          <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Adding...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</main>

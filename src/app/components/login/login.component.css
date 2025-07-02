@@ -1,0 +1,127 @@
+/* Using :host to encapsulate styles within the component */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-color); /* Uses global theme color */
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-grid-background {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(35, 209, 96, 0.1) 1px, transparent 1px),
+    linear-gradient(to right, rgba(35, 209, 96, 0.1) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+}
+.animated-grid-background::after { /* The scan line */
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 2px;
+  background: var(--primary-accent);
+  box-shadow: 0 0 10px var(--primary-accent), 0 0 20px var(--primary-accent);
+  animation: scan-effect 6s linear infinite;
+}
+@keyframes scan-effect {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* Main Form Card */
+.auth-form-container {
+  position: relative;
+  width: 100%; max-width: 420px;
+  padding: 3rem;
+  background-color: var(--surface-color);
+  border: 1px solid var(--primary-accent-translucent);
+  border-radius: var(--border-radius-large);
+  backdrop-filter: blur(12px);
+  animation: materialize-form 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes materialize-form {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Header Styling */
+.form-header { text-align: center; margin-bottom: 2rem; }
+.header-icon-wrapper {
+  width: 70px; height: 70px; margin: 0 auto 1.5rem;
+  background: transparent; border: 2px solid var(--primary-accent);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: var(--primary-accent); box-shadow: 0 0 15px var(--shadow-color-accent);
+}
+.header-icon-wrapper svg { width: 36px; height: 36px; }
+.form-header h2 { color: var(--text-color); font-weight: var(--font-weight-bold); }
+.form-header p { color: var(--subtle-text-color); margin-top: 0.5rem; }
+
+/* Input Fields */
+.input-field-wrapper { margin-bottom: 0.5rem; }
+.form-control {
+  width: 100%; padding: 1rem;
+  background-color: var(--primary-accent-translucent);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-base);
+  color: var(--text-color); font-size: 1rem;
+  transition: all 0.3s ease; box-sizing: border-box;
+}
+.form-control:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 10px var(--shadow-color-accent);
+  outline: none;
+}
+.form-control::placeholder { color: var(--subtle-text-color); opacity: 0.7; }
+.form-control.is-invalid { border-color: var(--error-color) !important; }
+
+/* Error Message & Options */
+.error-message {
+  padding: 0 0.5rem;
+  min-height: 24px; /* Prevent layout shift */
+  text-align: left;
+}
+.error-message p { color: var(--error-color); font-size: 0.85rem; margin: 0; }
+.options-wrapper { display: flex; align-items: center; gap: 0.75rem; color: var(--subtle-text-color); margin-top: 1rem; }
+
+/* Custom Toggle Switch for Password */
+.toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border-color); border-radius: 34px; transition: .4s;
+}
+.slider:before {
+  position: absolute; content: ""; height: 16px; width: 16px;
+  left: 4px; bottom: 4px; background-color: white;
+  border-radius: 50%; transition: .4s;
+}
+input:checked + .slider { background-color: var(--primary-accent); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* Submit Button */
+.btn-submit-glow {
+  width: 100%; padding: 1rem; margin-top: 1.5rem;
+  background-color: transparent; border: 1px solid var(--primary-accent);
+  border-radius: var(--border-radius-base); color: var(--primary-accent);
+  font-size: 1.1rem; font-weight: var(--font-weight-bold);
+  cursor: pointer; position: relative;
+  transition: all 0.3s ease;
+}
+.btn-submit-glow:hover:not(:disabled) {
+  background-color: var(--primary-accent); color: var(--bg-color);
+  box-shadow: 0 0 20px var(--primary-accent);
+}
+.btn-submit-glow:disabled {
+  border-color: var(--border-color); color: var(--subtle-text-color);
+  cursor: not-allowed;
+}
+
+/* Footer */
+.form-footer { text-align: center; margin-top: 1.5rem; }
+.form-footer p { color: var(--subtle-text-color); }
+.form-footer a { color: var(--primary-accent); text-decoration: none; font-weight: var(--font-weight-semibold); }
+.form-footer a:hover { text-decoration: underline; }

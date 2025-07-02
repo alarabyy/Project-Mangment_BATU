@@ -1,0 +1,158 @@
+<!-- src/app/components/navbar/nav/nav.component.html -->
+<nav class="navbar" [class.dark]="isDarkMode" [class.search-active]="isSearchActive">
+  <!-- Left Section: Menu Toggle -->
+  <div class="navbar-section left">
+    <button
+      class="menu-toggle navbar-icon-btn"
+      [class.active]="isMenuOpen"
+      (click)="toggleMenu()"
+      aria-label="Toggle Navigation Menu"
+      title="Toggle Navigation Menu">
+      <div class="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Center Section: Logo -->
+  <div class="navbar-section center">
+    <a routerLink="/" class="logo" title="Go to Dashboard">
+      <i class="fas fa-sitemap"></i> <!-- أيقونة جديدة للشعار -->
+      <span>BATU-Projects</span>
+    </a>
+  </div>
+
+  <!-- Right Section: Actions (For Desktop) -->
+  <div class="navbar-section right desktop-actions">
+    <div class="search-container">
+        <button (click)="toggleSearch()" class="search-toggle navbar-icon-btn" title="Search">
+            <i class="fas fa-search"></i>
+        </button>
+        <div class="search-bar-container" [class.active]="isSearchActive">
+            <input type="search" #searchInput placeholder="Search projects, tasks..."
+                   (keyup.enter)="performSearch($event, searchInput.value)"/>
+            <button (click)="performSearch($event, searchInput.value)" class="search-submit-btn" title="Submit Search">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="global-add-container">
+        <button class="navbar-icon-btn global-add-btn" (click)="toggleGlobalAdd()" title="Quick Add" [class.active]="isGlobalAddOpen">
+            <i class="fas fa-plus"></i>
+        </button>
+        <div class="global-add-menu" [class.show]="isGlobalAddOpen" [class.dark]="isDarkMode">
+            <a (click)="quickCreate('project')"><i class="fas fa-folder-plus"></i> New Project</a>
+            <a (click)="quickCreate('task')"><i class="fas fa-calendar-check"></i> New Task</a>
+            <a (click)="quickCreate('document')"><i class="fas fa-file-alt"></i> New Document</a>
+            <a (click)="quickCreate('event')"><i class="fas fa-calendar-star"></i> New Event</a>
+        </div>
+    </div>
+
+    <a routerLink="/notifications" class="navbar-icon-btn notifications-btn" title="Notifications">
+      <i class="fas fa-bell"></i>
+      <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+    </a>
+    <button class="dark-mode-toggle navbar-icon-btn" (click)="toggleDarkMode()" title="Toggle Dark Mode">
+      <span class="icon-container">
+        <i class="fas fa-sun sun-icon"></i>
+        <i class="fas fa-moon moon-icon"></i>
+      </span>
+    </button>
+    <a routerLink="/MyProfile" class="navbar-icon-btn user-avatar-btn" title="My Profile">
+      <i class="fas fa-user-graduate"></i>
+    </a>
+  </div>
+
+  <!-- Mobile Actions Button (Far Right on Mobile) -->
+  <div class="navbar-section right mobile-actions-trigger">
+    <button class="navbar-icon-btn mobile-actions-toggle-btn"
+            (click)="toggleMobileActionsMenu()"
+            [class.active]="isMobileActionsMenuOpen"
+            title="More Actions"
+            aria-label="More Actions">
+      <i class="fas fa-ellipsis-v"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Actions Dropdown Menu -->
+<div class="mobile-actions-menu"
+     [class.show]="isMobileActionsMenuOpen"
+     [class.dark]="isDarkMode"
+     (click)="$event.stopPropagation()">
+  <a (click)="triggerSearchFromMobileMenu()" title="Search">
+    <i class="fas fa-search"></i> Search
+  </a>
+  <a (click)="triggerGlobalAddFromMobileMenu()" title="Quick Add">
+    <i class="fas fa-plus"></i> Quick Add
+  </a>
+  <a routerLink="/notifications" (click)="closeMobileActionsMenu()" title="Notifications">
+    <i class="fas fa-bell"></i> Notifications
+    <span class="badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+  </a>
+  <a (click)="triggerDarkModeFromMobileMenu()" title="Toggle Dark Mode">
+    <i class="icon" [ngClass]="isDarkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+    {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
+  </a>
+  <a routerLink="/MyProfile" (click)="closeMobileActionsMenu()" title="My Profile">
+    <i class="fas fa-user-graduate" routerLink="/MyProfile"></i> Profile
+  </a>
+</div>
+
+
+<!-- القائمة الجانبية المنسدلة (Sidebar Menu) -->
+<div class="dropdown-menu" [class.show]="isMenuOpen" [class.dark]="isDarkMode" (click)="$event.stopPropagation()">
+  <div class="menu-header">
+    <div class="user-profile-compact">
+        <i class="fas fa-user-circle menu-profile-icon"></i>
+        <div class="user-details">
+            <h4>Welcome, {{ userName || 'Student' }}!</h4>
+            <p>{{ userRole || 'Project Contributor' }}</p>
+        </div>
+    </div>
+    <button class="close-menu-btn" (click)="toggleMenu()" title="Close Menu" aria-label="Close Menu">×</button>
+  </div>
+
+  <ul class="menu-items">
+
+    <li class="menu-separator-invisible"></li>
+
+    <li class="menu-category"><span><i class="fas fa-project-diagram"></i> admin</span></li>
+    <li><a routerLink="/Chat"  routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-tasks"></i></span>Ask Ai </a></li>
+    <li><a routerLink="/projects/all"  routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-tasks"></i></span>All Projects</a></li>
+    <li><a routerLink="/projects/my"  routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-user-shield"></i></span>My Projects</a></li>
+    <li><a routerLink="/CreateNewProject" ><span class="menu-icon"><i class="fas fa-folder-plus"></i></span>Create New Project</a></li>
+    <li><a routerLink="/FacultyList" ><span class="menu-icon"><i class="fas fa-folder-plus"></i></span>Facultys</a></li>
+    <li><a routerLink="/DepartmentsList" ><span class="menu-icon"><i class="fas fa-folder-plus"></i></span>Departments</a></li>
+    <li><a routerLink="/CreateNewProject" ><span class="menu-icon"><i class="fas fa-folder-plus"></i></span>Staff</a></li>
+    <li><a routerLink="/CategoryList" ><span class="menu-icon"><i class="fas fa-folder-plus"></i></span>Categories</a></li>
+    <li><a routerLink="/announcements" (click)="onMenuItemClick('/announcements')" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-bullhorn"></i></span>Blogs</a></li>
+    <li><a routerLink="/reports" (click)="onMenuItemClick('/reports')" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-chart-line"></i></span>Reports & Analytics</a></li>
+
+
+    <li class="menu-category"><span><i class="fas fa-project-diagram"></i> User</span></li>
+    <li class="menu-category"><span><i class="fas fa-project-diagram"></i> ****</span></li>
+
+
+
+
+    <li class="menu-separator"></li>
+    <li><a routerLink="/Privacy" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-life-ring"></i></span>Help & Support</a></li>
+    <li><a routerLink="/Documentaion"  routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-folder-open"></i></span>Documentation</a></li>
+    <li><a routerLink="/feedback" (click)="onMenuItemClick('/feedback')" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-comment-dots"></i></span>Submit Feedback</a></li>
+
+
+<hr>
+
+        <li><a (click)="onLogout()"><span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</a></li>
+    <li><a routerLink="/Login"><span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>Login</a></li>
+    <li><a routerLink="/SignUp"><span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>SignUp</a></li>
+
+  </ul>
+
+  <div class="menu-footer">
+    <p><i class="far fa-copyright"></i> {{ currentYear }} ProjectFlow Suite. All rights reserved.</p>
+    <p>Version 1.0.0</p>
+  </div>
+</div>

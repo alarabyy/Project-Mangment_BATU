@@ -1,0 +1,42 @@
+<div class="floating-controls-container" [class.active]="showControls">
+  <button class="fab-main" (click)="toggleShowControls()" title="Accessibility & Display Settings">
+    <i class="fas" [ngClass]="showControls ? 'fa-times' : 'fa-tools'"></i>
+  </button>
+
+  <div class="fab-options" [class.visible]="showControls">
+    <!-- Scroll to Top -->
+    <button *ngIf="showScrollToTopButton" class="fab-option-item scroll-top-fab" (click)="scrollToTop()" title="Scroll to Top">
+      <i class="fas fa-arrow-up"></i>
+      <span>Top</span>
+    </button>
+
+    <!-- Dark Mode -->
+    <button class="fab-option-item theme-toggle-fab" (click)="toggleDarkMode()" title="Toggle Dark Mode">
+      <i class="fas" [ngClass]="isDarkMode ? 'fa-sun' : 'fa-moon'"></i>
+      <span>{{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}</span>
+    </button>
+
+    <!-- Font Size -->
+    <div class="fab-option-item font-size-control-group">
+      <button class="font-adjust-btn" (click)="decreaseFontSize()" [disabled]="currentFontSize <= minFontSize">
+        <i class="fas fa-minus"></i>
+      </button>
+      <span class="font-size-display">{{ (currentFontSize / 16 * 100).toFixed(0) }}%</span>
+      <button class="font-adjust-btn" (click)="increaseFontSize()" [disabled]="currentFontSize >= maxFontSize">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+
+    <!-- Clock -->
+    <div class="fab-option-item digital-clock-fab">
+      <i class="fas fa-clock"></i>
+      <span>{{ timeString }}</span>
+    </div>
+
+    <!-- Ask AI -->
+    <a routerLink="/Chat" class="fab-option-item ask-ai-fab" title="Ask AI">
+      <i class="fas fa-robot"></i>
+      <span>Ask AI</span>
+    </a>
+  </div>
+</div>

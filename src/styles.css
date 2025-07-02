@@ -1,0 +1,110 @@
+/* styles.css or styles.scss */
+
+/* Import a modern font like Inter with more weights */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap'); */ /* Cairo can be a fallback or for specific elements if needed */
+
+:root {
+  /* DARK MODE Variables are NOW DEFAULT */
+  --bg-color: #000000;                     /* Pure Black */
+  --text-color: #c9d1d9;                 /* Light grey text (good contrast) */
+  --surface-color: #101010;              /* Very dark grey, slightly off-black for cards, sections */
+  --border-color: #2a3038;               /* Darker borders */
+  --border-color-translucent: rgba(180, 200, 230, 0.1); /* Subtle, slightly cool translucent border */
+
+  --primary-accent: #23d160;             /* Vibrant Green (your preferred green) */
+  --primary-accent-hover: #20c997;       /* Slightly different green for hover */
+  --primary-accent-active: #1db451;      /* Green for active/pressed states */
+  --primary-accent-translucent: rgba(35, 209, 96, 0.15); /* For subtle backgrounds or glows */
+
+  /* Specific variable for the mandated green text on HomeComponent */
+  --home-component-text-color: var(--primary-accent);
+
+  --secondary-accent: #00b4d8;           /* A cool blue as secondary accent for contrast */
+  --secondary-accent-hover: #00a2c6;
+
+  --subtle-text-color: #848d97;          /* For less important text */
+  --link-hover-color: var(--primary-accent-hover); /* Keep links consistent with green theme */
+  --error-color: #f85149;                 /* For error messages */
+
+  --navbar-height: 75px;                 /* Slightly taller navbar */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Inter first for English */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;              /* For impactful headings */
+
+  --border-radius-sm: 6px;
+  --border-radius-base: 10px;
+  --border-radius-large: 18px;
+  --border-radius-xl: 24px;
+  --border-radius-pill: 50px;
+
+  --shadow-color: rgba(0,0,0, 0.5); /* Darker shadow for dark theme */
+  --shadow-color-accent: rgba(35, 209, 96, 0.2); /* Greenish shadow for accents */
+  --box-shadow-sm: 0 2px 5px var(--shadow-color);
+  --box-shadow-md: 0 6px 15px var(--shadow-color);
+  --box-shadow-lg: 0 10px 30px var(--shadow-color);
+  --box-shadow-inset: inset 0 2px 4px 0 rgba(0,0,0,0.5);
+
+  --transition-speed-fast: 0.2s;
+  --transition-speed-normal: 0.35s;
+  --transition-speed-slow: 0.6s;
+  --easing-curve-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55); /* For bouncy effects */
+  --easing-curve-elegant: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* For smooth, elegant transitions */
+  --easing-curve-sharp: cubic-bezier(0.4, 0, 0.2, 1); /* Material Design like sharp curve */
+}
+
+/* Optional: Light Theme Variables (if you implement a toggle) */
+body.light-theme-active {
+  --bg-color: #ffffff; /* Pure White */
+  --text-color: #1c1e21; /* Dark grey, not pure black */
+  --surface-color: #f8f9fa; /* Light grey for surface in light mode, not pure white */
+  --border-color: #dce1e6;
+  --border-color-translucent: rgba(0,0,0,0.07);
+  --home-component-text-color: var(--primary-accent); /* Ensures HomeComponent text remains green */
+  --secondary-accent: #007bff; /* Standard blue for light theme */
+  --secondary-accent-hover: #0069d9;
+  --subtle-text-color: #56595c;
+  --link-hover-color: var(--primary-accent-hover);
+  --shadow-color: rgba(0,0,0, 0.1); /* Lighter shadow for light theme */
+  --shadow-color-accent: rgba(35, 209, 96, 0.15);
+}
+
+/* Global Resets and Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-accent) var(--surface-color);
+}
+html::-webkit-scrollbar { width: 10px; }
+html::-webkit-scrollbar-track { background: var(--surface-color); }
+html::-webkit-scrollbar-thumb {
+  background-color: var(--primary-accent);
+  border-radius: var(--border-radius-pill);
+  border: 2px solid var(--surface-color);
+}
+html::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-hover); }
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-top: var(--navbar-height, 0px);
+  overflow-x: hidden;
+  transition: background-color var(--transition-speed-normal) var(--easing-curve-elegant),
+              color var(--transition-speed-normal) var(--easing-curve-elegant);
+}

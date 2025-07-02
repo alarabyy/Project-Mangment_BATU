@@ -1,0 +1,62 @@
+<main class="container">
+  <header class="header">
+    <div class="header-content">
+      <i class="fas fa-plus-circle header-icon"></i>
+      <h1 class="header-title">Add New Faculty</h1>
+    </div>
+    <button (click)="cancel()" class="btn btn-secondary" title="Back to Faculties List">
+      <i class="fas fa-arrow-alt-circle-left"></i>
+      <span>Back to List</span>
+    </button>
+  </header>
+
+  <!-- Add Form -->
+  <div class="form-container fade-in">
+    <form (ngSubmit)="createFaculty()" class="faculty-form">
+      <div class="form-group">
+        <label for="name">Faculty Name</label>
+        <input type="text" id="name" name="name" [(ngModel)]="newFaculty.name" required class="form-input"
+               placeholder="e.g., Faculty of Arts" minlength="3" maxlength="100">
+        <!-- Add Angular form validation messages here if using Reactive Forms or template-driven with NgForm -->
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" [(ngModel)]="newFaculty.description" required class="form-input"
+                  placeholder="Provide a brief description of the new faculty." rows="4" minlength="10"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="deanId">Dean ID</label>
+        <input type="number" id="deanId" name="deanId" [(ngModel)]="newFaculty.deanId" required class="form-input"
+               placeholder="e.g., 101" min="1">
+      </div>
+
+      <div class="form-group">
+        <label for="deanName">Dean Name</label>
+        <input type="text" id="deanName" name="deanName" [(ngModel)]="newFaculty.deanName" required class="form-input"
+               placeholder="e.g., Dr. Jane Doe" minlength="3" maxlength="100">
+      </div>
+
+      <div *ngIf="saveSuccess" class="success-message">
+        <i class="fas fa-check-circle"></i>
+        Faculty added successfully! Redirecting...
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message state-container" style="border:none; padding: 1rem; margin-top: 1.5rem;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p class="state-text">{{ errorMessage }}</p>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving">
+          <span *ngIf="!isSaving"><i class="fas fa-plus"></i> Add Faculty</span>
+          <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Adding...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</main>

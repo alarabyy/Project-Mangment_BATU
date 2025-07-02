@@ -1,0 +1,84 @@
+<!-- Main container for the authentication page -->
+<div class="auth-page-container">
+  <!-- "Grid Scan" animated background -->
+  <div class="animated-grid-background"></div>
+
+  <!-- The main authentication form container -->
+  <div class="auth-form-container">
+    <!-- Header Section -->
+    <div class="form-header">
+      <div class="header-icon-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m0 10c2.7 0 5.8 1.29 6 2H6c.23-.72 3.31-2 6-2m0-12C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+      </div>
+      <h2>Create Account</h2>
+      <p>Join the platform to manage your projects</p>
+    </div>
+
+    <!-- The Angular Reactive Form -->
+    <form [formGroup]="signupForm" (ngSubmit)="submitSignup()" class="auth-form">
+      <!-- Name Field -->
+      <div class="input-field-wrapper">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Full Name"
+          formControlName="name"
+          [class.is-invalid]="name?.invalid && name?.touched"
+        />
+      </div>
+      <div class="error-message" *ngIf="name?.invalid && name?.touched">
+        <p *ngIf="name?.errors?.['required']">* Name is required.</p>
+        <p *ngIf="name?.errors?.['minlength']">* Minimum length is 3 characters.</p>
+      </div>
+
+      <!-- Email Field -->
+      <div class="input-field-wrapper">
+        <input
+          type="email"
+          class="form-control"
+          placeholder="University Email"
+          formControlName="email"
+          [class.is-invalid]="email?.invalid && email?.touched"
+        />
+      </div>
+      <div class="error-message" *ngIf="email?.invalid && email?.touched">
+        <p *ngIf="email?.errors?.['required']">* Email is required.</p>
+        <p *ngIf="email?.errors?.['email']">* This email is not valid.</p>
+      </div>
+
+      <!-- Password Field -->
+      <div class="input-field-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          class="form-control"
+          placeholder="Password"
+          formControlName="password"
+          [class.is-invalid]="password?.invalid && password?.touched"
+        />
+      </div>
+      <div class="error-message" *ngIf="password?.invalid && password?.touched">
+        <p *ngIf="password?.errors?.['required']">* Password is required.</p>
+        <p *ngIf="password?.errors?.['pattern']">* The password pattern is not valid.</p>
+      </div>
+
+      <!-- Show Password Toggle -->
+      <div class="options-wrapper">
+        <label class="toggle-switch">
+          <input type="checkbox" (click)="togglePassword()">
+          <span class="slider"></span>
+        </label>
+        <span>Show Password</span>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-submit-glow" [disabled]="signupForm.invalid">
+        <span>Sign Up</span>
+      </button>
+
+      <!-- Footer Link -->
+      <div class="form-footer">
+        <p>Already have an account? <a routerLink="/login">Login</a></p>
+      </div>
+    </form>
+  </div>
+</div>

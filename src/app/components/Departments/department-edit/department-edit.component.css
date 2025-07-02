@@ -1,0 +1,309 @@
+/* ==========================================================================
+   1. GLOBAL THEME INHERITANCE
+   ========================================================================== */
+:host {
+  display: block;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ==========================================================================
+   2. PAGE LAYOUT AND HEADER
+   ========================================================================== */
+.page-container {
+  width: 100%;
+  max-width: 900px; /* Adjusted max-width for the form */
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.header-content h1 {
+  color: var(--text-color);
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.header-content h1 span {
+  color: var(--primary-accent);
+}
+
+.header-content p {
+  color: var(--subtle-text-color);
+  font-size: 1rem;
+  margin-top: 0.75rem;
+  max-width: 65ch;
+  line-height: 1.6;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--border-color); /* Light background for back button */
+  color: var(--text-color);
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--border-radius-pill);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  border: none; /* No border for a cleaner look */
+  cursor: pointer;
+  transition: all var(--transition-speed-normal) var(--easing-curve-sharp);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.back-btn:hover {
+  background-color: #D1D5DB; /* Slightly darker gray on hover */
+  transform: translateY(-3px);
+  box-shadow: var(--box-shadow-md);
+}
+
+.back-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ==========================================================================
+   3. STATE INDICATORS (Loading, Error, Empty)
+   ========================================================================== */
+
+.state-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 40vh;
+  text-align: center;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+.loading-text {
+  color: var(--subtle-text-color);
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--border-color);
+  border-top-color: var(--primary-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.status-box {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-large);
+  padding: 3rem 2rem;
+  background-color: var(--primary-accent-translucent);
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-box h2 {
+  color: var(--text-color);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.75rem;
+}
+
+.status-box h2 svg {
+  width: 30px;
+  height: 30px;
+  color: var(--primary-accent);
+}
+
+.status-box.error-state h2 svg {
+  color: var(--error-color);
+}
+
+.status-box p {
+  color: var(--subtle-text-color);
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================================================
+   4. EDIT FORM STYLES
+   ========================================================================== */
+
+.edit-form-container {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-large);
+  padding: 2.5rem;
+  box-shadow: var(--box-shadow-md);
+  margin-top: 1rem;
+}
+
+.department-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Space between form groups */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.95rem;
+  color: var(--subtle-text-color);
+  margin-bottom: 0.5rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all var(--transition-speed-fast) ease-in-out;
+  box-sizing: border-box; /* Include padding in width */
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px var(--primary-accent-translucent);
+}
+
+textarea.form-input {
+  min-height: 100px; /* Taller textarea */
+  resize: vertical;
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--primary-accent-translucent);
+  color: var(--primary-accent-hover);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-base);
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semibold);
+  margin-top: 1rem;
+}
+
+.success-message svg {
+  width: 20px;
+  height: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem; /* Space above action buttons */
+}
+
+.btn {
+  padding: 0.85rem 1.75rem;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-speed-normal) var(--easing-curve-sharp);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.btn-secondary:hover {
+  background-color: #D1D5DB;
+}
+
+.btn-primary {
+  background-color: var(--primary-accent);
+  color: white;
+  box-shadow: 0 4px 15px -5px var(--shadow-color-accent);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-accent-hover);
+  box-shadow: 0 6px 20px -5px var(--shadow-color-accent);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   5. ANIMATIONS & RESPONSIVENESS
+   ========================================================================== */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+/* You can add more animations if needed */
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 1.5rem;
+  }
+  .page-header .back-btn {
+    align-self: flex-end;
+  }
+  .page-container {
+    padding: 2rem 1rem;
+  }
+  .edit-form-container {
+    padding: 1.5rem;
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .form-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 2rem;
+  }
+  .back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

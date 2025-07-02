@@ -1,0 +1,268 @@
+/* --- Global CSS Variables (Ensure these are defined correctly in your styles.css or :root) --- */
+/*
+:root {
+  --primary-green: #1DB954; // The main green you want for text
+  --light-green-accent: #4CAF50; // For hover states
+  --white-bg: #ffffff;
+  --dark-text: #191414; // Text color in light mode
+  --very-light-text: #f0f0f0; // Fallback or for specific highlights if needed
+  --medium-gray-text: #5f6368; // Links in light mode
+
+  --light-border-color: #dee2e6;
+  --dark-border-color: #333333; // Or a very dark grey like #2a2a2a
+  --light-gray-bg: #f4f6f8;
+  --dark-bg-hover: #282828; // Darker hover for elements on very dark bg
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--white-bg);
+  color: var(--dark-text);
+  // ... other body styles
+}
+
+body.dark-theme-active {
+  background-color: #121212; // Very dark background (as per your image)
+  color: var(--primary-green); // Default body text in dark mode could also be green if desired globally
+  // ... other dark theme body styles
+}
+*/
+
+/* --- Footer Styling --- */
+.app-footer {
+  background-color: transparent; /* Essential for theme to show through */
+  padding: 40px 25px 20px;
+  font-family: var(--font-primary);
+  border-top: 1px solid var(--light-border-color);
+  transition: border-color 0.3s ease, color 0.3s ease;
+  color: #2b7f2e; /* Default text color for light mode */
+}
+
+/* Dark Mode Footer Styles - ALL TEXT GREEN */
+body.dark-theme-active .app-footer {
+  border-top-color: var(--dark-border-color); /* Border should be subtle dark grey */
+  color: var(--primary-green); /* <<< ALL general text in footer is now green for dark mode */
+}
+
+/* Links in footer */
+.app-footer a {
+  text-decoration: none;
+  transition: color var(--hover-transition-speed) ease, text-decoration var(--hover-transition-speed) ease;
+  color: var(--medium-gray-text); /* Link color in light mode */
+}
+body.dark-theme-active .app-footer a {
+  color: var(--primary-green); /* <<< Link color in dark mode - green */
+}
+/* Hover for links */
+.app-footer a:hover {
+  color: var(--primary-green); /* Link hover in light mode */
+  text-decoration: underline;
+}
+body.dark-theme-active .app-footer a:hover {
+  color: var(--light-green-accent); /* <<< Link hover in dark mode - lighter green */
+  text-decoration: underline;
+}
+
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 30px;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 220px;
+  margin-bottom: 20px;
+}
+
+/* Section Headings in footer */
+.footer-section h4 {
+  font-size: 1.1em;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--light-border-color);
+  position: relative;
+  transition: color 0.3s ease, border-color 0.3s ease;
+  color: #2b7f2e; /* Heading color in light mode */
+}
+body.dark-theme-active .footer-section h4 {
+  color: var(--primary-green); /* <<< Heading color in dark mode - green */
+  border-bottom-color: var(--dark-border-color); /* Subtle border */
+}
+.footer-section h4::after { /* Accent line under heading */
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 50px;
+  height: 2px;
+  background-color: var(--primary-green); /* Accent line always green */
+}
+
+/* Footer Logo */
+.footer-logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.8em;
+  font-weight: 700;
+  margin-bottom: 10px;
+  transition: color 0.3s ease;
+  color: #2b7f2e; /* Logo text color in light mode */
+}
+body.dark-theme-active .footer-logo {
+  color: var(--primary-green); /* <<< Logo text color in dark mode - green */
+}
+.footer-logo i { /* Logo icon */
+  margin-right: 12px;
+  color: var(--primary-green); /* Logo icon always green */
+}
+
+/* Paragraphs and List items in footer sections */
+.footer-section p,
+.footer-section ul li {
+  font-size: 0.9em;
+  line-height: 1.7;
+  margin-bottom: 8px;
+  /* Color will be inherited from .app-footer (which is green in dark mode) */
+}
+/* No specific override needed for dark mode as base .app-footer is green */
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.footer-section ul li i { /* Icons next to list items */
+  width: 20px;
+  margin-right: 8px;
+  color: var(--primary-green); /* List item icons always green */
+}
+
+/* Optional: If you still want tagline/mission slightly different but still visible */
+body.dark-theme-active .footer-section.brand-info .footer-tagline,
+body.dark-theme-active .footer-section.brand-info .footer-mission {
+  /* color: var(--light-green-accent); // Could use a slightly lighter green */
+  opacity: 0.9; /* Or just make them slightly less opaque if they are also primary green */
+}
+
+
+/* Social Media Icons */
+.footer-social-icons {
+  margin-top: 15px;
+}
+.footer-social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-size: 1.1em;
+  transition: background-color var(--hover-transition-speed) ease, color var(--hover-transition-speed) ease;
+  background-color: var(--light-gray-bg); /* Background in light mode */
+  color: var(--medium-gray-text); /* Icon color in light mode */
+}
+body.dark-theme-active .footer-social-icons a {
+  background-color: var(--dark-bg-hover); /* Subtle dark background for the icon container */
+  color: var(--primary-green); /* <<< Social icons themselves green in dark mode */
+}
+.footer-social-icons a:hover { /* Hover state for social icons */
+  background-color: var(--primary-green);
+  color: var(--white-bg) !important; /* Icon becomes white on green background */
+  text-decoration: none;
+}
+body.dark-theme-active .footer-social-icons a:hover {
+    background-color: var(--light-green-accent); /* Lighter green background on hover */
+    color: var(--white-bg) !important; /* Icon stays white */
+}
+
+
+/* Bottom part of the footer */
+.footer-bottom {
+  text-align: center;
+  padding-top: 25px;
+  border-top: 1px solid var(--light-border-color);
+  font-size: 0.85em;
+  transition: border-color 0.3s ease;
+  /* Color will be inherited from .app-footer (green in dark mode) */
+}
+body.dark-theme-active .footer-bottom {
+  border-top-color: var(--dark-border-color); /* Subtle border */
+}
+/* No specific color override needed for dark mode paragraphs here as base is green */
+
+.footer-bottom p {
+  margin: 5px 0;
+  line-height: 1.6;
+}
+.footer-bottom a { /* Links in the bottom part */
+  margin: 0 8px;
+  /* Color will be inherited from general footer link styles (green in dark mode) */
+}
+
+/* --- Responsive Footer (No changes needed for this specific color request, ensure it adapts well) --- */
+@media (max-width: 992px) {
+  .footer-container {
+    gap: 25px;
+  }
+  .footer-section {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-footer {
+    padding: 30px 20px 15px;
+  }
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .footer-section {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 25px;
+  }
+  .footer-section h4::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .footer-logo {
+    justify-content: center;
+  }
+  .footer-section ul {
+    display: inline-block;
+    text-align: left;
+  }
+  .footer-social-icons {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    padding: 25px 15px 10px;
+  }
+  .footer-section h4 {
+    font-size: 1em;
+  }
+  .footer-section p,
+  .footer-section ul li {
+    font-size: 0.85em;
+  }
+  .footer-bottom {
+    font-size: 0.8em;
+  }
+  .footer-social-icons a {
+    width: 32px;
+    height: 32px;
+    font-size: 1em;
+  }
+}

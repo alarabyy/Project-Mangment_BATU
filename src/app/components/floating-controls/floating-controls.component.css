@@ -1,0 +1,230 @@
+/* Ensure global CSS variables are defined in your styles.css or :root */
+/* Example:
+:root {
+  --primary-accent: #1DB954;
+  --secondary-accent: #4CAF50;
+  --bg-color: #ffffff; // Main page background
+  --text-color-primary: #191414; // Main text color
+  --surface-color: #f8f9fa; // For cards/popups in light mode
+  --border-color: #dee2e6; // Border color in light mode
+
+  // Dark mode overrides (applied via body.dark-theme-active)
+  // --bg-color-dark: #121212;
+  // --text-color-primary-dark: #e0e0e0;
+  // --surface-color-dark: #1e1e1e;
+  // --border-color-dark: #383838;
+}
+*/
+
+.floating-controls-container {
+  position: fixed;
+  bottom: 30px; /* Increased bottom spacing */
+  right: 30px;  /* Increased right spacing */
+  z-index: 1010; /* Ensure it's above most content but potentially below modals */
+  display: flex;
+  flex-direction: column-reverse; /* Options appear above main FAB */
+  align-items: center;
+}
+
+.fab-main {
+  background-color: var(--primary-accent);
+  color: white; /* Icon color for main FAB */
+  border: none;
+  border-radius: 50%;
+  width: 56px;  /* Slightly smaller FAB */
+  height: 56px;
+  font-size: 1.6em; /* Adjusted icon size */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); /* Softer shadow */
+  transition: transform 0.25s ease-in-out, background-color 0.25s ease-in-out;
+  outline: none;
+}
+
+.fab-main:hover {
+  transform: scale(1.08) rotate(15deg); /* More engaging hover */
+  background-color: var(--secondary-accent);
+}
+
+.floating-controls-container.active .fab-main {
+  transform: rotate(135deg); /* 'X' like rotation */
+}
+
+.fab-options {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end; /* Align options to the right, closer to where FAB is */
+  margin-bottom: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(15px) scale(0.95);
+  transition: opacity 0.25s ease-out, visibility 0s 0.25s, transform 0.25s ease-out;
+}
+
+.floating-controls-container.active .fab-options.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+  transition-delay: 0s, 0s, 0s; /* Ensure visibility delay is reset */
+}
+
+/* Common style for all option items (buttons and divs) */
+.fab-option-item {
+  background-color: var(--surface-color); /* Use themed surface color */
+  color: var(--text-color-primary);    /* Use themed text color */
+  border: 1px solid var(--border-color);    /* Use themed border color */
+  border-radius: 25px; /* Pill shape */
+  min-width: 48px; /* For icon-only buttons */
+  height: 48px;
+  padding: 0 20px; /* Horizontal padding for items with text */
+  margin-bottom: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center content if only icon, or handles space if text */
+  gap: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  font-size: 0.95em;
+  font-weight: 500;
+  white-space: nowrap;
+  outline: none;
+}
+
+.fab-option-item:last-child {
+  margin-bottom: 0;
+}
+
+.fab-option-item:hover {
+  transform: scale(1.05) translateX(-3px); /* Slight lift and move left */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-accent); /* Highlight border on hover */
+}
+
+.fab-option-item i {
+  font-size: 1.2em; /* Consistent icon size */
+  color: var(--primary-accent);
+  width: 20px;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+.fab-option-item span {
+    transition: color 0.3s ease;
+}
+
+/* Specific styling for buttons within fab-options to ensure consistency */
+.fab-options button.fab-option-item {
+  text-align: left; /* Align text for buttons with spans */
+  justify-content: flex-start;
+}
+
+/* Font Size Controls Group */
+.font-size-control-group {
+  justify-content: space-between;
+  min-width: 150px; /* Ensure enough width for +/- and percentage */
+}
+.font-adjust-btn { /* Individual +/- buttons */
+  background: transparent;
+  border: none;
+  color: var(--primary-accent);
+  font-size: 1.3em;
+  cursor: pointer;
+  padding: 0 8px; /* Padding for click area */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Fill height of parent item */
+}
+.font-adjust-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--text-color-secondary); /* Dim disabled color */
+}
+.font-size-display {
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+  /* Color inherited from .fab-option-item */
+}
+
+/* Digital Clock FAB Item */
+.digital-clock-fab {
+  min-width: 130px; /* Enough space for HH:MM:SS AM/PM */
+  justify-content: flex-start; /* Align clock icon and time to the start */
+}
+.digital-clock-fab i {
+  margin-right: 8px; /* Space between icon and time */
+}
+
+/* ASL AI Button Specific Styles */
+.asl-ai-fab {
+  /* Inherits common fab-option-item styles */
+  background: linear-gradient(45deg, #FF6F61, #DE473F); /* Warm, engaging gradient */
+  color: white; /* White text for contrast */
+  border: 1px solid #FF6F61;
+  box-shadow: 0 5px 15px rgba(255, 111, 97, 0.4); /* Soft shadow reflecting gradient */
+  position: relative; /* For the pseudo-element animation */
+  overflow: hidden; /* Hide overflow for the ripple effect */
+}
+
+.asl-ai-fab i {
+  color: white; /* Ensure icon is white */
+}
+
+.asl-ai-fab span {
+  color: white; /* Ensure text is white */
+  font-weight: 600;
+}
+
+.asl-ai-fab:hover {
+  transform: scale(1.08); /* More pronounced hover effect */
+  box-shadow: 0 8px 20px rgba(255, 111, 97, 0.6); /* Stronger shadow on hover */
+  border-color: #fff; /* White border on hover for emphasis */
+}
+
+/* Ripple effect on click for ASL AI button */
+.asl-ai-fab:active::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3); /* White ripple */
+  width: 0;
+  height: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: ripple 0.6s ease-out forwards;
+}
+
+@keyframes ripple {
+  from {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  to {
+    width: 200%; /* Expands beyond button size */
+    height: 200%;
+    opacity: 0;
+  }
+}
+.ask-ai-fab {
+  background-color: #28a745; /* Professional green */
+  color: #fff;
+  border: 1px solid #1e7e34;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.ask-ai-fab:hover {
+  background-color: #218838;
+  transform: scale(1.06) translateX(-3px);
+}
+
+.ask-ai-fab i {
+  color: #ffffff;
+}
+
+/* ... باقي التنسيقات موجودة بالفعل من الكود السابق ... */

@@ -1,0 +1,44 @@
+<main class="page-container">
+  <div class="form-wrapper">
+    <header class="form-header">
+      <h1 class="page-title">Create New Department</h1>
+      <p class="page-subtitle">Fill in the details for the new department.</p>
+    </header>
+
+    <form #departmentForm="ngForm" (ngSubmit)="onSubmit(departmentForm)" novalidate>
+      <div class="form-group">
+        <label for="name">Department Name</label>
+        <input type="text" id="name" name="name" class="form-input" placeholder="e.g., Computer Science" [(ngModel)]="departmentModel.name" #name="ngModel" required>
+        <div *ngIf="name.invalid && name.touched" class="validation-error">Name is required.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" class="form-input" placeholder="A brief description" [(ngModel)]="departmentModel.description" #description="ngModel" required></textarea>
+        <div *ngIf="description.invalid && description.touched" class="validation-error">Description is required.</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="facultyId">Faculty ID</label>
+          <input type="number" id="facultyId" name="facultyId" class="form-input" placeholder="e.g., 101" [(ngModel)]="departmentModel.facultyId" #facultyId="ngModel" required min="1">
+          <div *ngIf="facultyId.invalid && facultyId.touched" class="validation-error">Valid Faculty ID is required.</div>
+        </div>
+        <div class="form-group">
+          <label for="headId">Head ID</label>
+          <input type="number" id="headId" name="headId" class="form-input" placeholder="e.g., 202" [(ngModel)]="departmentModel.headId" #headId="ngModel" required min="1">
+          <div *ngIf="headId.invalid && headId.touched" class="validation-error">Valid Head ID is required.</div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading || departmentForm.invalid">
+        <span *ngIf="!isLoading">Create Department</span>
+        <span *ngIf="isLoading" class="loader"></span>
+      </button>
+
+      <div *ngIf="errorMessage" class="feedback-area alert-danger">
+        {{ errorMessage }}
+      </div>
+    </form>
+  </div>
+</main>

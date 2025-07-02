@@ -1,0 +1,68 @@
+<div class="container">
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-content">
+      <i class="fas fa-university header-icon"></i>
+      <h1 class="header-title">Faculties Dashboard</h1>
+    </div>
+    <button (click)="addFaculty()" class="btn btn-primary pulse-hover">
+      <i class="fas fa-plus-circle"></i>
+      <span>New Faculty</span>
+    </button>
+  </header>
+
+  <!-- Content Area -->
+  <main class="content">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="state-container fade-in">
+      <div class="spinner"></div>
+      <p class="state-text">Fetching data from server...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage" class="state-container error-message fade-in">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p class="state-text">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !errorMessage && faculties.length === 0" class="state-container fade-in">
+      <i class="fas fa-box-open"></i>
+      <p class="state-text">No faculties found. Let's create the first one!</p>
+    </div>
+
+    <!-- Data List -->
+    <div *ngIf="!isLoading && !errorMessage && faculties.length > 0" class="faculty-grid">
+      <div
+        *ngFor="let faculty of faculties; let i = index"
+        class="faculty-card fade-in-up"
+        [style.--item-index]="i"
+        [class.deleting]="deletingFacultyIds.has(faculty.id)">
+
+        <div class="card-header">
+          <h2 class="card-title">{{ faculty.name }}</h2>
+          <span class="card-id">#{{ faculty.id }}</span>
+        </div>
+
+        <div class="card-body">
+          <p class="card-description">{{ faculty.description }}</p>
+          <div class="card-dean-info">
+            <i class="fas fa-user-tie"></i>
+            <span><strong>Dean:</strong> {{ faculty.dean.name }}</span>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button (click)="editFaculty(faculty.id)" class="btn btn-secondary">
+            <i class="fas fa-pencil-alt"></i>
+            <span>Edit</span>
+          </button>
+          <button (click)="deleteFaculty(faculty.id)" class="btn btn-danger">
+            <i class="fas fa-trash-alt"></i>
+            <span>Delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
