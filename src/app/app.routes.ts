@@ -4,7 +4,7 @@ import { LoginComponent } from './components/login/login.component';
 import { MyProfileComponent } from './components/my-profile/my-profile.component';
 import { AddProjectComponent } from './components/add-project/add-project.component';
 import { PrivacyPolicyComponent } from './components/privacy/privacy.component';
-import { DocumentaionComponent } from './components/documentaion/documentaion.component';
+import { documentaionComponent } from './components/documentaion/documentaion.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DepartmentCreateComponent } from './components/Departments/department-create/department-create.component';
 import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
@@ -22,7 +22,7 @@ import { EditCategoryComponent } from './components/category/edit-category/edit-
 
 export const routes: Routes = [
   { path: 'Home', component: HomeComponent },
-  { path: 'Documentaion', component: DocumentaionComponent },
+  { path: 'documentaion', component: documentaionComponent },
   { path: 'Privacy', component: PrivacyPolicyComponent },
   { path: 'SignUp', component: SignUpComponent },
   { path: 'Login', component: LoginComponent },

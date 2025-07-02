@@ -1,11 +1,12 @@
 import { Component, AfterViewInit, ElementRef, OnDestroy, Renderer2, NgZone } from '@angular/core';
 
 @Component({
-  selector: 'app-Documentaion', // Corrected selector name
-  templateUrl: './Documentaion.component.html', // Corrected template URL
-  styleUrls: ['./Documentaion.component.css'] // Corrected style URL
+
+  selector: 'app-documentaion', // Corrected selector name
+  templateUrl: './documentaion.component.html', // Corrected template URL
+  styleUrls: ['./documentaion.component.css'] // Corrected style URL
 })
-export class DocumentaionComponent implements AfterViewInit, OnDestroy {
+export class documentaionComponent implements AfterViewInit, OnDestroy {
 
   // Properties for typing animation
   private subtitleText = "Borg El Arab Technological University Projects Platform";
