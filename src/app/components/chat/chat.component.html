@@ -1,3 +1,4 @@
+<!-- src/app/components/chat/chat.component.html -->
 <div class="ai-background-system">
   <div class="ai-particle-layer layer-1"></div>
   <div class="ai-particle-layer layer-2"></div>
@@ -10,26 +11,29 @@
   <div class="chat-container">
     <header class="chat-header">
       <div class="header-content">
-        <h2 style="color: rgb(18, 195, 44);">Project AI Assistant</h2>
+        <h2 style="color: chartreuse;">Project AI Assistant</h2>
         <div class="status">
           <span class="status-dot"></span>
-          <span style="color: rgb(23, 100, 34);"git --version
->Online & Active</span>
+          <span style="color: chartreuse;">Online & Active</span>
         </div>
       </div>
     </header>
 
     <main class="chat-messages" #scrollContainer>
-      <div *ngFor="let message of messages; let i = index;"
+      <div *ngFor="let message of messages"
            class="message-wrapper"
-           [ngClass]="{'user-wrapper': message.isUser, 'bot-wrapper': !message.isUser}"
-           [attr.data-message-type]="message.isUser ? 'user' : 'bot'">
-        <div class="message" [class.new-message-anim]="true">
+           [ngClass]="{'user-wrapper': message.isUser, 'bot-wrapper': !message.isUser}">
+        <div class="message">
+          <!-- استخدام [innerHTML] هنا قد يكون خطراً أمنياً (XSS) إذا كان النص يأتي من مصدر غير موثوق.
+               لكن بما أننا نتحكم في رسائل الخطأ، والنص من Gemini عادة ما يكون آمناً، يمكن استخدامه بحذر
+               لعرض التنسيق مثل الأسطر الجديدة. للأمان المطلق، استخدم <p>{{ message.text }}</p> فقط.
+               سأبقيها على <p> للأمان.
+          -->
           <p>{{ message.text }}</p>
         </div>
       </div>
 
-      <div *ngIf="isLoading" class="message-wrapper bot-wrapper" data-message-type="bot">
+      <div *ngIf="isLoading" class="message-wrapper bot-wrapper">
         <div class="message bot-typing-indicator">
           <div class="typing-dot"></div>
           <div class="typing-dot"></div>
