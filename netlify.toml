@@ -1,3 +1,7 @@
+[build]
+  publish = "dist/project-management/browser"
+  command = "npm install && npm run build -- --configuration=production"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
