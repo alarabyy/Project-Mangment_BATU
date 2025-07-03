@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { MyProfileComponent } from './components/my-profile/my-profile.component';
-import { AddProjectComponent } from './components/add-project/add-project.component';
+import { AddProjectComponent } from './components/project/add-project/add-project.component';
 import { PrivacyPolicyComponent } from './components/privacy/privacy.component';
 import { documentaionComponent } from './components/documentaion/documentaion.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
@@ -18,6 +18,8 @@ import { FacultyEditComponent } from './components/faculty/faculty-edit/faculty-
 import { CategoryListComponent } from './components/category/category-list/category-list.component';
 import { AddCategoryComponent } from './components/category/add-category/add-category.component';
 import { EditCategoryComponent } from './components/category/edit-category/edit-category.component';
+import { ProjectListComponent } from './components/project/project-list/project-list.component';
+import { EditProjectComponent } from './components/project/edit-project/edit-project.component';
 
 
 export const routes: Routes = [
@@ -43,7 +45,12 @@ export const routes: Routes = [
   { path: 'add-category', component: AddCategoryComponent },
   { path: 'categoryEdit/:id', component: EditCategoryComponent },
 
-  { path: 'CreateNewProject', component: AddProjectComponent },
+  // Category Routes (NEW)
+  { path: 'projects/add', component: AddProjectComponent },
+  { path: 'projects', component: ProjectListComponent },
+  { path: 'projects/edit/:id', component: EditProjectComponent },
+
+
   { path: 'Chat', component: ChatComponent },
 
   { path: '', redirectTo : 'Home' , pathMatch:'full'},

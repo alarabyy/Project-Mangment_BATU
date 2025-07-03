@@ -1,0 +1,92 @@
+.form-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius-large);
+  border: 1px solid var(--border-color);
+}
+.form-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-accent);
+}
+.form-group { margin-bottom: 1.5rem; }
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--subtle-text-color);
+}
+.form-control {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: border-color var(--transition-speed-fast), box-shadow var(--transition-speed-fast);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px var(--primary-accent-translucent);
+}
+.form-control.is-invalid {
+  border-color: var(--error-color);
+}
+.form-control.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(248, 81, 73, 0.25);
+}
+textarea.form-control { resize: vertical; min-height: 100px; }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 600px) {
+  .form-row { grid-template-columns: 1fr 1fr; }
+}
+.error-message {
+  color: var(--error-color);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color-translucent);
+}
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-speed-fast) var(--easing-curve-sharp);
+}
+.btn-primary {
+  background-color: var(--primary-accent);
+  color: var(--bg-color);
+}
+.btn-primary:hover {
+  background-color: var(--primary-accent-hover);
+}
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+  background-color: var(--surface-color);
+  border-color: var(--text-color);
+}
+.btn-primary:disabled {
+  background-color: var(--subtle-text-color);
+  cursor: not-allowed;
+}

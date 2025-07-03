@@ -1,0 +1,40 @@
+<div class="list-container">
+  <header class="list-header">
+    <h1>Project Dashboard</h1>
+    <a routerLink="/projects/add" class="btn btn-primary">
+      Add New Project
+    </a>
+  </header>
+
+  <div class="projects-grid">
+    <ng-container *ngIf="projects$ | async as projects; else loading">
+      <p *ngIf="projects.length === 0" class="empty-message">No projects found. Why not add one?</p>
+
+      <div class="project-card" *ngFor="let project of projects" [routerLink]="['/projects/edit', project.id]">
+        <div class="card-header">
+          <h3>{{ project.name }}</h3>
+          <span class="status-badge" [ngClass]="project.status | lowercase">{{ project.status }}</span>
+        </div>
+        <div class="card-body">
+          <p class="client-name">Client: {{ project.clientName }}</p>
+          <p class="description">{{ project.description || 'No description available.' }}</p>
+        </div>
+        <div class="card-footer">
+          <p class="dates">
+            Starts on: {{ project.startDate | date: 'mediumDate' }}
+          </p>
+          <div class="card-actions">
+            <button (click)="deleteProject(project.id, $event)" class="btn-icon btn-danger" title="Delete Project">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #loading>
+      <div class="loading-spinner"></div>
+      <p>Loading projects...</p>
+    </ng-template>
+  </div>
+</div>
