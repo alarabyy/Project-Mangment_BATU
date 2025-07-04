@@ -10,20 +10,46 @@
     <ng-container *ngIf="projects$ | async as projects; else loading">
       <p *ngIf="projects.length === 0" class="empty-message">No projects found. Why not add one?</p>
 
-      <div class="project-card" *ngFor="let project of projects" [routerLink]="['/projects/edit', project.id]">
+      <!-- routerLink removed from the main div. The card is no longer a link. -->
+      <div class="project-card" *ngFor="let project of projects">
+
+        <!-- Card Header: Title and Grade -->
         <div class="card-header">
-          <h3>{{ project.name }}</h3>
-          <span class="status-badge" [ngClass]="project.status | lowercase">{{ project.status }}</span>
+          <h3>{{ project.title }}</h3>
+          <span class="grade-badge">Grade: {{ project.grade }}</span>
         </div>
+
+        <!-- Card Body: Description and Problem Statement -->
         <div class="card-body">
-          <p class="client-name">Client: {{ project.clientName }}</p>
-          <p class="description">{{ project.description || 'No description available.' }}</p>
+          <div class="card-section">
+            <h4>Description</h4>
+            <p class="description">{{ project.description || 'No description available.' }}</p>
+          </div>
+          <div class="card-section">
+            <h4>Problem Statement</h4>
+            <p class="description">{{ project.problemStatement || 'Not specified.' }}</p>
+          </div>
         </div>
+
+        <!-- Details Section: Tech and Tools -->
+        <div class="card-details">
+            <p><strong>Technologies:</strong> {{ project.technologies }}</p>
+            <p><strong>Tools Used:</strong> {{ project.toolsUsed }}</p>
+        </div>
+
+        <!-- Card Footer: IDs and Actions -->
         <div class="card-footer">
-          <p class="dates">
-            Starts on: {{ project.startDate | date: 'mediumDate' }}
-          </p>
+          <div class="id-group">
+            <span title="Leader ID">L: {{ project.leaderId }}</span>
+            <span title="Category ID">C: {{ project.categoryId }}</span>
+            <span title="Department ID">D: {{ project.departmentId }}</span>
+          </div>
+
+          <!-- Actions section now contains both Edit and Delete buttons -->
           <div class="card-actions">
+            <a [routerLink]="['/projects/edit', project.id]" (click)="$event.stopPropagation()" class="btn-icon btn-edit" title="Edit Project">
+              Edit
+            </a>
             <button (click)="deleteProject(project.id, $event)" class="btn-icon btn-danger" title="Delete Project">
               Delete
             </button>

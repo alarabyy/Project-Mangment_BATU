@@ -1,16 +1,18 @@
-// src/app/components/project-list/project-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ProjectService } from '../../../Services/project.service';
-import { Project } from '../../../models/project';
+
+
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ProjectService } from '../../../Services/project.service';
+import { Project } from '../../../models/project';
 
 @Component({
   selector: 'app-project-list',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
   templateUrl: './project-list.component.html',
-  styleUrls: ['./project-list.component.css'],
-  imports: [CommonModule , RouterLink],
+  styleUrls: ['./project-list.component.css']
 })
 export class ProjectListComponent implements OnInit {
   projects$!: Observable<Project[]>;

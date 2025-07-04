@@ -2,55 +2,96 @@
   <h1>Create a New Project</h1>
 
   <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
-    <!-- Project Name -->
-    <div class="form-group">
-      <label for="name">Project Name</label>
-      <input type="text" id="name" formControlName="name" class="form-control" [class.is-invalid]="f['name'].invalid && f['name'].touched">
-      <div *ngIf="f['name'].invalid && (f['name'].dirty || f['name'].touched)" class="error-message">
-        <small *ngIf="f['name'].errors?.['required']">Project name is required.</small>
-        <small *ngIf="f['name'].errors?.['minlength']">Name must be at least 3 characters long.</small>
-      </div>
-    </div>
 
-    <!-- Client Name -->
+    <!-- Project Title -->
     <div class="form-group">
-      <label for="clientName">Client Name</label>
-      <input type="text" id="clientName" formControlName="clientName" class="form-control" [class.is-invalid]="f['clientName'].invalid && f['clientName'].touched">
-      <div *ngIf="f['clientName'].invalid && (f['clientName'].dirty || f['clientName'].touched)" class="error-message">
-        <small *ngIf="f['clientName'].errors?.['required']">Client name is required.</small>
+      <label for="title">Project Title</label>
+      <input type="text" id="title" formControlName="title" class="form-control" [class.is-invalid]="f['title'].invalid && f['title'].touched">
+      <div *ngIf="f['title'].touched && f['title'].errors" class="error-message">
+        <small *ngIf="f['title'].errors?.['required']">Project title is required.</small>
+        <small *ngIf="f['title'].errors?.['minlength']">Title must be at least 3 characters long.</small>
       </div>
     </div>
 
     <!-- Description -->
     <div class="form-group">
       <label for="description">Description</label>
-      <textarea id="description" formControlName="description" class="form-control" rows="4"></textarea>
+      <textarea id="description" formControlName="description" class="form-control" rows="3" [class.is-invalid]="f['description'].invalid && f['description'].touched"></textarea>
+      <div *ngIf="f['description'].touched && f['description'].errors" class="error-message">
+        <small *ngIf="f['description'].errors?.['required']">Description is required.</small>
+      </div>
     </div>
 
-    <!-- Dates -->
+    <!-- Problem Statement -->
+    <div class="form-group">
+      <label for="problemStatement">Problem Statement</label>
+      <textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3" [class.is-invalid]="f['problemStatement'].invalid && f['problemStatement'].touched"></textarea>
+      <div *ngIf="f['problemStatement'].touched && f['problemStatement'].errors" class="error-message">
+        <small *ngIf="f['problemStatement'].errors?.['required']">Problem Statement is required.</small>
+      </div>
+    </div>
+
+    <!-- Technologies -->
+    <div class="form-group">
+      <label for="technologies">Technologies Used</label>
+      <input type="text" id="technologies" formControlName="technologies" class="form-control" [class.is-invalid]="f['technologies'].invalid && f['technologies'].touched">
+      <div *ngIf="f['technologies'].touched && f['technologies'].errors" class="error-message">
+        <small *ngIf="f['technologies'].errors?.['required']">Technologies are required.</small>
+      </div>
+    </div>
+
+    <!-- Tools Used -->
+    <div class="form-group">
+      <label for="toolsUsed">Tools Used</label>
+      <input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control" [class.is-invalid]="f['toolsUsed'].invalid && f['toolsUsed'].touched">
+      <div *ngIf="f['toolsUsed'].touched && f['toolsUsed'].errors" class="error-message">
+        <small *ngIf="f['toolsUsed'].errors?.['required']">Tools used are required.</small>
+      </div>
+    </div>
+
+    <!-- Numeric Inputs in a row -->
     <div class="form-row">
+      <!-- Grade -->
       <div class="form-group">
-        <label for="startDate">Start Date</label>
-        <input type="date" id="startDate" formControlName="startDate" class="form-control" [class.is-invalid]="f['startDate'].invalid && f['startDate'].touched">
-         <div *ngIf="f['startDate'].invalid && (f['startDate'].dirty || f['startDate'].touched)" class="error-message">
-            <small *ngIf="f['startDate'].errors?.['required']">Start date is required.</small>
+        <label for="grade">Grade</label>
+        <input type="number" id="grade" formControlName="grade" class="form-control" [class.is-invalid]="f['grade'].invalid && f['grade'].touched">
+        <div *ngIf="f['grade'].touched && f['grade'].errors" class="error-message">
+          <small *ngIf="f['grade'].errors?.['required']">Grade is required.</small>
+          <small *ngIf="f['grade'].errors?.['min']">Grade cannot be negative.</small>
         </div>
       </div>
+
+      <!-- Leader ID -->
       <div class="form-group">
-        <label for="endDate">End Date (Optional)</label>
-        <input type="date" id="endDate" formControlName="endDate" class="form-control">
+        <label for="leaderId">Leader ID</label>
+        <input type="number" id="leaderId" formControlName="leaderId" class="form-control" [class.is-invalid]="f['leaderId'].invalid && f['leaderId'].touched">
+        <div *ngIf="f['leaderId'].touched && f['leaderId'].errors" class="error-message">
+          <small *ngIf="f['leaderId'].errors?.['required']">Leader ID is required.</small>
+          <small *ngIf="f['leaderId'].errors?.['pattern']">Leader ID must be a valid number.</small>
+        </div>
       </div>
     </div>
 
-     <!-- Status -->
-    <div class="form-group">
-      <label for="status">Status</label>
-      <select id="status" formControlName="status" class="form-control">
-        <option value="Not Started">Not Started</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Completed">Completed</option>
-        <option value="On Hold">On Hold</option>
-      </select>
+    <div class="form-row">
+      <!-- Category ID -->
+      <div class="form-group">
+        <label for="categoryId">Category ID</label>
+        <input type="number" id="categoryId" formControlName="categoryId" class="form-control" [class.is-invalid]="f['categoryId'].invalid && f['categoryId'].touched">
+        <div *ngIf="f['categoryId'].touched && f['categoryId'].errors" class="error-message">
+          <small *ngIf="f['categoryId'].errors?.['required']">Category ID is required.</small>
+          <small *ngIf="f['categoryId'].errors?.['pattern']">Category ID must be a valid number.</small>
+        </div>
+      </div>
+
+      <!-- Department ID -->
+      <div class="form-group">
+        <label for="departmentId">Department ID</label>
+        <input type="number" id="departmentId" formControlName="departmentId" class="form-control" [class.is-invalid]="f['departmentId'].invalid && f['departmentId'].touched">
+        <div *ngIf="f['departmentId'].touched && f['departmentId'].errors" class="error-message">
+          <small *ngIf="f['departmentId'].errors?.['required']">Department ID is required.</small>
+          <small *ngIf="f['departmentId'].errors?.['pattern']">Department ID must be a valid number.</small>
+        </div>
+      </div>
     </div>
 
     <!-- Action Buttons -->
