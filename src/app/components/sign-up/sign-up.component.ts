@@ -1,43 +1,69 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService, UserRegistration } from '../../Services/auth.service';
+
 
 @Component({
-  selector: 'app-signup',
+  selector: 'app-sign-up',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './sign-up.component.html',
-  styleUrls: ['./sign-up.component.css'], // Remove or comment out if not needed
-  imports: [CommonModule , ReactiveFormsModule ] // Add any necessary imports here
+  styleUrls: ['./sign-up.component.css']
 })
 export class SignUpComponent implements OnInit {
   signupForm!: FormGroup;
   showPassword = false;
+  isSubmitting = false;
+  errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      middleName: ['', Validators.required],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      gender: ['0', Validators.required], // Default to '0' (Male)
+      role: ['0', Validators.required],   // Default to '0' (Student)
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern(/^[0-9]{3,8}[a-zA-Z]{3,8}$/)]]
+      password: ['', [Validators.required, Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')]]
     });
   }
 
-  // Getters for easier template access
-  get name() { return this.signupForm.get('name'); }
-  get email() { return this.signupForm.get('email'); }
-  get password() { return this.signupForm.get('password'); }
+  get f() { return this.signupForm.controls; }
 
-  // Method to toggle password visibility
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  // Method to handle form submission
   submitSignup(): void {
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
       return;
     }
-    console.log('Signup form submitted:', this.signupForm.value);
+
+    this.isSubmitting = true;
+    this.errorMessage = null;
+    const userData: UserRegistration = this.signupForm.value;
+
+    this.authService.register(userData).subscribe({
+      next: (response) => {
+        console.log('Registration successful!', response);
+        this.router.navigate(['/login']); // Redirect to login on success
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'An unknown error occurred during registration.';
+        this.isSubmitting = false;
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      }
+    });
   }
 }

@@ -1,83 +1,84 @@
-<!-- Main container for the authentication page -->
 <div class="auth-page-container">
-  <!-- "Grid Scan" animated background -->
+  <div class="aurora-background"></div>
   <div class="animated-grid-background"></div>
 
-  <!-- The main authentication form container -->
   <div class="auth-form-container">
-    <!-- Header Section -->
     <div class="form-header">
       <div class="header-icon-wrapper">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m0 10c2.7 0 5.8 1.29 6 2H6c.23-.72 3.31-2 6-2m0-12C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+        <!-- New Professional User-Plus Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="user-plus-icon">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm7-1h-2v-2h-2v2h-2v2h2v2h2v-2h2v-2z"></path>
+        </svg>
       </div>
       <h2>Create Account</h2>
       <p>Join the platform to manage your projects</p>
     </div>
 
-    <!-- The Angular Reactive Form -->
     <form [formGroup]="signupForm" (ngSubmit)="submitSignup()" class="auth-form">
-      <!-- Name Field -->
-      <div class="input-field-wrapper">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Full Name"
-          formControlName="name"
-          [class.is-invalid]="name?.invalid && name?.touched"
-        />
+      <!-- Name Fields Row -->
+      <div class="form-row">
+        <div class="input-field-wrapper">
+          <input id="firstName" type="text" class="form-control" placeholder=" " formControlName="firstName" [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched"/>
+          <label for="firstName">First Name</label>
+        </div>
+        <div class="input-field-wrapper">
+          <input id="middleName" type="text" class="form-control" placeholder=" " formControlName="middleName" [class.is-invalid]="f['middleName'].invalid && f['middleName'].touched"/>
+          <label for="middleName">Middle Name</label>
+        </div>
+        <div class="input-field-wrapper">
+          <input id="lastName" type="text" class="form-control" placeholder=" " formControlName="lastName" [class.is-invalid]="f['lastName'].invalid && f['lastName'].touched"/>
+          <label for="lastName">Last Name</label>
+        </div>
       </div>
-      <div class="error-message" *ngIf="name?.invalid && name?.touched">
-        <p *ngIf="name?.errors?.['required']">* Name is required.</p>
-        <p *ngIf="name?.errors?.['minlength']">* Minimum length is 3 characters.</p>
+
+      <!-- Gender & Role Radio Groups Row -->
+      <div class="form-row">
+        <div class="radio-group-wrapper">
+          <label class="radio-group-label">Gender</label>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" value="0" formControlName="gender"><span>Male</span></label>
+            <label class="radio-option"><input type="radio" value="1" formControlName="gender"><span>Female</span></label>
+          </div>
+        </div>
+        <div class="radio-group-wrapper">
+          <label class="radio-group-label">Role</label>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" value="0" formControlName="role"><span>Student</span></label>
+            <label class="radio-option"><input type="radio" value="1" formControlName="role"><span>Doctor</span></label>
+          </div>
+        </div>
       </div>
 
       <!-- Email Field -->
       <div class="input-field-wrapper">
-        <input
-          type="email"
-          class="form-control"
-          placeholder="University Email"
-          formControlName="email"
-          [class.is-invalid]="email?.invalid && email?.touched"
-        />
-      </div>
-      <div class="error-message" *ngIf="email?.invalid && email?.touched">
-        <p *ngIf="email?.errors?.['required']">* Email is required.</p>
-        <p *ngIf="email?.errors?.['email']">* This email is not valid.</p>
+        <input id="email" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="f['email'].invalid && f['email'].touched"/>
+        <label for="email">University Email</label>
       </div>
 
       <!-- Password Field -->
       <div class="input-field-wrapper">
-        <input
-          [type]="showPassword ? 'text' : 'password'"
-          class="form-control"
-          placeholder="Password"
-          formControlName="password"
-          [class.is-invalid]="password?.invalid && password?.touched"
-        />
+        <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="password" [class.is-invalid]="f['password'].invalid && f['password'].touched"/>
+        <label for="password">Password</label>
       </div>
-      <div class="error-message" *ngIf="password?.invalid && password?.touched">
-        <p *ngIf="password?.errors?.['required']">* Password is required.</p>
-        <p *ngIf="password?.errors?.['pattern']">* The password pattern is not valid.</p>
+      <div class="error-message" *ngIf="f['password'].invalid && f['password'].touched">
+        <p *ngIf="f['password'].errors?.['pattern']">* At least 8 characters, one letter, and one number required.</p>
       </div>
 
-      <!-- Show Password Toggle -->
       <div class="options-wrapper">
-        <label class="toggle-switch">
-          <input type="checkbox" (click)="togglePassword()">
-          <span class="slider"></span>
-        </label>
+        <label class="toggle-switch"><input type="checkbox" (click)="togglePassword()"><span class="slider"></span></label>
         <span>Show Password</span>
       </div>
 
-      <!-- Submit Button -->
-      <button type="submit" class="btn-submit-glow" [disabled]="signupForm.invalid">
-        <span>Sign Up</span>
+      <div *ngIf="errorMessage" class="server-error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-submit-glow" [disabled]="signupForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Creating Account...' : 'Sign Up' }}
       </button>
 
-      <!-- Footer Link -->
       <div class="form-footer">
-        <p>Already have an account? <a routerLink="/login">Login</a></p>
+        <p>Already have an account? <a routerLink="/login">Secure Login</a></p>
       </div>
     </form>
   </div>
