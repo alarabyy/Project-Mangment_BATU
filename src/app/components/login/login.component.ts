@@ -1,9 +1,10 @@
+// src/app/components/login/login.component.ts
+
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, UserCredentials } from '../../Services/auth.service';
-
 
 @Component({
   selector: 'app-login',
@@ -20,11 +21,15 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.redirectToDashboard();
+    }
+
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -49,16 +54,36 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        console.log('Login successful!', response);
-        this.router.navigate(['/projects']);
+        // ======================= التشخيص الحاسم هنا =======================
+        console.log('--- LOGIN API RESPONSE ---', response);
+        // =================================================================
+
+        console.log('Login successful!');
+        this.redirectToDashboard();
       },
       error: (err) => {
-        this.errorMessage = 'Invalid email or password. Please try again.';
+        this.errorMessage = err.error?.message || 'Invalid email or password. Please try again.';
         this.isSubmitting = false;
       },
       complete: () => {
         this.isSubmitting = false;
       }
     });
+  }
+
+  private redirectToDashboard(): void {
+    const role = this.authService.getRole()?.toLowerCase();
+    switch (role) {
+      case 'admin':
+        this.router.navigate(['/FacultyList']);
+        break;
+      case 'doctor':
+      case 'student':
+        this.router.navigate(['/projects']);
+        break;
+      default:
+        this.router.navigate(['/Home']);
+        break;
+    }
   }
 }

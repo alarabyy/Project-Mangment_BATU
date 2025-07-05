@@ -1,3 +1,4 @@
+<!-- src/app/components/sign-up/sign-up.component.html -->
 <div class="auth-page-container">
   <div class="aurora-background"></div>
   <div class="animated-grid-background"></div>
@@ -5,7 +6,6 @@
   <div class="auth-form-container">
     <div class="form-header">
       <div class="header-icon-wrapper">
-        <!-- New Professional User-Plus Icon -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="user-plus-icon">
           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm7-1h-2v-2h-2v2h-2v2h2v2h2v-2h2v-2z"></path>
         </svg>
@@ -15,7 +15,6 @@
     </div>
 
     <form [formGroup]="signupForm" (ngSubmit)="submitSignup()" class="auth-form">
-      <!-- Name Fields Row -->
       <div class="form-row">
         <div class="input-field-wrapper">
           <input id="firstName" type="text" class="form-control" placeholder=" " formControlName="firstName" [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched"/>
@@ -31,7 +30,6 @@
         </div>
       </div>
 
-      <!-- Gender & Role Radio Groups Row -->
       <div class="form-row">
         <div class="radio-group-wrapper">
           <label class="radio-group-label">Gender</label>
@@ -41,7 +39,7 @@
           </div>
         </div>
         <div class="radio-group-wrapper">
-          <label class="radio-group-label">Role</label>
+          <label class="radio-group-label">I am a</label>
           <div class="radio-group">
             <label class="radio-option"><input type="radio" value="0" formControlName="role"><span>Student</span></label>
             <label class="radio-option"><input type="radio" value="1" formControlName="role"><span>Doctor</span></label>
@@ -49,13 +47,11 @@
         </div>
       </div>
 
-      <!-- Email Field -->
       <div class="input-field-wrapper">
         <input id="email" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="f['email'].invalid && f['email'].touched"/>
         <label for="email">University Email</label>
       </div>
 
-      <!-- Password Field -->
       <div class="input-field-wrapper">
         <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="password" [class.is-invalid]="f['password'].invalid && f['password'].touched"/>
         <label for="password">Password</label>
@@ -78,7 +74,7 @@
       </button>
 
       <div class="form-footer">
-        <p>Already have an account? <a routerLink="/login">Secure Login</a></p>
+        <p>Already have an account? <a routerLink="/Login">Login</a></p>
       </div>
     </form>
   </div>

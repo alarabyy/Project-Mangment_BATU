@@ -1,0 +1,136 @@
+/* src/app/components/unauthorized/unauthorized.component.css */
+
+/* --- 1. LAYOUT & BACKGROUND ANIMATIONS (Inherited) --- */
+/* هذه الأنماط موروثة من ملفات الـ CSS الأخرى لديك */
+:host {
+  display: flex; justify-content: center; align-items: center;
+  width: 100vw; min-height: 100vh; padding: 2rem 1rem;
+  background-color: var(--bg-color); position: relative; overflow: hidden;
+  color: var(--text-color);
+  font-family: var(--font-family-base);
+}
+
+.aurora-background {
+  position: absolute; top: 50%; left: 50%; width: 150vmax; height: 150vmax;
+  transform: translate(-50%, -50%); z-index: 0;
+  background: radial-gradient(ellipse at center, var(--primary-accent-translucent) 0%, transparent 40%),
+              radial-gradient(ellipse at center, rgba(248, 81, 73, 0.1) 0%, transparent 40%); /* Using error color */
+  animation: aurora-sway 25s ease-in-out infinite alternate;
+}
+
+.animated-grid-background {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+  background-image: linear-gradient(var(--border-color-translucent) 1px, transparent 1px),
+                    linear-gradient(to right, var(--border-color-translucent) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+}
+
+@keyframes aurora-sway {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
+/* --- 2. CONTENT CONTAINER --- */
+.unauthorized-container {
+  position: relative; z-index: 2; width: 100%; max-width: 500px;
+  padding: 3rem; text-align: center;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--box-shadow-lg);
+  backdrop-filter: blur(10px);
+  animation: enter-container 1s var(--easing-curve-elegant) forwards;
+}
+
+.icon-wrapper {
+  width: 80px; height: 80px; margin: 0 auto 1.5rem;
+  background: transparent; border: 2px solid var(--error-color); /* استخدام لون الخطأ */
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: var(--error-color);
+}
+.lock-icon {
+  width: 45px; height: 45px;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: var(--error-color);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 10px rgba(248, 81, 73, 0.3);
+}
+
+.message {
+  color: var(--subtle-text-color);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+
+/* --- 3. ACTIONS & FOOTER --- */
+.actions-wrapper {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.btn-action {
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius-base);
+  border: none;
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-speed-fast) var(--easing-curve-sharp);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary-glow {
+  background: var(--primary-accent);
+  color: #000;
+}
+.btn-primary-glow:hover {
+  background: var(--primary-accent-hover);
+  box-shadow: 0 5px 20px var(--shadow-color-accent);
+  transform: translateY(-3px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--subtle-text-color);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+  background: var(--surface-color-hover);
+  border-color: var(--primary-accent);
+  color: var(--primary-accent);
+}
+
+.footer-note {
+  font-size: 0.9rem;
+  color: var(--subtle-text-color);
+}
+.footer-note a {
+  color: var(--primary-accent);
+  text-decoration: none;
+}
+.footer-note a:hover {
+  text-decoration: underline;
+}
+
+/* --- 4. ANIMATIONS --- */
+@keyframes enter-container {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .unauthorized-container { padding: 2rem 1.5rem; }
+  .title { font-size: 2rem; }
+  .actions-wrapper { flex-direction: column; }
+}

@@ -1,9 +1,10 @@
+// src/app/components/sign-up/sign-up.component.ts
+
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, UserRegistration } from '../../Services/auth.service';
-
 
 @Component({
   selector: 'app-sign-up',
@@ -29,8 +30,8 @@ export class SignUpComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       middleName: ['', Validators.required],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      gender: ['0', Validators.required], // Default to '0' (Male)
-      role: ['0', Validators.required],   // Default to '0' (Student)
+      gender: ['0', Validators.required],
+      role: ['0', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')]]
     });
@@ -50,15 +51,31 @@ export class SignUpComponent implements OnInit {
 
     this.isSubmitting = true;
     this.errorMessage = null;
-    const userData: UserRegistration = this.signupForm.value;
 
-    this.authService.register(userData).subscribe({
-      next: (response) => {
-        console.log('Registration successful!', response);
-        this.router.navigate(['/login']); // Redirect to login on success
+    const formValues = this.signupForm.value;
+    const payload: UserRegistration = {
+      firstName: formValues.firstName,
+      middleName: formValues.middleName,
+      lastName: formValues.lastName,
+      email: formValues.email,
+      password: formValues.password,
+      gender: +formValues.gender,
+      role: +formValues.role
+    };
+
+    this.authService.register(payload).subscribe({
+      next: () => {
+        alert('Account created successfully! Please log in.');
+        this.router.navigate(['/Login']);
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'An unknown error occurred during registration.';
+        console.error('Registration failed:', err);
+        if (err.error && typeof err.error === 'object') {
+          const validationErrors = err.error.errors ? Object.values(err.error.errors).flat().join(' ') : null;
+          this.errorMessage = validationErrors || err.error.message || err.error.title || 'An unknown error occurred.';
+        } else {
+          this.errorMessage = 'An unknown server error occurred.';
+        }
         this.isSubmitting = false;
       },
       complete: () => {

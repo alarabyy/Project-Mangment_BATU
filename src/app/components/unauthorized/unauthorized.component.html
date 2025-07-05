@@ -1,0 +1,35 @@
+<!-- src/app/components/unauthorized/unauthorized.component.html -->
+
+<div class="auth-page-container">
+  <!-- نفس الخلفيات المتحركة لتناسق التصميم -->
+  <div class="aurora-background"></div>
+  <div class="animated-grid-background"></div>
+
+  <div class="unauthorized-container">
+    <div class="icon-wrapper">
+      <!-- أيقونة "ممنوع" أو "قفل" مناسبة -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="lock-icon">
+        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"></path>
+      </svg>
+    </div>
+
+    <h2 class="title">Access Denied</h2>
+    <p class="message">
+      Sorry, you do not have the necessary permissions to access this page.
+      Your current role does not grant you access.
+    </p>
+
+    <div class="actions-wrapper">
+      <button class="btn-action btn-primary-glow" (click)="goToHome()">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+      <button class="btn-action btn-secondary" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Go Back
+      </button>
+    </div>
+
+    <div class="footer-note">
+      If you believe this is an error, please contact the .
+    </div>
+  </div>
+</div>

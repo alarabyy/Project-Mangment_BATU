@@ -1,58 +1,61 @@
+// src/app/app.routes.ts
+
 import { Routes } from '@angular/router';
+import { RoleGuard } from './guards/role.guard';
+
+// --- Import Components ---
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { MyProfileComponent } from './components/my-profile/my-profile.component';
-import { AddProjectComponent } from './components/project/add-project/add-project.component';
 import { PrivacyPolicyComponent } from './components/privacy/privacy.component';
 import { documentaionComponent } from './components/documentaion/documentaion.component';
-import { SignUpComponent } from './components/sign-up/sign-up.component';
+import { ChatComponent } from './components/chat/chat.component';
 import { DepartmentCreateComponent } from './components/Departments/department-create/department-create.component';
 import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
-import { ChatComponent } from './components/chat/chat.component';
-import { FacultyListComponent } from './components/faculty/faculty-list/faculty-list.component';
 import { DepartmentEditComponent } from './components/Departments/department-edit/department-edit.component';
+import { FacultyListComponent } from './components/faculty/faculty-list/faculty-list.component';
 import { AddFacultyComponent } from './components/faculty/add-faculty/add-faculty.component';
 import { FacultyEditComponent } from './components/faculty/faculty-edit/faculty-edit.component';
-
-// New Category Components
 import { CategoryListComponent } from './components/category/category-list/category-list.component';
 import { AddCategoryComponent } from './components/category/add-category/add-category.component';
 import { EditCategoryComponent } from './components/category/edit-category/edit-category.component';
+import { AddProjectComponent } from './components/project/add-project/add-project.component';
 import { ProjectListComponent } from './components/project/project-list/project-list.component';
 import { EditProjectComponent } from './components/project/edit-project/edit-project.component';
-
+import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
+  // 1. Public Routes
   { path: 'Home', component: HomeComponent },
   { path: 'documentaion', component: documentaionComponent },
   { path: 'Privacy', component: PrivacyPolicyComponent },
   { path: 'SignUp', component: SignUpComponent },
   { path: 'Login', component: LoginComponent },
-  { path: 'MyProfile', component: MyProfileComponent },
+  { path: 'unauthorized', component: UnauthorizedComponent },
 
-  // Faculty Routes
-  { path: 'FacultyList', component: FacultyListComponent },
-  { path: 'add-faculty', component: AddFacultyComponent },
-  { path: 'facultyEdit/:id', component: FacultyEditComponent },
+  // 2. Shared Protected Routes
+  { path: 'projects/add', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'projects', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
+  { path: 'projects/edit/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
 
-  // Department Routes (existing)
-  { path: 'Departments', component: DepartmentCreateComponent },
-  { path: 'DepartmentsList', component: DepartmentListComponent },
-  { path: 'departmentEdit/:id', component: DepartmentEditComponent },
+  { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
+  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
 
-  // Category Routes (NEW)
-  { path: 'CategoryList', component: CategoryListComponent },
-  { path: 'add-category', component: AddCategoryComponent },
-  { path: 'categoryEdit/:id', component: EditCategoryComponent },
+  // 3. Admin-Only Routes
+  { path: 'FacultyList', component: FacultyListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'add-faculty', component: AddFacultyComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'facultyEdit/:id', component: FacultyEditComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
-  // Category Routes (NEW)
-  { path: 'projects/add', component: AddProjectComponent },
-  { path: 'projects', component: ProjectListComponent },
-  { path: 'projects/edit/:id', component: EditProjectComponent },
+  { path: 'Departments', component: DepartmentCreateComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'DepartmentsList', component: DepartmentListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'departmentEdit/:id', component: DepartmentEditComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
+  { path: 'CategoryList', component: CategoryListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'add-category', component: AddCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'categoryEdit/:id', component: EditCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
-  { path: 'Chat', component: ChatComponent },
-
-  { path: '', redirectTo : 'Home' , pathMatch:'full'},
-  { path: '**', component: HomeComponent }, // Fallback route
+  // 5. Redirects & Fallback Route
+  { path: '', redirectTo: 'Home', pathMatch: 'full' },
+  { path: '**', component: HomeComponent },
 ];

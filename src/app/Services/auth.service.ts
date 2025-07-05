@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs'; // Import 'tap'
-import { environment } from '../environments/environment';
+// src/app/Services/auth.service.ts
 
-// واجهة لبيانات التسجيل
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
+
+// الواجهة التي يتوقعها الـ API عند إنشاء حساب
 export interface UserRegistration {
-  // ... (from previous step)
   firstName: string;
   middleName: string;
   lastName: string;
@@ -15,67 +18,98 @@ export interface UserRegistration {
   password: string;
 }
 
-// واجهة لبيانات تسجيل الدخول
+// الواجهة التي يتوقعها الـ API عند تسجيل الدخول
 export interface UserCredentials {
   email: string;
   password: string;
 }
 
-// واجهة لاستجابة تسجيل الدخول التي تحتوي على التوكن
-export interface AuthResponse {
+// الواجهة التي يرجعها الـ API عند تسجيل الدخول
+export interface LoginResponse {
   token: string;
-  // you might have other properties like 'expiresIn', 'user', etc.
+}
+
+// الواجهة التي يرجعها الـ API لصفحة البروفايل
+export interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: number; // الدور يأتي كرقم من API البروفايل
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
-  private readonly TOKEN_KEY = 'auth_token'; // Key for localStorage
+  private authUrl = 'https://batuprojects.runasp.net/api/Auth';
+  private userUrl = 'https://batuprojects.runasp.net/api/User';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   register(userData: UserRegistration): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+    return this.http.post(`${this.authUrl}/register`, userData);
   }
 
-  /**
-   * Logs in a user and stores the token upon success.
-   * @param credentials The user's email and password.
-   * @returns An Observable of the server's response.
-   */
-  login(credentials: UserCredentials): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      // Use the 'tap' operator to perform a side effect (saving the token)
-      tap(response => {
-        if (response && response.token) {
-          localStorage.setItem(this.TOKEN_KEY, response.token);
-        }
-      })
-    );
+  login(credentials: UserCredentials): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.authUrl}/login`, credentials)
+      .pipe(
+        tap(response => {
+          if (response.token) {
+            localStorage.setItem('authToken', response.token);
+          }
+        })
+      );
   }
 
-  /**
-   * Logs out the user by removing the token.
-   */
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem('authToken');
+    this.router.navigate(['/Login']);
   }
 
-  /**
-   * Gets the authentication token from localStorage.
-   * @returns The token string or null if not found.
-   */
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  /**
-   * Checks if the user is currently authenticated.
-   * @returns True if a token exists, false otherwise.
-   */
-  isAuthenticated(): boolean {
+  isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('authToken');
+  }
+
+  private getDecodedToken(): any {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      return jwtDecode(token);
+    } catch (error) { return null; }
+  }
+
+  // يقرأ الدور كنص من التوكن (لصالح الـ Guard والـ Navbar)
+  getRole(): string | null {
+    const decodedToken = this.getDecodedToken();
+    if (!decodedToken) return null;
+
+    let role = decodedToken.role;
+    if (Array.isArray(role)) { role = role[0]; }
+
+    if (role && role.toLowerCase() === 'professor') {
+      return 'doctor'; // ترجمة 'Professor' إلى 'doctor'
+    }
+
+    return role ? role.toLowerCase() : null;
+  }
+
+  // يقرأ ID المستخدم من التوكن
+  getUserId(): string | null {
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken.nameid : null;
+  }
+
+  // يطلب البروفايل من الـ API
+  getUserProfileFromApi(): Observable<UserProfile> {
+    const userId = this.getUserId();
+    if (!userId) return of({} as UserProfile);
+
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${this.getToken()}` });
+    return this.http.get<UserProfile>(`${this.userUrl}/profile/${userId}`, { headers });
   }
 }
