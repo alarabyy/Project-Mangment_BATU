@@ -1,12 +1,11 @@
 // File: src/app/services/auth.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, tap, of } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 
-// الواجهة الآن تطابق تمامًا ما يرسله الـ API
 export interface UserProfile {
   id: number;
   email: string;
@@ -25,9 +24,7 @@ export interface LoginResponse {
 })
 export class AuthService {
   private authApiUrl = 'https://batuprojects.runasp.net/api/auth';
-  // ================= 🔽 المسار الصحيح هنا 🔽 =================
   private userApiUrl = 'https://batuprojects.runasp.net/api/user';
-  // ==========================================================
   private authTokenKey = 'authToken';
 
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
@@ -49,7 +46,7 @@ export class AuthService {
     }
   }
 
-  // --- API Communication Methods ---
+  // --- API Methods ---
   public register(userData: any): Observable<any> {
     return this.http.post(`${this.authApiUrl}/register`, userData);
   }
@@ -65,22 +62,20 @@ export class AuthService {
     );
   }
 
-  // ================= 🔽 تم تعديل هذه الدالة بشكل كامل 🔽 =================
   public getUserProfileFromApi(): Observable<UserProfile> {
-    const userId = this.getUserId();
+    // ================= 🔽 تم تعديل هذه الدالة لتكون أكثر مرونة 🔽 =================
+    const userId = this.getUserIdFromToken();
+
     if (!userId) {
-      console.error("[AuthService] getUserProfileFromApi: Cannot fetch profile, User ID not found in token.");
-      return new Observable(observer => {
-        observer.error('User ID not found in token.');
-        observer.complete();
-      });
+      const errorMessage = "[AuthService] Cannot fetch profile, User ID claim not found in token.";
+      console.error(errorMessage);
+      return new Observable(observer => observer.error(errorMessage));
     }
 
-    // بناء المسار الديناميكي الصحيح باستخدام ID المستخدم
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
-    console.log(`[AuthService] Fetching profile from: ${profileUrl}`); // للتشخيص
+    console.log(`[AuthService] Fetching profile from: ${profileUrl}`);
 
-    return this.http.get<UserProfile>(profileUrl);
+    return this.http.get<UserProfile>(profileUrl, { headers: this.getAuthHeaders() });
   }
   // ====================================================================
 
@@ -100,27 +95,38 @@ export class AuthService {
     return localStorage.getItem(this.authTokenKey);
   }
 
-  public getUserId(): string | null {
+  private getDecodedToken(): any | null {
     const token = this.getToken();
     if (!token) return null;
     try {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || decodedToken.sub || null;
+      return jwtDecode(token);
     } catch (error) {
       return null;
     }
   }
 
+  // ================= 🔽 دالة جديدة تبحث عن كل الأسماء المحتملة 🔽 =================
+  private getUserIdFromToken(): string | null {
+    const decodedToken = this.getDecodedToken();
+    if (!decodedToken) return null;
+
+    // ابحث عن الـ ID بأشهر الأسماء المحتملة بالترتيب
+    const userId =
+      decodedToken.id || // الاسم المباشر
+      decodedToken.sub || // الاسم القياسي في JWT
+      decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || // الاسم القياسي في .NET
+      decodedToken.nameid; // اسم آخر شائع
+
+    return userId || null;
+  }
+  // ======================================================================
+
   public getUserRole(): string | null {
-    const token = this.getToken();
-    if (!token) return null;
-    try {
-      const decodedToken: any = jwtDecode(token);
-      const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decodedToken['role'];
-      return role ? role.toLowerCase() : null;
-    } catch (error) {
-      return null;
-    }
+    const decodedToken = this.getDecodedToken();
+    if (!decodedToken) return null;
+
+    const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decodedToken['role'];
+    return role ? role.toLowerCase() : null;
   }
 
   private isTokenExpired(token: string): boolean {
@@ -130,5 +136,13 @@ export class AuthService {
     } catch (err) {
       return true;
     }
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    if (token) {
+      return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    }
+    return new HttpHeaders();
   }
 }
