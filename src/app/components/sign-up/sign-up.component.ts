@@ -1,4 +1,4 @@
-// src/app/components/sign-up/sign-up.component.ts
+// File: src/app/components/sign-up/sign-up.component.ts
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
@@ -24,12 +24,12 @@ export class SignUpComponent implements OnInit {
   ngOnInit(): void {
     this.signupForm = this.fb.group({
       firstName: ['', [Validators.required]],
-      middleName: ['', [Validators.required]],
+      middleName: [''],
       lastName: ['', [Validators.required]],
       gender: ['0', Validators.required],
       role: ['0', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$')]]
+      password: ['', [Validators.required, Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$')]]
     });
   }
 
@@ -37,22 +37,26 @@ export class SignUpComponent implements OnInit {
   togglePassword(): void { this.showPassword = !this.showPassword; }
 
   submitSignup(): void {
-    if (this.signupForm.invalid) { return; }
+    if (this.signupForm.invalid) {
+      this.signupForm.markAllAsTouched();
+      return;
+    }
 
     this.isSubmitting = true;
     this.errorMessage = null;
 
-    const formValues = this.signupForm.value;
-    // *** الإصلاح هنا: تحويل البيانات إلى PascalCase ***
+    // ================= 🔽 تم التعديل هنا 🔽 =================
+    // إنشاء الـ payload بأسماء حقول camelCase لتطابق مواصفات الـ API
     const payload = {
-      FirstName: formValues.firstName,
-      MiddleName: formValues.middleName,
-      LastName: formValues.lastName,
-      Email: formValues.email,
-      Password: formValues.password,
-      Gender: +formValues.gender,
-      Role: +formValues.role
+      firstName: this.signupForm.value.firstName,
+      middleName: this.signupForm.value.middleName,
+      lastName: this.signupForm.value.lastName,
+      email: this.signupForm.value.email,
+      password: this.signupForm.value.password,
+      gender: +this.signupForm.value.gender,
+      role: +this.signupForm.value.role
     };
+    // ========================================================
 
     this.authService.register(payload).subscribe({
       next: () => {
@@ -60,7 +64,8 @@ export class SignUpComponent implements OnInit {
         this.router.navigate(['/Login']);
       },
       error: (err) => {
-        this.errorMessage = 'Registration failed. The email might already be in use.';
+        // يمكننا الآن عرض رسالة الخطأ القادمة من الخادم مباشرة
+        this.errorMessage = err.error?.message || err.error?.title || 'Registration failed. Please check your details.';
         this.isSubmitting = false;
       },
       complete: () => { this.isSubmitting = false; }

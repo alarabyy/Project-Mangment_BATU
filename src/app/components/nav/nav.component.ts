@@ -1,76 +1,89 @@
-// src/app/components/navbar/nav/nav.component.ts
+// File: src/app/components/nav/nav.component.ts
 
-import { Component, OnInit, OnDestroy, Renderer2, ChangeDetectorRef } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { CommonModule, NgClass, TitleCasePipe } from '@angular/common';
-import { ThemeService } from '../../Services/theme-service.service'; // تأكد من أن هذا المسار صحيح
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../Services/auth.service';
+import { ThemeService } from '../../Services/theme-service.service';
 
 @Component({
   selector: 'app-nav',
   standalone: true,
+  imports: [CommonModule, RouterModule, TitleCasePipe],
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css'],
-  imports: [CommonModule, RouterModule, NgClass, TitleCasePipe],
+  styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit, OnDestroy {
+  isDarkMode = false;
   isMenuOpen = false;
-  isDarkMode: boolean = false;
-
-  // خاصية جديدة لعدد الإشعارات
-  notificationCount: number = 3;
-
-  private themeSubscription!: Subscription;
+  isSearchActive = false;
+  isGlobalAddOpen = false;
+  isMobileActionsMenuOpen = false;
+  userRole: string | null = null;
+  notificationCount = 0;
+  currentYear: number = new Date().getFullYear();
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private router: Router,
-    private themeService: ThemeService, // إعادة إضافة خدمة الثيم
-    private renderer: Renderer2,
-    private cdr: ChangeDetectorRef,
-    public authService: AuthService
+    public authService: AuthService,
+    private themeService: ThemeService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    // إعادة إضافة منطق الاشتراك في تغيير الثيم
-    this.themeSubscription = this.themeService.isDarkMode$.subscribe(mode => {
-      this.isDarkMode = mode;
-      // تطبيق الثيم على body ليعمل على مستوى التطبيق كله
-      const theme = mode ? 'dark' : 'light';
-      this.renderer.setAttribute(document.body, 'data-theme', theme);
-      this.cdr.markForCheck();
+    const themeSub = this.themeService.isDarkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
     });
+
+    // تحديث دور المستخدم عند تغيير المسار (بعد تسجيل الدخول)
+    const routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.userRole = this.authService.getUserRole();
+    });
+
+    // تحديث الدور عند التحميل الأولي
+    this.userRole = this.authService.getUserRole();
+
+    this.subscriptions.add(themeSub);
+    this.subscriptions.add(routerSub);
   }
 
-  toggleMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
-  /**
-   * دالة جديدة لتغيير الثيم
-   */
-  toggleDarkMode(): void {
-    this.themeService.toggleDarkMode();
+  // --- بقية الدوال كما هي ---
+  toggleMenu(): void { this.isMenuOpen = !this.isMenuOpen; }
+  toggleSearch(): void { this.isSearchActive = !this.isSearchActive; }
+  toggleGlobalAdd(): void { this.isGlobalAddOpen = !this.isGlobalAddOpen; }
+  toggleMobileActionsMenu(): void { this.isMobileActionsMenuOpen = !this.isMobileActionsMenuOpen; }
+  toggleDarkMode(): void { this.themeService.toggleDarkMode(); }
+
+  performSearch(query: string): void {
+    if (query.trim()) {
+      this.router.navigate(['/search'], { queryParams: { q: query } });
+      this.isSearchActive = false;
+    }
+  }
+
+  quickCreate(type: string): void {
+    if (type === 'project') {
+      this.router.navigate(['/projects/add']);
+    }
+    this.isGlobalAddOpen = false;
   }
 
   onMenuItemClick(path: string): void {
     this.router.navigate([path]);
     this.isMenuOpen = false;
+    this.isMobileActionsMenuOpen = false;
   }
 
-  logout(): void {
+  onLogout(): void {
     this.authService.logout();
-    this.isMenuOpen = false;
-  }
-
-  get userRole(): 'admin' | 'doctor' | 'student' | null {
-    const role = this.authService.getRole();
-    return role ? role.toLowerCase() as 'admin' | 'doctor' | 'student' : null;
-  }
-
-  ngOnDestroy(): void {
-    if (this.themeSubscription) {
-      this.themeSubscription.unsubscribe();
-    }
+    this.userRole = null;
+    this.onMenuItemClick('/login');
   }
 }

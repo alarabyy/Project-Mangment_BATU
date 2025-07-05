@@ -1,14 +1,14 @@
-// src/app/components/my-profile/my-profile.component.ts
+// File: src/app/components/my-profile/my-profile.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { AuthService, UserProfile } from '../../Services/auth.service';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { AuthService, UserProfile } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-my-profile',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './my-profile.component.html',
   styleUrls: ['./my-profile.component.css']
 })
@@ -23,7 +23,7 @@ export class MyProfileComponent implements OnInit {
   ngOnInit(): void {
     this.authService.getUserProfileFromApi().subscribe({
       next: (profile) => {
-        if (profile && profile.firstName) {
+        if (profile) {
           this.userProfile = profile;
         } else {
           this.errorMessage = "Profile data received from API is incomplete.";
@@ -33,14 +33,16 @@ export class MyProfileComponent implements OnInit {
       error: (err) => {
         this.errorMessage = "Could not load your profile. Please try again later.";
         this.isLoading = false;
+        console.error("API Error fetching profile:", err);
       }
     });
   }
 
-  getRoleAsString(roleNumber: number): string {
+  getRoleAsString(roleNumber: number | undefined): string {
+    if (roleNumber === undefined) return 'Unknown';
     switch (roleNumber) {
       case 0: return 'Student';
-      case 1: return 'Doctor';
+      case 1: return 'Professor';
       case 2: return 'Admin';
       default: return 'Unknown';
     }
@@ -48,5 +50,6 @@ export class MyProfileComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

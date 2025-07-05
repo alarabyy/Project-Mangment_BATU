@@ -1,73 +1,4 @@
-<!-- src/app/components/my-profile/my-profile.component.html -->
-<div class="profile-container">
-
-  <div *ngIf="isLoading" class="status-container">
-    <div class="spinner"></div>
-  </div>
-
-  <div *ngIf="errorMessage && !isLoading" class="status-container error-container">
-    <i class="fas fa-exclamation-circle error-icon"></i>
-    <h2>Oops!</h2>
-    <p>{{ errorMessage }}</p>
-  </div>
-
-  <div *ngIf="userProfile && !isLoading && !errorMessage" class="profile-content animate-fade-in">
-    <!-- Profile Header with Animated Background -->
-    <header class="profile-header">
-      <div class="header-background"></div>
-      <div class="header-content">
-        <div class="avatar-wrapper animate-pop-in">
-          <i class="fas fa-user-shield"></i>
-        </div>
-        <h1 class="animate-slide-in-top">{{ userProfile.firstName }} {{ userProfile.lastName }}</h1>
-        <p class="role-badge animate-slide-in-top delay-1">{{ getRoleAsString(userProfile.role) }}</p>
-      </div>
-    </header>
-
-    <!-- Profile Details -->
-    <main class="profile-details">
-      <div class="details-card animate-slide-in-bottom">
-        <div class="card-header">
-          <i class="fas fa-info-circle"></i>
-          <h3>Contact Information</h3>
-        </div>
-        <div class="card-body">
-          <div class="info-row">
-            <label>Email Address</label>
-            <span>{{ userProfile.email }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="details-card animate-slide-in-bottom delay-2">
-        <div class="card-header">
-          <i class="fas fa-id-card"></i>
-          <h3>Account Information</h3>
-        </div>
-        <div class="card-body">
-          <div class="info-row">
-            <label>User ID</label>
-            <span>{{ userProfile.id }}</span>
-          </div>
-          <div class="info-row">
-            <label>Account Status</label>
-            <span class="status-active">Active</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="actions-card animate-slide-in-bottom delay-3">
-        <button class="action-btn primary">
-          <i class="fas fa-edit"></i> Edit Profile
-        </button>
-        <button class="action-btn secondary">
-          <i class="fas fa-key"></i> Change Password
-        </button>
-      </div>
-    </main>
-  </div>
-</div>
-<!-- src/app/components/my-profile/my-profile.component.html -->
+<!-- File: src/app/components/my-profile/my-profile.component.html -->
 <div class="profile-container">
 
   <div *ngIf="isLoading" class="status-container">
@@ -85,9 +16,11 @@
       <div class="header-background"></div>
       <div class="header-content">
         <div class="avatar-wrapper animate-pop-in">
-          <i class="fas fa-user-shield"></i>
+          <!-- عرض صورة المستخدم، مع صورة افتراضية -->
+          <img [src]="userProfile.imageUrl || 'assets/images/default-avatar.png'" alt="User Avatar" class="profile-avatar">
         </div>
-        <h1 class="animate-slide-in-top">{{ userProfile.firstName }} {{ userProfile.lastName }}</h1>
+
+        <h1 class="animate-slide-in-top">{{ userProfile.firstName }} {{ userProfile.lastname }}</h1>
         <p class="role-badge animate-slide-in-top delay-1">{{ getRoleAsString(userProfile.role) }}</p>
       </div>
     </header>

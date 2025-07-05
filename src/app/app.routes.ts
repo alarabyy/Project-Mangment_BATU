@@ -1,4 +1,4 @@
-// src/app/app.routes.ts
+// File: src/app/app.routes.ts
 
 import { Routes } from '@angular/router';
 import { RoleGuard } from './guards/role.guard';
@@ -26,7 +26,7 @@ import { EditProjectComponent } from './components/project/edit-project/edit-pro
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
-  // 1. Public Routes
+  // Public Routes
   { path: 'Home', component: HomeComponent },
   { path: 'documentaion', component: documentaionComponent },
   { path: 'Privacy', component: PrivacyPolicyComponent },
@@ -34,15 +34,17 @@ export const routes: Routes = [
   { path: 'Login', component: LoginComponent },
   { path: 'unauthorized', component: UnauthorizedComponent },
 
-  // 2. Shared Protected Routes
-  { path: 'projects/add', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
-  { path: 'projects', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
-  { path: 'projects/edit/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  // ================= 🔽 تم التعديل هنا 🔽 =================
+  // Shared Protected Routes
+  { path: 'projects/add', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
+  { path: 'projects', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
+  { path: 'projects/edit/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
 
-  { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
-  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
+  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
+  // ========================================================
 
-  // 3. Admin-Only Routes
+  // Admin-Only Routes
   { path: 'FacultyList', component: FacultyListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'add-faculty', component: AddFacultyComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'facultyEdit/:id', component: FacultyEditComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
@@ -55,7 +57,7 @@ export const routes: Routes = [
   { path: 'add-category', component: AddCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'categoryEdit/:id', component: EditCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
-  // 5. Redirects & Fallback Route
+  // Redirects & Fallback Route
   { path: '', redirectTo: 'Home', pathMatch: 'full' },
   { path: '**', component: HomeComponent },
 ];

@@ -1,4 +1,4 @@
-// src/app/components/login/login.component.ts
+// File: src/app/components/login/login.component.ts
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
@@ -44,11 +44,9 @@ export class LoginComponent implements OnInit {
     this.isSubmitting = true;
     this.errorMessage = null;
 
-    const formValues = this.loginForm.value;
-    // *** الإصلاح هنا: تحويل البيانات إلى PascalCase ***
     const payload = {
-      Email: formValues.email,
-      Password: formValues.password
+      email: this.loginForm.value.email,
+      password: this.loginForm.value.password
     };
 
     this.authService.login(payload).subscribe({
@@ -56,7 +54,7 @@ export class LoginComponent implements OnInit {
         this.redirectToDashboard();
       },
       error: (err) => {
-        this.errorMessage = 'Invalid credentials. Please check your email and password.';
+        this.errorMessage = err.error?.message || 'Invalid credentials. Please check your email and password.';
         this.isSubmitting = false;
       },
       complete: () => { this.isSubmitting = false; }
@@ -64,12 +62,23 @@ export class LoginComponent implements OnInit {
   }
 
   private redirectToDashboard(): void {
-    const role = this.authService.getRole();
+    const role = this.authService.getUserRole();
     switch (role) {
-      case 'admin': this.router.navigate(['/FacultyList']); break;
+      case 'admin':
+        this.router.navigate(['/FacultyList']);
+        break;
+      // ================= 🔽 تم التعديل هنا 🔽 =================
       case 'doctor':
-      case 'student': this.router.navigate(['/projects']); break;
-      default: this.router.navigate(['/Home']); break;
+      case 'professor': // تعامل مع professor بنفس طريقة doctor
+        this.router.navigate(['/projects']);
+        break;
+      // ========================================================
+      case 'student':
+        this.router.navigate(['/projects']);
+        break;
+      default:
+        this.router.navigate(['/Home']);
+        break;
     }
   }
 }
