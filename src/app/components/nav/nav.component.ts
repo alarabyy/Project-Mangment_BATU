@@ -1,10 +1,10 @@
 // src/app/components/navbar/nav/nav.component.ts
 
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, Renderer2, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Renderer2, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CommonModule, NgClass, TitleCasePipe } from '@angular/common';
-import { ThemeService } from '../../Services/theme-service.service';
+import { ThemeService } from '../../Services/theme-service.service'; // تأكد من أن هذا المسار صحيح
 import { AuthService } from '../../Services/auth.service';
 
 @Component({
@@ -13,92 +13,54 @@ import { AuthService } from '../../Services/auth.service';
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css'],
   imports: [CommonModule, RouterModule, NgClass, TitleCasePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   isDarkMode: boolean = false;
-  isSearchActive = false;
-  isGlobalAddOpen = false;
-  isMobileActionsMenuOpen = false;
-  notificationCount: number = 3;
-  currentYear: number = new Date().getFullYear();
-  private themeSubscription!: Subscription;
 
-  @ViewChild('searchInput') searchInputEl!: ElementRef<HTMLInputElement>;
+  // خاصية جديدة لعدد الإشعارات
+  notificationCount: number = 3;
+
+  private themeSubscription!: Subscription;
 
   constructor(
     private router: Router,
-    private themeService: ThemeService,
+    private themeService: ThemeService, // إعادة إضافة خدمة الثيم
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
     public authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // إعادة إضافة منطق الاشتراك في تغيير الثيم
     this.themeSubscription = this.themeService.isDarkMode$.subscribe(mode => {
       this.isDarkMode = mode;
-      this.renderer.setAttribute(document.body, 'data-theme', mode ? 'dark' : 'light');
+      // تطبيق الثيم على body ليعمل على مستوى التطبيق كله
+      const theme = mode ? 'dark' : 'light';
+      this.renderer.setAttribute(document.body, 'data-theme', theme);
       this.cdr.markForCheck();
     });
   }
 
-  private closeAllPopups(): void {
-    this.isMenuOpen = false;
-    this.isGlobalAddOpen = false;
-    this.isSearchActive = false;
-    this.isMobileActionsMenuOpen = false;
-    this.cdr.markForCheck();
-  }
-
   toggleMenu(): void {
-    const currentlyOpen = this.isMenuOpen;
-    this.closeAllPopups();
-    this.isMenuOpen = !currentlyOpen;
+    this.isMenuOpen = !this.isMenuOpen;
   }
 
-  toggleGlobalAdd(): void {
-    const currentlyOpen = this.isGlobalAddOpen;
-    this.closeAllPopups();
-    this.isGlobalAddOpen = !currentlyOpen;
-  }
-
-  toggleSearch(): void {
-    const currentlyOpen = this.isSearchActive;
-    this.closeAllPopups();
-    this.isSearchActive = !currentlyOpen;
-    if (this.isSearchActive) {
-      setTimeout(() => this.searchInputEl?.nativeElement.focus(), 0);
-    }
-  }
-
-  toggleMobileActionsMenu(): void {
-    const currentlyOpen = this.isMobileActionsMenuOpen;
-    this.closeAllPopups();
-    this.isMobileActionsMenuOpen = !currentlyOpen;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.navbar, .dropdown-menu, .global-add-menu, .mobile-actions-menu')) {
-        this.closeAllPopups();
-    }
+  /**
+   * دالة جديدة لتغيير الثيم
+   */
+  toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
   }
 
   onMenuItemClick(path: string): void {
     this.router.navigate([path]);
-    this.closeAllPopups();
+    this.isMenuOpen = false;
   }
 
-  toggleDarkMode(): void {
-    // افترض وجود هذه الدالة في خدمتك
-    // this.themeService.toggleDarkMode();
-  }
-
-  onLogout(): void {
+  logout(): void {
     this.authService.logout();
-    this.closeAllPopups();
+    this.isMenuOpen = false;
   }
 
   get userRole(): 'admin' | 'doctor' | 'student' | null {

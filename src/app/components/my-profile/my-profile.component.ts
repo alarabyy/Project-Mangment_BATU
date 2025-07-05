@@ -23,8 +23,7 @@ export class MyProfileComponent implements OnInit {
   ngOnInit(): void {
     this.authService.getUserProfileFromApi().subscribe({
       next: (profile) => {
-        // الشرط الجديد يبحث عن أي من الحقول الأساسية
-        if (profile && profile.id && profile.firstName) {
+        if (profile && profile.firstName) {
           this.userProfile = profile;
         } else {
           this.errorMessage = "Profile data received from API is incomplete.";
@@ -32,14 +31,12 @@ export class MyProfileComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Failed to fetch profile:', err);
         this.errorMessage = "Could not load your profile. Please try again later.";
         this.isLoading = false;
       }
     });
   }
 
-  // تترجم الدور الرقمي إلى نص
   getRoleAsString(roleNumber: number): string {
     switch (roleNumber) {
       case 0: return 'Student';

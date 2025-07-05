@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService, UserCredentials } from '../../Services/auth.service';
+import { AuthService } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -21,15 +21,14 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    public authService: AuthService,
+    private authService: AuthService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
       this.redirectToDashboard();
     }
-
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -37,53 +36,40 @@ export class LoginComponent implements OnInit {
   }
 
   get f() { return this.loginForm.controls; }
-
-  togglePassword(): void {
-    this.showPassword = !this.showPassword;
-  }
+  togglePassword(): void { this.showPassword = !this.showPassword; }
 
   submitLogin(): void {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
+    if (this.loginForm.invalid) { return; }
 
     this.isSubmitting = true;
     this.errorMessage = null;
-    const credentials: UserCredentials = this.loginForm.value;
 
-    this.authService.login(credentials).subscribe({
-      next: (response) => {
-        // ======================= التشخيص الحاسم هنا =======================
-        console.log('--- LOGIN API RESPONSE ---', response);
-        // =================================================================
+    const formValues = this.loginForm.value;
+    // *** الإصلاح هنا: تحويل البيانات إلى PascalCase ***
+    const payload = {
+      Email: formValues.email,
+      Password: formValues.password
+    };
 
-        console.log('Login successful!');
+    this.authService.login(payload).subscribe({
+      next: () => {
         this.redirectToDashboard();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Invalid email or password. Please try again.';
+        this.errorMessage = 'Invalid credentials. Please check your email and password.';
         this.isSubmitting = false;
       },
-      complete: () => {
-        this.isSubmitting = false;
-      }
+      complete: () => { this.isSubmitting = false; }
     });
   }
 
   private redirectToDashboard(): void {
-    const role = this.authService.getRole()?.toLowerCase();
+    const role = this.authService.getRole();
     switch (role) {
-      case 'admin':
-        this.router.navigate(['/FacultyList']);
-        break;
+      case 'admin': this.router.navigate(['/FacultyList']); break;
       case 'doctor':
-      case 'student':
-        this.router.navigate(['/projects']);
-        break;
-      default:
-        this.router.navigate(['/Home']);
-        break;
+      case 'student': this.router.navigate(['/projects']); break;
+      default: this.router.navigate(['/Home']); break;
     }
   }
 }

@@ -7,35 +7,31 @@ import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 
-// الواجهة التي يتوقعها الـ API عند إنشاء حساب
 export interface UserRegistration {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  gender: number;
-  role: number;
-  email: string;
-  password: string;
+  FirstName: string;
+  MiddleName: string;
+  LastName: string;
+  Gender: number;
+  Role: number;
+  Email: string;
+  Password: string;
 }
 
-// الواجهة التي يتوقعها الـ API عند تسجيل الدخول
 export interface UserCredentials {
-  email: string;
-  password: string;
+  Email: string;
+  Password: string;
 }
 
-// الواجهة التي يرجعها الـ API عند تسجيل الدخول
 export interface LoginResponse {
   token: string;
 }
 
-// الواجهة التي يرجعها الـ API لصفحة البروفايل
 export interface UserProfile {
   id: string;
-  firstName: string;
+  firstName: string; // لاحظ أن الـ API يرجع camelCase هنا
   lastName: string;
   email: string;
-  role: number; // الدور يأتي كرقم من API البروفايل
+  role: number;
 }
 
 @Injectable({
@@ -83,7 +79,6 @@ export class AuthService {
     } catch (error) { return null; }
   }
 
-  // يقرأ الدور كنص من التوكن (لصالح الـ Guard والـ Navbar)
   getRole(): string | null {
     const decodedToken = this.getDecodedToken();
     if (!decodedToken) return null;
@@ -92,19 +87,17 @@ export class AuthService {
     if (Array.isArray(role)) { role = role[0]; }
 
     if (role && role.toLowerCase() === 'professor') {
-      return 'doctor'; // ترجمة 'Professor' إلى 'doctor'
+      return 'doctor';
     }
 
     return role ? role.toLowerCase() : null;
   }
 
-  // يقرأ ID المستخدم من التوكن
   getUserId(): string | null {
     const decodedToken = this.getDecodedToken();
     return decodedToken ? decodedToken.nameid : null;
   }
 
-  // يطلب البروفايل من الـ API
   getUserProfileFromApi(): Observable<UserProfile> {
     const userId = this.getUserId();
     if (!userId) return of({} as UserProfile);

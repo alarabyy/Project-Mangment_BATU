@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService, UserRegistration } from '../../Services/auth.service';
+import { AuthService } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -19,17 +19,13 @@ export class SignUpComponent implements OnInit {
   isSubmitting = false;
   errorMessage: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) { }
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      middleName: ['', Validators.required],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      firstName: ['', [Validators.required]],
+      middleName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
       gender: ['0', Validators.required],
       role: ['0', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -38,29 +34,24 @@ export class SignUpComponent implements OnInit {
   }
 
   get f() { return this.signupForm.controls; }
-
-  togglePassword(): void {
-    this.showPassword = !this.showPassword;
-  }
+  togglePassword(): void { this.showPassword = !this.showPassword; }
 
   submitSignup(): void {
-    if (this.signupForm.invalid) {
-      this.signupForm.markAllAsTouched();
-      return;
-    }
+    if (this.signupForm.invalid) { return; }
 
     this.isSubmitting = true;
     this.errorMessage = null;
 
     const formValues = this.signupForm.value;
-    const payload: UserRegistration = {
-      firstName: formValues.firstName,
-      middleName: formValues.middleName,
-      lastName: formValues.lastName,
-      email: formValues.email,
-      password: formValues.password,
-      gender: +formValues.gender,
-      role: +formValues.role
+    // *** الإصلاح هنا: تحويل البيانات إلى PascalCase ***
+    const payload = {
+      FirstName: formValues.firstName,
+      MiddleName: formValues.middleName,
+      LastName: formValues.lastName,
+      Email: formValues.email,
+      Password: formValues.password,
+      Gender: +formValues.gender,
+      Role: +formValues.role
     };
 
     this.authService.register(payload).subscribe({
@@ -69,18 +60,10 @@ export class SignUpComponent implements OnInit {
         this.router.navigate(['/Login']);
       },
       error: (err) => {
-        console.error('Registration failed:', err);
-        if (err.error && typeof err.error === 'object') {
-          const validationErrors = err.error.errors ? Object.values(err.error.errors).flat().join(' ') : null;
-          this.errorMessage = validationErrors || err.error.message || err.error.title || 'An unknown error occurred.';
-        } else {
-          this.errorMessage = 'An unknown server error occurred.';
-        }
+        this.errorMessage = 'Registration failed. The email might already be in use.';
         this.isSubmitting = false;
       },
-      complete: () => {
-        this.isSubmitting = false;
-      }
+      complete: () => { this.isSubmitting = false; }
     });
   }
 }
