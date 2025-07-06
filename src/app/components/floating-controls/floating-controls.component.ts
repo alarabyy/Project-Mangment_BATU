@@ -1,3 +1,5 @@
+// File: src/app/components/floating-controls/floating-controls.component.ts
+
 import { Component, OnInit, OnDestroy, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
@@ -51,17 +53,20 @@ export class FloatingControlsComponent implements OnInit, OnDestroy {
   increaseFontSize(): void {
     if (this.currentFontSize < this.maxFontSize) {
       this.currentFontSize += this.fontSizeStep;
-      this.document.documentElement.style.fontSize = `${this.currentFontSize}px`;
-      localStorage.setItem('preferredFontSize', this.currentFontSize.toString());
+      this.applyAndStoreFontSize();
     }
   }
 
   decreaseFontSize(): void {
     if (this.currentFontSize > this.minFontSize) {
       this.currentFontSize -= this.fontSizeStep;
-      this.document.documentElement.style.fontSize = `${this.currentFontSize}px`;
-      localStorage.setItem('preferredFontSize', this.currentFontSize.toString());
+      this.applyAndStoreFontSize();
     }
+  }
+
+  private applyAndStoreFontSize(): void {
+    this.document.documentElement.style.fontSize = `${this.currentFontSize}px`;
+    localStorage.setItem('preferredFontSize', this.currentFontSize.toString());
   }
 
   loadFontSizePreference(): void {
@@ -79,8 +84,7 @@ export class FloatingControlsComponent implements OnInit, OnDestroy {
     this.clockSubscription = interval(1000)
       .pipe(
         startWith(0),
-        map(() => new Date()),
-        map(date => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+        map(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
       )
       .subscribe(timeStr => {
         this.timeString = timeStr;
@@ -96,26 +100,20 @@ export class FloatingControlsComponent implements OnInit, OnDestroy {
   onWindowScroll(): void {
     const yOffset = window.pageYOffset || this.document.documentElement.scrollTop || this.document.body.scrollTop || 0;
     const showOffset = 250;
+    const shouldShow = yOffset > showOffset;
 
-    if (yOffset > showOffset) {
-      if (!this.showScrollToTopButton) {
-        this.showScrollToTopButton = true;
-        this.cdr.markForCheck();
-      }
-    } else {
-      if (this.showScrollToTopButton) {
-        this.showScrollToTopButton = false;
-        this.cdr.markForCheck();
-      }
+    if (this.showScrollToTopButton !== shouldShow) {
+      this.showScrollToTopButton = shouldShow;
+      this.cdr.markForCheck();
     }
   }
 
   scrollToTop(): void {
-    this.document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   ngOnDestroy(): void {
-    if (this.themeSubscription) this.themeSubscription.unsubscribe();
-    if (this.clockSubscription) this.clockSubscription.unsubscribe();
+    this.themeSubscription?.unsubscribe();
+    this.clockSubscription?.unsubscribe();
   }
 }

@@ -7,9 +7,9 @@ import { Location } from '@angular/common';
 @Component({
   selector: 'app-unauthorized',
   standalone: true,
-  imports: [RouterLink], // RouterLink ضروري لـ [routerLink]
   templateUrl: './unauthorized.component.html',
-  styleUrls: ['./unauthorized.component.css']
+  styleUrls: ['./unauthorized.component.css'],
+  // imports: [RouterLink]
 })
 export class UnauthorizedComponent {
 

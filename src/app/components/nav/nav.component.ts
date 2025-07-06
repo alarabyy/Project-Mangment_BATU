@@ -36,14 +36,12 @@ export class NavComponent implements OnInit, OnDestroy {
       this.isDarkMode = isDark;
     });
 
-    // تحديث دور المستخدم عند تغيير المسار (بعد تسجيل الدخول)
     const routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.userRole = this.authService.getUserRole();
     });
 
-    // تحديث الدور عند التحميل الأولي
     this.userRole = this.authService.getUserRole();
 
     this.subscriptions.add(themeSub);
@@ -54,16 +52,18 @@ export class NavComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  // --- بقية الدوال كما هي ---
+  toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
+  }
+
   toggleMenu(): void { this.isMenuOpen = !this.isMenuOpen; }
   toggleSearch(): void { this.isSearchActive = !this.isSearchActive; }
   toggleGlobalAdd(): void { this.isGlobalAddOpen = !this.isGlobalAddOpen; }
   toggleMobileActionsMenu(): void { this.isMobileActionsMenuOpen = !this.isMobileActionsMenuOpen; }
-  toggleDarkMode(): void { this.themeService.toggleDarkMode(); }
 
   performSearch(query: string): void {
     if (query.trim()) {
-      this.router.navigate(['/search'], { queryParams: { q: query } });
+      this.router.navigate(['/search'], { queryParams: { q: query.trim() } });
       this.isSearchActive = false;
     }
   }
@@ -84,6 +84,6 @@ export class NavComponent implements OnInit, OnDestroy {
   onLogout(): void {
     this.authService.logout();
     this.userRole = null;
-    this.onMenuItemClick('/login');
+    this.onMenuItemClick('/auth/login');
   }
 }

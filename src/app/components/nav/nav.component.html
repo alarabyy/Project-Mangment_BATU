@@ -1,4 +1,4 @@
-<!-- File: src/app/components/nav/nav.component.html (Final Version) -->
+<!-- File: src/app/components/nav/nav.component.html -->
 
 <nav class="navbar" [class.dark]="isDarkMode" [class.search-active]="isSearchActive">
   <!-- Left Section -->
@@ -86,14 +86,10 @@
         <li><a (click)="onMenuItemClick('/projects/add')"><span class="menu-icon"><i class="fas fa-plus-circle"></i></span>Add Project</a></li>
       </ng-container>
 
-      <!-- ================= 🔽 تم التعديل هنا 🔽 ================= -->
-      <!-- Doctor / Professor Tools Menu -->
       <ng-container *ngIf="userRole === 'doctor' || userRole === 'professor'">
         <li class="menu-category"><span><i class="fas fa-user-md"></i> Doctor Tools</span></li>
         <li><a (click)="onMenuItemClick('/projects/add')"><span class="menu-icon"><i class="fas fa-plus-circle"></i></span>Add Project Idea</a></li>
       </ng-container>
-      <!-- ======================================================== -->
-
     </ng-container>
 
     <li class="menu-separator"></li>
