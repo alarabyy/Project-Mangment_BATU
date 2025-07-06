@@ -1,20 +1,20 @@
 <!-- src/app/components/chat/chat.component.html -->
 <div class="ai-background-system">
-  <div class="ai-particle-layer layer-1"></div>
-  <div class="ai-particle-layer layer-2"></div>
-  <div class="ai-glow-blob top-left"></div>
-  <div class="ai-glow-blob bottom-right"></div>
-  <div class="ai-scanline-overlay"></div>
+  <div class="grid-container">
+    <div class="grid-layer grid-lines-layer"></div>
+    <div class="grid-layer grid-squares-layer"></div>
+  </div>
 </div>
 
 <div class="chat-wrapper">
   <div class="chat-container">
     <header class="chat-header">
       <div class="header-content">
-        <h2 style="color: chartreuse;">Project AI Assistant</h2>
+        <!-- تم تغيير الألوان لتعتمد على متغيرات CSS للثيم -->
+        <h2>Project AI Assistant</h2>
         <div class="status">
           <span class="status-dot"></span>
-          <span style="color: chartreuse;">Online & Active</span>
+          <span>Online & Active</span>
         </div>
       </div>
     </header>
@@ -24,11 +24,6 @@
            class="message-wrapper"
            [ngClass]="{'user-wrapper': message.isUser, 'bot-wrapper': !message.isUser}">
         <div class="message">
-          <!-- استخدام [innerHTML] هنا قد يكون خطراً أمنياً (XSS) إذا كان النص يأتي من مصدر غير موثوق.
-               لكن بما أننا نتحكم في رسائل الخطأ، والنص من Gemini عادة ما يكون آمناً، يمكن استخدامه بحذر
-               لعرض التنسيق مثل الأسطر الجديدة. للأمان المطلق، استخدم <p>{{ message.text }}</p> فقط.
-               سأبقيها على <p> للأمان.
-          -->
           <p>{{ message.text }}</p>
         </div>
       </div>
