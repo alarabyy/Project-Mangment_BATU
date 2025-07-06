@@ -21,7 +21,7 @@ export class NavComponent implements OnInit, OnDestroy {
   isGlobalAddOpen = false;
   isMobileActionsMenuOpen = false;
   userRole: string | null = null;
-  notificationCount = 0;
+  notificationCount = 0; // Set this to a real value from a service, e.g., 5
   currentYear: number = new Date().getFullYear();
   private subscriptions: Subscription = new Subscription();
 
@@ -40,6 +40,10 @@ export class NavComponent implements OnInit, OnDestroy {
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.userRole = this.authService.getUserRole();
+      // Close any open menus on navigation
+      this.isMenuOpen = false;
+      this.isMobileActionsMenuOpen = false;
+      this.isGlobalAddOpen = false;
     });
 
     this.userRole = this.authService.getUserRole();
@@ -72,11 +76,12 @@ export class NavComponent implements OnInit, OnDestroy {
     if (type === 'project') {
       this.router.navigate(['/projects/add']);
     }
-    this.isGlobalAddOpen = false;
+    this.isGlobalAddOpen = false; // Close menu after action
   }
 
   onMenuItemClick(path: string): void {
     this.router.navigate([path]);
+    // Close menus after clicking an item
     this.isMenuOpen = false;
     this.isMobileActionsMenuOpen = false;
   }
@@ -84,6 +89,6 @@ export class NavComponent implements OnInit, OnDestroy {
   onLogout(): void {
     this.authService.logout();
     this.userRole = null;
-    this.onMenuItemClick('/auth/login');
+    this.onMenuItemClick('/auth/login'); // Use onMenuItemClick to also close menus
   }
 }
