@@ -1,0 +1,88 @@
+<!-- The entire component is wrapped in a state container driven by the async pipe -->
+<ng-container *ngIf="state$ | async as state">
+  <main class="user-management-container">
+    <!-- Page Header -->
+    <header class="page-header">
+      <div class="header-content">
+      <button><a routerLink="/user-analytics" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-tags"></i></span>financial-dashboard</a></button>
+        <h1>User Management</h1>
+        <p>Oversee and manage all registered users in the system.</p>
+      </div>
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            type="text"
+            placeholder="Search by ID, name, or email..."
+            (input)="onSearch($event)"
+            aria-label="Search users"
+          >
+        </div>
+      </div>
+    </header>
+
+    <!-- User List Section -->
+    <div class="user-list">
+      <!-- Skeleton Loader: Appears while state.isLoading is true -->
+      <ng-container *ngIf="state.isLoading">
+        <div class="user-row-skeleton" *ngFor="let i of [1,2,3,4,5]">
+          <div class="info-skeleton">
+            <div class="line long"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Error Message: Appears if an error occurs -->
+      <div *ngIf="state.error && !state.isLoading" class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ state.error }}</span>
+      </div>
+
+      <!-- Main Content: Appears on successful data load -->
+      <ng-container *ngIf="!state.isLoading && !state.error">
+        <!-- We now subscribe to the dedicated filteredUsers$ observable -->
+        <div *ngIf="filteredUsers$ | async as users">
+          <div *ngIf="users.length > 0; else emptyState" class="feed">
+            <!-- User Rows with staggered animation -->
+            <a
+              *ngFor="let user of users; trackBy: trackById; let i = index"
+              [routerLink]="['/user/profile', user.id]"
+              class="user-row"
+              [style.--animation-delay]="i * 50 + 'ms'"
+              title="View {{ user.firstName }}'s Profile"
+            >
+              <!-- User Info Section -->
+              <div class="user-info">
+                <h3 class="user-name">{{ user.firstName }} {{ user.lastname }}</h3>
+                <p class="user-email">{{ user.email }}</p>
+              </div>
+
+              <!-- User ID Section -->
+              <div class="user-id-container">
+                <span class="user-id">ID: {{user.id}}</span>
+              </div>
+
+              <!-- Role Badge Section -->
+              <div class="user-role">
+                <span class="role-badge" [ngClass]="getRoleInfo(user.role).name.toLowerCase()">
+                  <i class="fas" [ngClass]="getRoleInfo(user.role).icon"></i>
+                  <span>{{ getRoleInfo(user.role).name }}</span>
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Empty State Template -->
+      <ng-template #emptyState>
+        <div class="empty-state-container">
+          <i class="fas fa-users-slash empty-icon"></i>
+          <h2>No Users Found</h2>
+          <p>There are no users matching your search criteria.</p>
+        </div>
+      </ng-template>
+    </div>
+  </main>
+</ng-container>

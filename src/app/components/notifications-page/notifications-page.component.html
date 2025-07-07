@@ -1,0 +1,75 @@
+<main class="notifications-container">
+  <header class="page-header">
+    <h1>Notifications</h1>
+    <ng-container *ngIf="groupedNotifications$ | async as groups">
+      <button (click)="clearAllNotifications()" class="clear-all-btn" *ngIf="getGroupKeys(groups).length > 0">
+        <i class="fas fa-trash-alt"></i> Clear All
+      </button>
+    </ng-container>
+  </header>
+
+  <div class="notifications-list">
+    <ng-container *ngIf="!isLoading; else skeletonLoader">
+      <ng-container *ngIf="groupedNotifications$ | async as groups">
+        <div *ngIf="getGroupKeys(groups).length > 0; else emptyState">
+
+          <div *ngFor="let groupKey of getGroupKeys(groups)" class="notification-group">
+            <h3 class="group-title">{{ groupKey }}</h3>
+            <div class="feed">
+              <div
+                *ngFor="let notification of groups[groupKey]; trackBy: trackById"
+                class="notification-card"
+                [class.read]="notification.isRead"
+              >
+                <div class="icon-container" [ngClass]="notification.type">
+                  <i class="fas" [ngClass]="{
+                    'fa-plus-circle': notification.type === 'success',
+                    'fa-pencil-alt': notification.type === 'info',
+                    'fa-trash-alt': notification.type === 'error'
+                  }"></i>
+                </div>
+                <div class="content-container">
+                  <p class="message" [innerHTML]="notification.message"></p>
+                  <span class="timestamp" [title]="notification.timestamp | date:'full'">
+                    <i class="far fa-clock"></i> {{ getTimeAgo(notification.timestamp) }}
+                  </span>
+                </div>
+                <div class="actions-container">
+                  <button class="action-btn" [title]="notification.isRead ? 'Mark as Unread' : 'Mark as Read'" (click)="toggleRead(notification.id, $event)">
+                    <i class="fas" [ngClass]="notification.isRead ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  </button>
+                  <button class="action-btn delete" title="Delete Notification" (click)="deleteNotification(notification.id, $event)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="empty-state-container">
+        <i class="fas fa-check-circle empty-icon"></i>
+        <h2>All Caught Up!</h2>
+        <p>You have no new notifications.</p>
+      </div>
+    </ng-template>
+
+    <ng-template #skeletonLoader>
+      <div class="notification-group">
+        <div class="skeleton-title"></div>
+        <div class="feed">
+          <div class="notification-card skeleton" *ngFor="let i of [1,2,3]">
+            <div class="icon-container"></div>
+            <div class="content-container">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</main>

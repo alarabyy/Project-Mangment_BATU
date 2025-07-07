@@ -1,0 +1,124 @@
+<ng-container *ngIf="state$ | async as state">
+  <main class="analytics-container">
+    <header class="page-header">
+      <div class="header-content">
+        <h1>User Analytics</h1>
+        <p>An overview of user demographics and distribution.</p>
+      </div>
+    </header>
+
+    <!-- Skeleton Loader -->
+    <ng-container *ngIf="state.isLoading">
+      <div class="analytics-grid">
+        <div class="kpi-card-skeleton" *ngFor="let i of [1,2,3,4]"></div>
+        <div class="chart-card-skeleton large"></div>
+        <div class="chart-card-skeleton large"></div>
+        <div class="chart-card-skeleton full-width"></div>
+      </div>
+    </ng-container>
+
+    <!-- Error Message -->
+    <div *ngIf="state.error && !state.isLoading" class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h2>Could Not Load Analytics</h2>
+      <p>{{ state.error }}</p>
+    </div>
+
+    <!-- Main Content -->
+    <ng-container *ngIf="!state.isLoading && !state.error">
+      <ng-container *ngIf="kpiData$ | async as kpiData">
+        <div class="analytics-grid">
+          <!-- KPI Cards -->
+          <div class="kpi-card">
+            <i class="fas fa-users kpi-icon"></i>
+            <div class="kpi-content">
+              <span class="kpi-value">{{ kpiData.total }}</span>
+              <span class="kpi-title">Total Users</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <i class="fas fa-user-tag kpi-icon"></i>
+            <div class="kpi-content">
+              <span class="kpi-value">{{ kpiData.mostCommonRole }}</span>
+              <span class="kpi-title">Most Common Role</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <i class="fas fa-sitemap kpi-icon"></i>
+            <div class="kpi-content">
+              <span class="kpi-value">{{ kpiData.roles }}</span>
+              <span class="kpi-title">Distinct Roles</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <i class="fas fa-user-edit kpi-icon"></i>
+            <div class="kpi-content">
+              <span class="kpi-value">{{ kpiData.incomplete }}</span>
+              <span class="kpi-title">Incomplete Profiles</span>
+            </div>
+          </div>
+
+          <!-- Main Charts & Lists -->
+          <div class="chart-card large">
+            <h3 class="chart-title">Role Distribution</h3>
+            <!--
+              ==========================================================
+              ==            HERE IS THE FIRST & MAIN FIX            ==
+              ==========================================================
+              - Using the non-null assertion operator (!) tells TypeScript
+                that we are sure 'options' and its properties are not undefined.
+            -->
+            <ng-container *ngIf="roleChartOptions$ | async as options">
+              <apx-chart
+                [series]="options.series!"
+                [chart]="options.chart!"
+                [labels]="options.labels!"
+                [colors]="options.colors!"
+                [plotOptions]="options.plotOptions!"
+                [dataLabels]="options.dataLabels!"
+                [legend]="options.legend!"
+                [tooltip]="options.tooltip!"
+                [stroke]="options.stroke!">
+              </apx-chart>
+            </ng-container>
+          </div>
+
+          <div class="chart-card large">
+            <h3 class="chart-title">Latest Registered Users</h3>
+            <ul class="recent-users-list">
+              <li *ngFor="let user of (recentUsers$ | async)">
+                <div class="user-info">
+                  <span class="user-name">{{ user.firstName }} {{ user.lastname }}</span>
+                  <span class="user-email">{{ user.email }}</span>
+                </div>
+                <div class="user-meta">
+                  <span class="role-badge" [ngClass]="getRoleName(user.role).name.toLowerCase()">
+                    <i class="fas" [ngClass]="getRoleName(user.role).icon"></i>
+                  </span>
+                  <span class="timestamp">{{ getTimeAgo(user.createdAt) }}</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="chart-card full-width">
+            <h3 class="chart-title">Top 5 User Email Domains</h3>
+            <ng-container *ngIf="domainChartOptions$ | async as options">
+                <apx-chart
+                  [series]="options.series!"
+                  [chart]="options.chart!"
+                  [plotOptions]="options.plotOptions!"
+                  [xaxis]="options.xaxis!"
+                  [yaxis]="options.yaxis!"
+                  [grid]="options.grid!"
+                  [tooltip]="options.tooltip!"
+                  [legend]="options.legend!"
+                  [colors]="options.colors!">
+                </apx-chart>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </main>
+</ng-container>

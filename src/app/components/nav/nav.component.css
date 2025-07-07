@@ -302,3 +302,94 @@ a.active-link {
   .navbar-section.center { display: none; }
   .dropdown-menu { width: 280px; }
 }
+/* --- 1. Root Variables & Font --- */
+:host {
+  /* ... Your variables ... */
+  --primary-color: #1DB954;
+  /* ... */
+}
+/* ... */
+.navbar-icon-btn {
+  /* ... */
+  position: relative; /* Add this if not present, for badge positioning */
+}
+
+/* This style will be automatically applied to the badge in the bell icon */
+.notification-badge {
+  position: absolute;
+  top: 5px; /* Adjust as needed */
+  right: 5px; /* Adjust as needed */
+  background-color: #d93025;
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 3px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-light); /* Optional: creates a nice border */
+}
+:host-context(body.dark-theme) .notification-badge {
+  border-color: var(--bg-dark-navbar);
+}
+/*
+ *  STYLE SHEET FOR NAVIGATION COMPONENT
+ */
+
+/* --- 1. Root Variables & Font --- */
+:host {
+  /* Color Palette */
+  --primary-color: #1DB954;
+  --primary-hover: #1ed760;
+  --primary-active: #1aa34a;
+  /* ... (rest of your variables) ... */
+}
+
+/* --- (Your existing CSS code is fine) --- */
+/* ... */
+
+/* --- 4. Navbar Components (Logo, Buttons, Hamburger) --- */
+/* ... */
+.navbar-icon-btn {
+  /* ... (your existing styles) ... */
+  position: relative; /* Ensures the badge is positioned correctly */
+}
+
+/*
+  =======================================================
+  ==         STYLES FOR THE NOTIFICATION BADGE         ==
+  =======================================================
+*/
+.notification-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #d93025; /* A strong red color */
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 3px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-light); /* Creates a nice separation from the bell */
+  transform: scale(1);
+  animation: badge-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+:host-context(body.dark-theme) .notification-badge {
+  border-color: var(--bg-dark-navbar);
+}
+
+@keyframes badge-pop {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ... (Rest of your CSS file) */

@@ -27,7 +27,21 @@
   <!-- Right Section: Action Buttons -->
   <div class="navbar-section right">
     <ng-container *ngIf="authService.isLoggedIn()">
-      <a routerLink="/notifications" class="navbar-icon-btn" title="Notifications"><i class="fas fa-bell"></i></a>
+      <ng-container *ngIf="userRole === 'admin'">
+        <!--
+          =======================================================
+          ==       THIS IS THE CORRECTED NOTIFICATION BELL     ==
+          =======================================================
+        -->
+        <a routerLink="/notifications" class="navbar-icon-btn" title="Notifications">
+          <i class="fas fa-bell"></i>
+          <!-- The badge will show the number of unread notifications -->
+          <span *ngIf="(unreadCount$ | async)! > 0" class="notification-badge">
+            {{ unreadCount$ | async }}
+          </span>
+        </a>
+      </ng-container>
+
       <a routerLink="/MyProfile" class="navbar-icon-btn" title="My Profile"><i class="fas fa-user-graduate"></i></a>
     </ng-container>
     <button class="dark-mode-toggle navbar-icon-btn" (click)="toggleDarkMode()" title="Toggle Dark Mode">
@@ -36,7 +50,7 @@
   </div>
 </nav>
 
-<!-- Sidebar Flyout Menu -->
+<!-- Sidebar Flyout Menu (Your original code is fine) -->
 <div class="dropdown-menu" [class.show]="isMenuOpen" [class.dark]="isDarkMode">
   <!-- Menu Header with User Info -->
   <header class="menu-header" *ngIf="authService.isLoggedIn()">
@@ -66,6 +80,7 @@
       <li><a routerLink="/FacultyList" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-university"></i></span>Faculties</a></li>
       <li><a routerLink="/DepartmentsList" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-building"></i></span>Departments</a></li>
       <li><a routerLink="/CategoryList" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-tags"></i></span>Categories</a></li>
+      <li><a routerLink="/users" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-tags"></i></span>users</a></li>
     </ng-container>
 
     <!-- Student Specific Links -->
@@ -80,7 +95,6 @@
       <li><a routerLink="/projects/add" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-lightbulb"></i></span>Add Project Idea</a></li>
     </ng-container>
 
-    <!-- Separator (Handled by CSS on the element before it) -->
     <li class="menu-separator"></li>
 
     <!-- Help & Auth Links -->
