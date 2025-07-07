@@ -1,82 +1,96 @@
-<main class="page-container">
-  <header class="page-header">
+<main class="container">
+  <header class="header">
     <div class="header-content">
-      <h1>Edit Department <span>#{{ departmentId }}</span></h1>
-      <p>Modify the details of the selected department. Ensure all information is accurate before saving.</p>
+      <i class="fas fa-edit header-icon"></i>
+      <h1 class="header-title">
+        Edit Department
+        <span *ngIf="departmentId" class="title-id">#{{ departmentId }}</span>
+      </h1>
     </div>
-    <button (click)="cancel()" class="back-btn" title="Back to Departments">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08l-4.158 3.96H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
-      </svg>
+    <button (click)="cancel()" class="btn btn-secondary" title="Back to Departments List">
+      <i class="fas fa-arrow-alt-circle-left"></i>
       <span>Back to List</span>
     </button>
   </header>
 
-  <div *ngIf="isLoading" class="state-container">
+  <div *ngIf="isLoading" class="state-container fade-in">
     <div class="spinner"></div>
-    <p class="loading-text">Loading department details...</p>
+    <p class="state-text">Fetching department details...</p>
   </div>
 
-  <div *ngIf="error" class="state-container">
-    <div class="status-box error-state">
-      <h2>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.731 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-        Error
-      </h2>
-      <p>{{ error }}</p>
-    </div>
+  <div
+    *ngIf="errorMessage && !isLoading"
+    class="state-container error-message fade-in"
+  >
+    <i class="fas fa-exclamation-triangle"></i>
+    <p class="state-text">{{ errorMessage }}</p>
   </div>
 
-  <div *ngIf="!isLoading && !error && department" class="edit-form-container">
-    <form (ngSubmit)="saveChanges()" class="department-form">
+  <div *ngIf="!isLoading && !errorMessage && department" class="form-container">
+    <form (ngSubmit)="saveChanges()" #editForm="ngForm" class="department-form">
       <div class="form-group">
         <label for="name">Department Name</label>
-        <input type="text" id="name" name="name" [(ngModel)]="department.name" required class="form-input"
-               placeholder="e.g., Computer Science" minlength="3" maxlength="100">
+        <input
+          type="text"
+          id="name"
+          name="name"
+          [(ngModel)]="department.name"
+          required
+          class="form-input"
+          minlength="3"
+          maxlength="100"
+          #name="ngModel"
+        />
+        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="error-text">
+          <small *ngIf="name.errors?.['required']">Department name is required.</small>
+          <small *ngIf="name.errors?.['minlength']">Name must be at least 3 characters.</small>
         </div>
+      </div>
 
       <div class="form-group">
         <label for="description">Description</label>
-        <textarea id="description" name="description" [(ngModel)]="department.description" required class="form-input"
-                  placeholder="Provide a brief description of the department." rows="4" minlength="10"></textarea>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="department.description"
+          required
+          class="form-input"
+          rows="4"
+          minlength="10"
+          #description="ngModel"
+        ></textarea>
+        <div
+          *ngIf="description.invalid && (description.dirty || description.touched)"
+          class="error-text"
+        >
+          <small *ngIf="description.errors?.['required']">Description is required.</small>
+          <small *ngIf="description.errors?.['minlength']"
+            >Description must be at least 10 characters.</small
+          >
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="facultyId">Faculty ID</label>
-        <input type="number" id="facultyId" name="facultyId" [(ngModel)]="department.facultyId" required class="form-input"
-               placeholder="e.g., 101" min="1">
-      </div>
-
-      <div class="form-group">
-        <label for="headId">Head ID</label>
-        <input type="number" id="headId" name="headId" [(ngModel)]="department.headId" required class="form-input"
-               placeholder="e.g., 205" min="1">
-      </div>
-
+      <input type="hidden" name="facultyId" [(ngModel)]="department.facultyId" />
+      <input type="hidden" name="headId" [(ngModel)]="department.headId" />
       <div *ngIf="saveSuccess" class="success-message">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <i class="fas fa-check-circle"></i>
         Department updated successfully! Redirecting...
+      </div>
+
+      <div *ngIf="errorMessage && !saveSuccess" class="form-error-box">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ errorMessage }}</span>
       </div>
 
       <div class="form-actions">
         <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">
           Cancel
         </button>
-        <button type="submit" class="btn btn-primary" [disabled]="isSaving">
-          <span *ngIf="!isSaving">Save Changes</span>
-          <span *ngIf="isSaving">Saving...</span>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving || editForm.invalid">
+          <span *ngIf="!isSaving"><i class="fas fa-save"></i> Save Changes</span>
+          <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
         </button>
       </div>
     </form>
-  </div>
-
-  <div *ngIf="!isLoading && !error && !department" class="state-container">
-    <div class="status-box empty-state">
-      <h2>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.5l4.5-4.5m-4.5 4.5l-4.5-4.5m4.5 4.5v7.5" /></svg>
-        Department Not Found
-      </h2>
-      <p>The department you are looking for does not exist or has been removed.</p>
-    </div>
   </div>
 </main>

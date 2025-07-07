@@ -1,13 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http'; // 1. تأكد من استيراد HttpParams
 import { Observable } from 'rxjs';
-import { Faculty, FacultyCreatePayload } from '../models/faculty'; // استيراد FacultyCreatePayload
+import { Faculty, FacultyCreatePayload } from '../models/faculty';
 import { environment } from '../environments/environment';
 
-/**
- * @service FacultyService
- * @description Centralized service for all faculty-related API operations.
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -16,54 +12,37 @@ export class FacultyService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * @method getFaculties
-   * @description Fetches all faculties from the API.
-   * @returns An Observable array of Faculty objects.
-   */
   getFaculties(): Observable<Faculty[]> {
     return this.http.get<Faculty[]>(`${this.baseUrl}/get/all`);
   }
 
-  /**
-   * @method getFacultyById
-   * @description Fetches a single faculty by its ID from the API.
-   * @param id The ID of the faculty to fetch.
-   * @returns An Observable of a Faculty object.
-   */
   getFacultyById(id: number): Observable<Faculty> {
     return this.http.get<Faculty>(`${this.baseUrl}/get/${id}`);
   }
 
-  /**
-   * @method createFaculty
-   * @description Sends a request to create a new faculty.
-   * @param facultyData The data for the new faculty.
-   * @returns An Observable of the created Faculty object.
-   */
   createFaculty(facultyData: FacultyCreatePayload): Observable<Faculty> {
     return this.http.post<Faculty>(`${this.baseUrl}/create`, facultyData);
   }
 
-  /**
-   * @method updateFaculty
-   * @description Sends a request to update an existing faculty.
-   * @param facultyData The updated data for the faculty.
-   * @returns An Observable of the API response (e.g., success message or updated object).
-   */
   updateFaculty(facultyData: Faculty): Observable<any> {
-    // Assuming the API expects the full Faculty object in the body for PUT
     return this.http.put<any>(`${this.baseUrl}/update`, facultyData);
   }
 
   /**
    * @method deleteFaculty
-   * @description Sends a request to delete a faculty by its ID.
-   * @param id The ID of the faculty to delete.
-   * @returns An Observable of void.
+   * @description يرسل طلب حذف كلية باستخدام ID الخاص بها بالطريقة الصحيحة.
+   * @param id - معرف الكلية المراد حذفها.
    */
   deleteFaculty(id: number): Observable<void> {
-    // Assuming the API expects the ID as a path parameter for DELETE
-    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`);
+    // ===== 🔽 هذا هو الإصلاح الصحيح والنهائي 🔽 =====
+
+    // 2. إنشاء HttpParams لإرسال الـ ID كرابط استعلام (query parameter)
+    const params = new HttpParams().set('id', id.toString());
+
+    // 3. إرسال الطلب مع الرابط الصحيح والمعلمات
+    // الرابط النهائي الذي سيتم إرساله سيكون: .../api/faculty/delete?id=10
+    return this.http.delete<void>(`${this.baseUrl}/delete`, { params });
+
+    // ===== 🔼 نهاية الإصلاح 🔼 =====
   }
 }

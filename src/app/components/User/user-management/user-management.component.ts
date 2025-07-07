@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { Observable, BehaviorSubject, combineLatest, of } from 'rxjs';
-import { map, debounceTime, distinctUntilChanged, startWith, catchError, tap } from 'rxjs/operators';
+import { map, debounceTime, distinctUntilChanged, startWith, catchError } from 'rxjs/operators';
 import { User } from '../../../models/user';
 import { UserService } from '../../../Services/user.service';
 
-// Interface for the component's reactive state, which drives the UI
 interface UserManagementState {
   users: User[];
   isLoading: boolean;
@@ -22,42 +21,33 @@ interface UserManagementState {
   styleUrls: ['./user-management.component.css']
 })
 export class UserManagementComponent implements OnInit {
-  // A single state observable for loading and error states
   public state$!: Observable<UserManagementState>;
-  // A dedicated observable for the filtered user list
   public filteredUsers$!: Observable<User[]>;
-
   private searchTerm$ = new BehaviorSubject<string>('');
 
-  constructor(
-    private userService: UserService,
-    private router: Router
-  ) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    // 1. Create the primary data source stream
     const usersSource$ = this.userService.getUsers().pipe(
       map(users => ({ isLoading: false, users, error: null })),
       startWith({ isLoading: true, users: [], error: null }),
       catchError(err => {
         console.error("Error fetching users:", err);
-        return of({ isLoading: false, users: [], error: 'Could not load user data. Please check the connection and try again.' });
+        return of({ isLoading: false, users: [], error: 'Could not load user data. Please check the API connection and try again.' });
       })
     );
 
-    // 2. Create the filtered users stream based on the source and search term
+    this.state$ = usersSource$;
+
     this.filteredUsers$ = combineLatest([
-      usersSource$.pipe(map(state => state.users)), // We only need the users array for filtering
+      usersSource$.pipe(map(state => state.users)),
       this.searchTerm$.pipe(debounceTime(300), distinctUntilChanged())
     ]).pipe(
       map(([users, term]) => this.filterUsers(users, term))
     );
-
-    // 3. Expose the original state stream to the template for loading/error UI
-    this.state$ = usersSource$;
   }
 
-  // Pure function for filtering logic, easy to test and maintain
+  // [تم التصحيح] استخدام الخصائص الصحيحة (camelCase/lowercase)
   private filterUsers(users: User[], term: string): User[] {
     if (!term) return users;
     const lowerCaseTerm = term.toLowerCase();
@@ -69,14 +59,12 @@ export class UserManagementComponent implements OnInit {
     );
   }
 
-  // --- Template-facing methods ---
-
   onSearch(event: Event): void {
     const term = (event.target as HTMLInputElement).value;
     this.searchTerm$.next(term);
   }
 
-  // Returns both a name and an icon for the role
+  // [تم التصحيح] استخدام الخاصية الصحيحة user.role
   getRoleInfo(roleId: number): { name: string, icon: string } {
     switch (roleId) {
       case 2: return { name: 'Admin', icon: 'fa-user-shield' };
@@ -86,7 +74,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  // For NgFor performance
+  // [تم التصحيح] استخدام الخاصية الصحيحة item.id
   trackById(index: number, item: User): number {
     return item.id;
   }

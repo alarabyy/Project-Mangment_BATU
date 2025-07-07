@@ -4,8 +4,8 @@ import { Component, OnInit, OnDestroy, Inject, ChangeDetectorRef, HostListener }
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { ThemeService } from '../../Services/theme-service.service';
 import { RouterModule } from '@angular/router';
+import { ThemeService } from '../../../Services/theme-service.service.spec';
 
 @Component({
   selector: 'app-floating-controls',

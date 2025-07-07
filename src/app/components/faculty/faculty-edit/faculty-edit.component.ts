@@ -1,26 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Faculty, FacultyCreatePayload } from '../../../models/faculty'; // تأكد من المسار
-import { FacultyService } from '../../../Services/faculty.service'; // تأكد من المسار
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Faculty } from '../../../models/faculty';
+import { FacultyService } from '../../../Services/faculty.service';
+import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-faculty-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './faculty-edit.component.html',
   styleUrls: ['./faculty-edit.component.css']
 })
 export class FacultyEditComponent implements OnInit {
   facultyId: number | null = null;
   faculty: Faculty | null = null;
-  isLoading: boolean = true;
-  isSaving: boolean = false;
+  isLoading = true;
+  isSaving = false;
   errorMessage: string | null = null;
-  saveSuccess: boolean = false;
+  saveSuccess = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,73 +29,32 @@ export class FacultyEditComponent implements OnInit {
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    this.facultyId = idParam ? +idParam : null;
-
-    if (this.facultyId === null || isNaN(this.facultyId) || this.facultyId <= 0) {
-      this.errorMessage = 'Invalid or missing Faculty ID. Please navigate from the faculties list.';
+    if (idParam) {
+      this.facultyId = +idParam;
+      this.loadFacultyDetails();
+    } else {
       this.isLoading = false;
-      return;
+      this.errorMessage = 'Faculty ID is missing from the URL.';
     }
-    this.loadFacultyDetails();
   }
 
-  /**
-   * @private
-   * @method loadFacultyDetails
-   * Loads the details of the faculty to be edited.
-   */
-  private loadFacultyDetails(): void {
+  loadFacultyDetails(): void {
+    if (!this.facultyId) return;
     this.isLoading = true;
-    this.errorMessage = null;
-
-    this.facultyService.getFacultyById(this.facultyId!).pipe(
+    this.facultyService.getFacultyById(this.facultyId).pipe(
       finalize(() => this.isLoading = false),
       catchError(err => {
-        console.error('Error fetching faculty details:', err);
-        if (err.status === 404) {
-          this.errorMessage = 'Faculty not found. It might have been deleted.';
-        } else {
-          this.errorMessage = 'Failed to load faculty details. Please try again later.';
-        }
+        this.errorMessage = err.status === 404 ? 'Faculty not found.' : 'Failed to load details.';
         return of(null);
       })
     ).subscribe(data => {
-      if (data) {
-        // Create a deep copy to prevent direct mutation and ensure form data is distinct
-        this.faculty = { ...data, dean: { ...data.dean } };
-      } else {
-        this.faculty = null;
-        // Error message is set in catchError
-      }
+      this.faculty = data;
     });
   }
 
-  /**
-   * @public
-   * @method saveChanges
-   * Saves the updated faculty details to the API.
-   */
-  public saveChanges(): void {
-    if (!this.faculty) {
-      this.errorMessage = 'No faculty data to save.';
-      return;
-    }
-
-    // Client-side validation
-    if (!this.faculty.name || this.faculty.name.trim() === '') {
-      this.errorMessage = 'Faculty Name cannot be empty.';
-      return;
-    }
-    if (!this.faculty.description || this.faculty.description.trim() === '') {
-      this.errorMessage = 'Description cannot be empty.';
-      return;
-    }
-    if (typeof this.faculty.deanId !== 'number' || isNaN(this.faculty.deanId) || this.faculty.deanId <= 0) {
-      this.errorMessage = 'Dean ID is required and must be a positive number.';
-      return;
-    }
-    if (!this.faculty.dean.name || this.faculty.dean.name.trim() === '') {
-      this.errorMessage = 'Dean Name cannot be empty.';
+  saveChanges(): void {
+    if (!this.faculty || this.isFormInvalid()) {
+      this.errorMessage = 'Please fill all fields with valid data.';
       return;
     }
 
@@ -107,27 +65,27 @@ export class FacultyEditComponent implements OnInit {
     this.facultyService.updateFaculty(this.faculty).pipe(
       finalize(() => this.isSaving = false),
       catchError(err => {
-        console.error('Error updating faculty:', err);
-        this.errorMessage = 'Failed to update faculty. Please check your input and try again.';
+        this.errorMessage = err.error?.message || 'Failed to update faculty.';
         return of(null);
       })
     ).subscribe(response => {
       if (response) {
         this.saveSuccess = true;
-        console.log('Faculty updated successfully!', response);
-        setTimeout(() => {
-          this.router.navigate(['/FacultyList']); // Navigate back to the list page
-        }, 1500);
+        setTimeout(() => this.router.navigate(['/FacultyList']), 1500);
       }
     });
   }
 
-  /**
-   * @public
-   * @method cancel
-   * Navigates back to the faculty list without saving changes.
-   */
-  public cancel(): void {
+  cancel(): void {
     this.router.navigate(['/FacultyList']);
+  }
+
+  private isFormInvalid(): boolean {
+    if (!this.faculty) return true;
+    const model = this.faculty;
+    return !model.name || model.name.trim().length < 3 ||
+           !model.description || model.description.trim().length < 10 ||
+           model.deanId === null || model.deanId <= 0 ||
+           !model.dean.name || model.dean.name.trim().length < 3;
   }
 }

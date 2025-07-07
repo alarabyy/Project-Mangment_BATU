@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription, BehaviorSubject } from 'rxjs';
-import { AppNotification } from '../../models/notification';
+import { AppNotification } from '../../../models/notification';
 // **هذا هو المسار الصحيح والموحّد للخدمة**
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { NotificationService } from '../../Services/notification-proxy.service';
+import { NotificationService } from '../../../Services/notification-proxy.service';
 
 interface GroupedNotifications {
   [key: string]: AppNotification[];

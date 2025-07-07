@@ -1,0 +1,58 @@
+<div class="container">
+  <header class="header">
+    <div class="header-content">
+      <i class="fas fa-user-cog header-icon"></i>
+      <h1 class="header-title">My Projects</h1>
+    </div>
+    <button (click)="addProject()" class="btn btn-primary">
+      <i class="fas fa-plus-circle"></i>
+      <span>New Project</span>
+    </button>
+  </header>
+
+  <main class="content">
+    <div *ngIf="isLoading" class="state-container fade-in">
+      <div class="spinner"></div>
+      <p class="state-text">Fetching your projects...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !isLoading" class="state-container error-message fade-in">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p class="state-text">{{ errorMessage }}</p>
+      <button (click)="loadMyProjects()" class="btn btn-secondary" style="margin-top: 1rem;">Retry</button>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && projects.length === 0" class="state-container fade-in">
+      <i class="fas fa-folder-open"></i>
+      <p class="state-text">You have no projects yet. Let's create the first one!</p>
+    </div>
+
+    <!-- تم تعديل كل الخصائص إلى camelCase لتطابق موديل Project -->
+    <div *ngIf="!isLoading && !errorMessage && projects.length > 0" class="project-grid">
+      <div *ngFor="let project of projects; trackBy: trackByProjectId" class="project-card fade-in-up">
+        <div class="card-header">
+          <h3 class="card-title">{{ project.title }}</h3>
+          <span class="grade-badge" [class.no-grade]="!project.grade">
+            {{ project.grade ? 'Grade: ' + project.grade : 'Not Graded' }}
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="description">{{ project.description || 'No description provided.' }}</p>
+        </div>
+        <div class="card-footer">
+          <div class="id-group">
+            <span title="Leader ID">L: {{ project.leaderId }}</span>
+          </div>
+          <div class="card-actions">
+            <button (click)="editProject(project.id)" class="btn btn-icon btn-edit" title="Edit Project">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+            <button (click)="deleteProject(project.id)" class="btn btn-icon btn-danger" [disabled]="deletingProjectIds.has(project.id)" title="Delete Project">
+              <i class="fas" [class.fa-trash-alt]="!deletingProjectIds.has(project.id)" [class.fa-spinner]="deletingProjectIds.has(project.id)" [class.fa-spin]="deletingProjectIds.has(project.id)"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

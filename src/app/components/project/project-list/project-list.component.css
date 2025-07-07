@@ -1,9 +1,15 @@
-/* --- Base and Desktop Styles --- */
+:host {
+  display: block;
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
 .list-container {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: auto;
+  font-family: var(--font-family-base);
 }
+
 .list-header {
   display: flex;
   justify-content: space-between;
@@ -11,57 +17,85 @@
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 1rem;
-  flex-wrap: wrap; /* Allows wrapping on medium screens if needed */
+  flex-wrap: wrap;
   gap: 1rem;
 }
+
 .list-header h1 {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: var(--font-weight-bold);
   color: var(--text-color);
-  transition: font-size 0.2s ease-in-out;
 }
+
 .projects-grid {
   display: grid;
-  /* Reduced min-width to better fit smaller screens */
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
+
 .project-card {
   background-color: var(--surface-color);
   border-radius: var(--border-radius-large);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color-translucent);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  text-decoration: none; /* لإزالة الخط تحت الرابط */
+  color: inherit; /* ليرث لون النص العادي */
+}
+
+.project-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: var(--box-shadow-lg);
+  border-color: var(--primary-accent);
+}
+
+.card-image-wrapper {
+  width: 100%;
+  height: 200px; /* ارتفاع ثابت للصور */
+  background-color: var(--bg-color);
+}
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* لضمان ملء الصورة للمساحة بشكل جيد */
+}
+
+.card-content {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
+  flex-grow: 1;
 }
-.project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--box-shadow-md);
-  border-color: var(--primary-accent);
-}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
+  gap: 1rem;
 }
+
 .card-header h3 {
-  color: var(--text-color);
   font-size: 1.25rem;
   margin: 0;
   font-weight: var(--font-weight-semibold);
   line-height: 1.3;
 }
+
 .card-body {
   flex-grow: 1;
 }
+
 .description {
   color: var(--subtle-text-color);
   font-size: 0.9rem;
   line-height: 1.5;
-  margin-top: 0.25rem;
+  margin: 0;
+  min-height: 54px; /* ارتفاع تقريبي لثلاثة أسطر */
 }
+
 .card-footer {
   margin-top: 1.5rem;
   padding-top: 1rem;
@@ -69,45 +103,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Added for smooth transition during layout change */
-  transition: all 0.2s ease-in-out;
 }
-.btn, .btn-primary {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--border-radius-pill);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  transition: all var(--transition-speed-fast) var(--easing-curve-sharp);
-  text-decoration: none;
-  background-color: var(--primary-accent);
-  color: var(--bg-color);
-}
-.btn-primary:hover {
-  background-color: var(--primary-accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px var(--shadow-color-accent);
-}
-.empty-message, .loading-spinner + p {
-  text-align: center;
-  color: var(--subtle-text-color);
-  font-size: 1.2rem;
-  grid-column: 1 / -1;
-  margin-top: 3rem;
-}
-.loading-spinner {
-  border: 4px solid var(--surface-color);
-  border-top: 4px solid var(--primary-accent);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: 2rem auto 1rem;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+
 .grade-badge {
   background-color: var(--primary-accent-translucent);
   color: var(--primary-accent);
@@ -117,125 +114,72 @@
   font-weight: var(--font-weight-medium);
   flex-shrink: 0;
 }
-.card-section {
-  margin-top: 1rem;
-}
-.card-section:first-child {
-  margin-top: 0;
-}
-.card-section h4 {
-  margin-bottom: 0.25rem;
-  font-size: 0.9rem;
-  color: var(--text-color);
-  font-weight: var(--font-weight-semibold);
-}
-.card-details {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: var(--bg-color);
-  border-radius: var(--border-radius-base);
-  border: 1px solid var(--border-color-translucent);
-  font-size: 0.9rem;
-}
-.card-details p {
-  margin: 0;
-}
-.card-details p:not(:last-child) {
-  margin-bottom: 0.5rem;
-}
-.card-details strong {
-  color: var(--primary-accent);
-}
+
 .id-group {
   display: flex;
   gap: 1rem;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--subtle-text-color);
-  align-items: center;
 }
-.id-group span {
-  background-color: var(--bg-color);
-  padding: 0.2rem 0.6rem;
-  border-radius: var(--border-radius-base);
-  border: 1px solid var(--border-color);
-  font-weight: var(--font-weight-medium);
-}
+
 .card-actions {
   display: flex;
+}
+
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  text-decoration: none;
+  background-color: var(--primary-accent);
+  color: var(--bg-color);
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }
+
 .btn-icon {
-  background: transparent;
-  border: none;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--subtle-text-color);
   cursor: pointer;
-  padding: 0.6rem;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  transition: all var(--transition-speed-fast);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2; /* لضمان ظهوره فوق الرابط */
 }
-.btn-icon.btn-edit {
-  color: var(--primary-accent);
-}
-.btn-icon.btn-edit:hover {
-  background-color: var(--primary-accent-translucent);
-}
-.btn-icon.btn-danger {
-  color: var(--error-color);
-}
+
 .btn-icon.btn-danger:hover {
   background-color: rgba(248, 81, 73, 0.1);
+  border-color: var(--error-color);
+  color: var(--error-color);
 }
 
-/* --- Responsive Adjustments --- */
-
-/* For Tablets */
-@media (max-width: 768px) {
-  .list-container {
-    padding: 1.5rem;
-  }
-  .list-header h1 {
-    font-size: 2rem;
-  }
+.loading-container, .empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--subtle-text-color);
+  font-size: 1.2rem;
 }
 
-/* For Mobile Phones */
-@media (max-width: 480px) {
-  .list-container {
-    padding: 1rem;
-  }
+.loading-spinner {
+  border: 5px solid var(--surface-color);
+  border-top-color: var(--primary-accent);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
 
-  .list-header {
-    flex-direction: column; /* Stack header items */
-    align-items: flex-start;
-  }
-
-  .projects-grid {
-    gap: 1rem;
-  }
-
-  .project-card {
-    padding: 1rem;
-  }
-
-  .card-footer {
-    flex-direction: column;   /* Stack the ID group and actions vertically */
-    align-items: flex-start;  /* Align both to the left */
-    gap: 1rem;                /* Add space between them when stacked */
-  }
-
-  .id-group {
-    flex-wrap: wrap; /* Allows IDs to wrap to a new line if needed */
-    gap: 0.5rem;
-  }
-
-  .card-actions {
-    width: 100%; /* Make actions container take full width */
-    justify-content: flex-end; /* Push buttons to the right edge */
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

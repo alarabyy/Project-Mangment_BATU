@@ -1,16 +1,15 @@
 import { Component } from '@angular/core';
-import { NgForm, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Department, DepartmentCreatePayload } from '../../../models/department';
+import { Router } from '@angular/router';
+import { DepartmentCreatePayload } from '../../../models/department';
 import { DepartmentService } from '../../../Services/department.service';
-// CORRECTED PATH: Using lowercase 'services'
+import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-department-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './department-create.component.html',
   styleUrls: ['./department-create.component.css']
 })
@@ -22,37 +21,45 @@ export class DepartmentCreateComponent {
     headId: null
   };
   errorMessage: string | null = null;
-  isLoading: boolean = false;
+  isSaving = false;
+  saveSuccess = false;
 
   constructor(
     private departmentService: DepartmentService,
     private router: Router
   ) {}
 
-  onSubmit(form: NgForm): void {
-    if (form.invalid || this.departmentModel.facultyId === null || this.departmentModel.headId === null) {
-      this.errorMessage = 'Please fill out all required fields.';
-      return;
-    }
-    this.isLoading = true;
+  public createDepartment(): void {
+    if (this.isFormInvalid()) return;
+
+    this.isSaving = true;
     this.errorMessage = null;
-    const payloadToSend = {
-      name: this.departmentModel.name,
-      description: this.departmentModel.description,
-      facultyId: this.departmentModel.facultyId,
-      headId: this.departmentModel.headId
-    };
-    this.departmentService.createDepartment(payloadToSend as any).subscribe({
-      next: () => {
-        this.isLoading = false;
-        alert('Department created successfully!');
-        this.router.navigate(['/department-list']);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.isLoading = false;
-        this.errorMessage = 'Failed to create department. Please try again.';
-        console.error('Create error:', err);
+    this.saveSuccess = false;
+
+    this.departmentService.createDepartment(this.departmentModel).pipe(
+      finalize(() => this.isSaving = false),
+      catchError(err => {
+        this.errorMessage = err.error?.message || 'Failed to create department. Please try again.';
+        return of(null);
+      })
+    ).subscribe(response => {
+      if (response) {
+        this.saveSuccess = true;
+        setTimeout(() => this.router.navigate(['/DepartmentsList']), 1500);
       }
     });
+  }
+
+  public cancel(): void {
+    this.router.navigate(['/DepartmentsList']);
+  }
+
+  private isFormInvalid(): boolean {
+    const model = this.departmentModel;
+    if (!model.name || model.name.trim().length < 3) return true;
+    if (!model.description || model.description.trim().length < 10) return true;
+    if (model.facultyId === null || model.facultyId <= 0) return true;
+    if (model.headId === null || model.headId <= 0) return true;
+    return false;
   }
 }

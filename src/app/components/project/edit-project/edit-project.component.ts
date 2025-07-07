@@ -3,9 +3,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
-import { Project } from '../../../models/project';
-
-
+import { Project, ProjectImage } from '../../../models/project';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-edit-project',
@@ -16,8 +15,15 @@ import { Project } from '../../../models/project';
 })
 export class EditProjectComponent implements OnInit {
   projectForm!: FormGroup;
+  project: Project | null = null;
   isSubmitting = false;
-  pageTitle = 'Loading Project...'; // Default title
+  pageTitle = 'Loading Project...';
+
+  // متغيرات خاصة بإدارة الصور
+  selectedFile: File | null = null;
+  isUploading = false;
+  imagesBeingDeleted: Set<number> = new Set(); // لتتبع الصور التي يتم حذفها
+
   private projectId!: number;
 
   constructor(
@@ -28,50 +34,45 @@ export class EditProjectComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Attempt to get the project ID from the route parameters
     const idParam = this.route.snapshot.paramMap.get('id');
     if (!idParam) {
-      console.error("Project ID is missing from the route.");
       this.router.navigate(['/projects']);
       return;
     }
     this.projectId = +idParam;
+    this.initializeForm();
+    this.loadProjectData();
+  }
 
-    // Initialize the form with the new structure
+  initializeForm(): void {
     this.projectForm = this.fb.group({
-      id: [this.projectId], // The ID is crucial for the update operation
+      id: [this.projectId],
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
-      grade: [0, [Validators.required, Validators.min(0)]],
+      problemStatement: ['', Validators.required],
       technologies: ['', Validators.required],
       toolsUsed: ['', Validators.required],
-      problemStatement: ['', Validators.required],
-      leaderId: [null, [Validators.required, Validators.pattern("^[0-9]*$")]],
-      categoryId: [null, [Validators.required, Validators.pattern("^[0-9]*$")]],
-      departmentId: [null, [Validators.required, Validators.pattern("^[0-9]*$")]]
+      grade: [null, [Validators.required, Validators.min(0)]],
+      leaderId: ['', Validators.required],
+      categoryId: [null, Validators.required],
+      departmentId: [null, Validators.required]
     });
+  }
 
-    // Fetch the project data to populate the form
+  loadProjectData(): void {
     this.projectService.getProjectById(this.projectId).subscribe({
-      next: (project) => this.populateForm(project),
+      next: (projectData) => {
+        this.project = projectData;
+        this.pageTitle = `Edit Project: ${projectData.title}`;
+        this.projectForm.patchValue(projectData);
+      },
       error: (err) => {
         console.error("Could not fetch project data", err);
-        this.router.navigate(['/projects']); // Redirect if project not found
+        this.router.navigate(['/projects']);
       }
     });
   }
 
-  /**
-   * Populates the form with the fetched project data.
-   * @param project The project data from the API.
-   */
-  populateForm(project: Project): void {
-    this.pageTitle = `Edit Project: ${project.title}`;
-    // Use patchValue to fill the form with the project data
-    this.projectForm.patchValue(project);
-  }
-
-  // Helper for easy access to form controls in the template
   get f() { return this.projectForm.controls; }
 
   onSubmit(): void {
@@ -79,24 +80,69 @@ export class EditProjectComponent implements OnInit {
       this.projectForm.markAllAsTouched();
       return;
     }
-
     this.isSubmitting = true;
-    const updatedProject: Project = this.projectForm.value;
-
-    this.projectService.updateProject(updatedProject).subscribe({
+    this.projectService.updateProject(this.projectForm.value).pipe(
+      finalize(() => this.isSubmitting = false)
+    ).subscribe({
       next: () => {
-        console.log('Project updated successfully!');
         this.router.navigate(['/projects']);
       },
-      error: (err) => {
-        console.error('Error updating project:', err);
-        this.isSubmitting = false;
-      },
-      complete: () => {
-        this.isSubmitting = false;
-      }
+      error: (err) => console.error('Error updating project:', err)
     });
   }
+
+  // =================== 🔽 دوال إدارة الصور 🔽 ===================
+
+  onFileSelected(event: Event): void {
+    const element = event.currentTarget as HTMLInputElement;
+    const fileList: FileList | null = element.files;
+    if (fileList && fileList.length > 0) {
+      this.selectedFile = fileList[0];
+    } else {
+      this.selectedFile = null;
+    }
+  }
+
+  onImageUpload(): void {
+    if (!this.selectedFile) {
+      alert('Please select a file to upload.');
+      return;
+    }
+    this.isUploading = true;
+    this.projectService.uploadImage(this.projectId, this.selectedFile).pipe(
+      finalize(() => {
+        this.isUploading = false;
+        this.selectedFile = null;
+        // إعادة تعيين حقل الإدخال
+        const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
+        if(fileInput) fileInput.value = '';
+      })
+    ).subscribe({
+      next: () => {
+        console.log('Image uploaded successfully.');
+        this.loadProjectData(); // إعادة تحميل بيانات المشروع لإظهار الصورة الجديدة
+      },
+      error: (err) => console.error('Error uploading image:', err)
+    });
+  }
+
+  deleteImage(imageId: number): void {
+    if (confirm('Are you sure you want to delete this image?')) {
+      this.imagesBeingDeleted.add(imageId); // إظهار مؤشر الحذف لهذه الصورة
+
+      this.projectService.deleteImage(imageId).pipe(
+        finalize(() => this.imagesBeingDeleted.delete(imageId)) // إخفاء المؤشر
+      ).subscribe({
+        next: () => {
+          console.log('Image deleted successfully.');
+          this.loadProjectData(); // إعادة تحميل بيانات المشروع لتحديث المعرض
+        },
+        error: (err) => console.error('Error deleting image:', err)
+      });
+    }
+  }
+
+  // ===============================================================
 
   onCancel(): void {
     this.router.navigate(['/projects']);

@@ -1,61 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { FacultyCreatePayload } from '../../../models/faculty'; // تأكد من المسار
-import { FacultyService } from '../../../Services/faculty.service'; // تأكد من المسار
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Router } from '@angular/router';
+import { FacultyCreatePayload } from '../../../models/faculty';
+import { FacultyService } from '../../../Services/faculty.service';
+import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-add-faculty',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './add-faculty.component.html',
   styleUrls: ['./add-faculty.component.css']
 })
-export class AddFacultyComponent implements OnInit {
-  // Initializing newFaculty with default values to avoid errors with two-way binding
+export class AddFacultyComponent {
+  // الآن، هذا التعريف صحيح تمامًا بفضل تعديل الواجهة
   newFaculty: FacultyCreatePayload = {
     name: '',
     description: '',
-    deanId: null as any, // Use null and handle validation for number input
+    deanId: null,
     deanName: ''
   };
-  isSaving: boolean = false;
+  isSaving = false;
   errorMessage: string | null = null;
-  saveSuccess: boolean = false;
+  saveSuccess = false;
 
   constructor(
     private facultyService: FacultyService,
     private router: Router
   ) {}
 
-  ngOnInit(): void {
-    // No initial data loading needed for adding a new faculty
-  }
-
-  /**
-   * @public
-   * @method createFaculty
-   * Handles the form submission to create a new faculty.
-   */
   public createFaculty(): void {
-    // Client-side validation
-    if (!this.newFaculty.name || this.newFaculty.name.trim() === '') {
-      this.errorMessage = 'Faculty Name cannot be empty.';
-      return;
-    }
-    if (!this.newFaculty.description || this.newFaculty.description.trim() === '') {
-      this.errorMessage = 'Description cannot be empty.';
-      return;
-    }
-    if (typeof this.newFaculty.deanId !== 'number' || isNaN(this.newFaculty.deanId) || this.newFaculty.deanId <= 0) {
-      this.errorMessage = 'Dean ID is required and must be a positive number.';
-      return;
-    }
-    if (!this.newFaculty.deanName || this.newFaculty.deanName.trim() === '') {
-      this.errorMessage = 'Dean Name cannot be empty.';
+    if (this.isFormInvalid()) {
+      // رسالة الخطأ يتم عرضها الآن من خلال التحقق الفوري في النموذج
+      // يمكنك ترك هذا التحقق كحماية إضافية
       return;
     }
 
@@ -66,28 +44,27 @@ export class AddFacultyComponent implements OnInit {
     this.facultyService.createFaculty(this.newFaculty).pipe(
       finalize(() => this.isSaving = false),
       catchError(err => {
-        console.error('Error creating faculty:', err);
-        this.errorMessage = 'Failed to create faculty. Please check your input and try again.';
+        this.errorMessage = err.error?.message || 'Failed to create faculty. Please try again.';
         return of(null);
       })
     ).subscribe(response => {
       if (response) {
         this.saveSuccess = true;
-        console.log('Faculty created successfully!', response);
-        // Navigate back to the list after a short delay to show success message
-        setTimeout(() => {
-          this.router.navigate(['/FacultyList']);
-        }, 1500);
+        // العودة إلى صفحة القائمة بعد 1.5 ثانية
+        setTimeout(() => this.router.navigate(['/FacultyList']), 1500);
       }
     });
   }
 
-  /**
-   * @public
-   * @method cancel
-   * Navigates back to the faculty list without saving changes.
-   */
   public cancel(): void {
     this.router.navigate(['/FacultyList']);
+  }
+
+  private isFormInvalid(): boolean {
+    const model = this.newFaculty;
+    return !model.name || model.name.trim().length < 3 ||
+           !model.description || model.description.trim().length < 10 ||
+           model.deanId === null || model.deanId <= 0 ||
+           !model.deanName || model.deanName.trim().length < 3;
   }
 }

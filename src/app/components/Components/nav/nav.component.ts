@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subscription, filter, Observable } from 'rxjs';
-import { AuthService } from '../../Services/auth.service';
-import { ThemeService } from '../../Services/theme-service.service';
-import { NotificationService } from '../../Services/notification-proxy.service';
+import { AuthService } from '../../../Services/auth.service';
+import { NotificationService } from '../../../Services/notification-proxy.service';
+import { ThemeService } from '../../../Services/theme-service.service.spec';
 // ==========================================================
 // ==            THIS IS THE CORRECTED IMPORT              ==
 // ==========================================================

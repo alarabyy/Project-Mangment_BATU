@@ -1,15 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Faculty } from '../../../models/faculty';
 import { FacultyService } from '../../../Services/faculty.service';
-import { CommonModule } from '@angular/common'; // مهم لاستخدام *ngIf و *ngFor
+import { catchError, finalize, firstValueFrom, of } from 'rxjs';
 
-/**
- * @component FacultyListComponent
- * @description Manages the display and interaction logic for the faculties list.
- * It uses FacultyService for data operations and handles UI states and animations.
- */
 @Component({
   selector: 'app-faculty-list',
   templateUrl: './faculty-list.component.html',
@@ -19,9 +15,9 @@ import { CommonModule } from '@angular/common'; // مهم لاستخدام *ngIf
 })
 export class FacultyListComponent implements OnInit {
   public faculties: Faculty[] = [];
-  public isLoading: boolean = true;
+  public isLoading = true;
   public errorMessage: string | null = null;
-  public deletingFacultyIds = new Set<number>(); // يستخدم لتتبع الأقسام التي يتم حذفها
+  public deletingFacultyIds = new Set<number>();
 
   constructor(
     private facultyService: FacultyService,
@@ -32,76 +28,57 @@ export class FacultyListComponent implements OnInit {
     this.loadFaculties();
   }
 
-  /**
-   * @method loadFaculties
-   * @description Fetches faculties using the service and handles UI states.
-   */
   public async loadFaculties(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
     try {
-      const faculties$ = this.facultyService.getFaculties();
-      this.faculties = await firstValueFrom(faculties$);
+      this.faculties = await firstValueFrom(this.facultyService.getFaculties());
     } catch (error) {
       console.error('API Error:', error);
-      this.errorMessage = 'Failed to load data. The server might be down or an issue occurred.';
+      this.errorMessage = 'Failed to load faculties. Server might be unavailable.';
     } finally {
       this.isLoading = false;
     }
   }
 
-  /**
-   * @method deleteFaculty
-   * @description Deletes a faculty with an exit animation and updates the list.
-   * @param facultyId - The ID of the faculty to delete.
-   */
-  public async deleteFaculty(facultyId: number): Promise<void> {
-    // منع الحذف المتعدد لنفس العنصر
-    if (this.deletingFacultyIds.has(facultyId)) {
-      console.warn(`Deletion already in progress for faculty ID: ${facultyId}`);
-      return;
-    }
-
+  public deleteFaculty(facultyId: number): void {
+    if (this.deletingFacultyIds.has(facultyId)) return;
     const confirmation = confirm('Are you sure you want to permanently delete this faculty? This action cannot be undone.');
-    if (!confirmation) {
-      return;
-    }
+    if (!confirmation) return;
 
-    // أضف الـ ID إلى المجموعة لتفعيل animation الحذف
     this.deletingFacultyIds.add(facultyId);
+    this.errorMessage = null;
 
-    // انتظر قليلاً للسماح لـ animation الحذف بالتشغيل قبل الإزالة الفعلية
-    setTimeout(async () => {
-      try {
-        await firstValueFrom(this.facultyService.deleteFaculty(facultyId));
-        // قم بإزالة العنصر من المصفوفة بعد الحذف الناجح
-        this.faculties = this.faculties.filter(f => f.id !== facultyId);
-        // قم بإزالة الـ ID من مجموعة التتبع
-        this.deletingFacultyIds.delete(facultyId);
-        console.log(`Faculty with ID ${facultyId} deleted successfully.`);
-      } catch (error) {
-        console.error('Deletion Error:', error);
-        this.errorMessage = `Failed to delete faculty ID: ${facultyId}. Please try again.`;
-        // في حالة الفشل، أزل الـ ID للسماح بالمحاولة مرة أخرى وإظهار العنصر
-        this.deletingFacultyIds.delete(facultyId);
-      }
-    }, 500); // يجب أن تتوافق هذه المدة مع مدة animation الإزالة (fadeOutShrink) في CSS
+    setTimeout(() => {
+      this.facultyService.deleteFaculty(facultyId).pipe(
+        finalize(() => this.deletingFacultyIds.delete(facultyId))
+      ).subscribe({
+        next: () => {
+          this.faculties = this.faculties.filter(f => f.id !== facultyId);
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Deletion Error:', err);
+          if (err.error?.message) {
+            this.errorMessage = `Error: ${err.error.message}`;
+          } else if (err.status === 409) {
+            this.errorMessage = `Cannot delete faculty #${facultyId}. It is linked to other data (e.g., departments).`;
+          } else {
+            this.errorMessage = `Failed to delete faculty. Status: ${err.statusText || 'Unknown Error'}`;
+          }
+        }
+      });
+    }, 500);
   }
 
-  /**
-   * @method addFaculty
-   * @description Navigates to the add faculty page.
-   */
   public addFaculty(): void {
-    this.router.navigate(['/add-faculty']); // المسار لصفحة إضافة قسم جديد
+    this.router.navigate(['/add-faculty']);
   }
 
-  /**
-   * @method editFaculty
-   * @description Navigates to the faculty edit page with the specified faculty ID.
-   * @param facultyId - The ID of the faculty to edit.
-   */
   public editFaculty(facultyId: number): void {
-    this.router.navigate(['/facultyEdit', facultyId]); // المسار المطلوب لصفحة التعديل
+    this.router.navigate(['/facultyEdit', facultyId]);
+  }
+
+  public trackByFacultyId(index: number, faculty: Faculty): number {
+    return faculty.id;
   }
 }

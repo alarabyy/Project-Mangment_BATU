@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Category, CategoryCreatePayload } from '../models/category'; // استيراد CategoryCreatePayload
 import { environment } from '../environments/environment';
+import { Category, CategoryCreatePayload } from '../models/category';
 
 /**
  * @service CategoryService
@@ -19,7 +19,6 @@ export class CategoryService {
   /**
    * @method getAllCategories
    * @description Fetches all categories from the API.
-   * @returns An Observable array of Category objects.
    */
   getAllCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.baseUrl}/get/all`);
@@ -27,9 +26,7 @@ export class CategoryService {
 
   /**
    * @method getCategoryById
-   * @description Fetches a single category by its ID from the API.
-   * @param id The ID of the category to fetch.
-   * @returns An Observable of a Category object.
+   * @description Fetches a single category by its ID.
    */
   getCategoryById(id: number): Observable<Category> {
     return this.http.get<Category>(`${this.baseUrl}/get/${id}`);
@@ -37,9 +34,7 @@ export class CategoryService {
 
   /**
    * @method createCategory
-   * @description Sends a request to create a new category.
-   * @param categoryData The data for the new category.
-   * @returns An Observable of the created Category object.
+   * @description Creates a new category.
    */
   createCategory(categoryData: CategoryCreatePayload): Observable<Category> {
     return this.http.post<Category>(`${this.baseUrl}/create`, categoryData);
@@ -47,23 +42,26 @@ export class CategoryService {
 
   /**
    * @method updateCategory
-   * @description Sends a request to update an existing category.
-   * @param categoryData The updated data for the category.
-   * @returns An Observable of the API response (e.g., success message or updated object).
+   * @description Updates an existing category.
    */
   updateCategory(categoryData: Category): Observable<any> {
-    // Assuming the API expects the full Category object in the body for PUT
     return this.http.put<any>(`${this.baseUrl}/update`, categoryData);
   }
 
   /**
    * @method deleteCategory
-   * @description Sends a request to delete a category by its ID.
+   * @description Deletes a category by its ID using a query parameter.
    * @param id The ID of the category to delete.
    * @returns An Observable of void.
    */
   deleteCategory(id: number): Observable<void> {
-    // Assuming the API expects the ID as a path parameter for DELETE
-    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`);
+    // --- التعديل هنا ---
+    // 1. إنشاء HttpParams لوضع الـ ID كـ query parameter
+    const params = new HttpParams().set('id', id.toString());
+
+    // 2. إرسال الطلب مع الرابط الصحيح والـ params
+    // الرابط الناتج سيكون: .../api/category/delete?id=1
+    return this.http.delete<void>(`${this.baseUrl}/delete`, { params: params });
   }
 }
+

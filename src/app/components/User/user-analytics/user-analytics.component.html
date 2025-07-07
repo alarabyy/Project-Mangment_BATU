@@ -27,7 +27,6 @@
       </div>
     </header>
 
-    <!-- --- Loading State --- -->
     <ng-container *ngIf="state.isLoading">
       <div class="analytics-grid skeleton-grid">
         <div class="kpi-card-skeleton" *ngFor="let i of [1,2,3,4]"></div>
@@ -37,14 +36,12 @@
       </div>
     </ng-container>
 
-    <!-- --- Error State --- -->
     <div *ngIf="state.error && !state.isLoading" class="error-message">
       <i class="fas fa-exclamation-triangle"></i>
       <h3>Loading Failed</h3>
       <p>{{ state.error }}</p>
     </div>
 
-    <!-- --- Success State --- -->
     <ng-container *ngIf="!state.isLoading && !state.error">
       <div *ngIf="filteredUsers$ | async as users">
         <ng-container *ngIf="kpiData$ | async as kpiData">
@@ -54,28 +51,28 @@
             <div class="kpi-card">
               <i class="fas fa-users kpi-icon"></i>
               <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.total"></span>
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.total">0</span>
                 <span class="kpi-title">Total Users</span>
               </div>
             </div>
             <div class="kpi-card">
               <i class="fas fa-user-check kpi-icon"></i>
               <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.active"></span>
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.active">0</span>
                 <span class="kpi-title">Active Users</span>
               </div>
             </div>
             <div class="kpi-card">
               <i class="fas fa-calendar-alt kpi-icon"></i>
               <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.newLastMonth"></span>
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.newLastMonth">0</span>
                 <span class="kpi-title">New Last 30 Days</span>
               </div>
             </div>
             <div class="kpi-card">
               <i class="fas fa-user-clock kpi-icon"></i>
               <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.pending"></span>
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.pending">0</span>
                 <span class="kpi-title">Pending Users</span>
               </div>
             </div>
@@ -84,35 +81,15 @@
             <div class="chart-card large">
               <h3 class="chart-title">Role Distribution</h3>
               <div *ngIf="roleDistributionOptions$ | async as options" class="chart-wrapper">
-                <apx-chart
-                  [series]="options.series"
-                  [chart]="options.chart"
-                  [labels]="options.labels"
-                  [colors]="options.colors"
-                  [legend]="options.legend"
-                  [dataLabels]="options.dataLabels"
-                  [plotOptions]="options.plotOptions"
-                  [tooltip]="options.tooltip"
-                ></apx-chart>
+                <apx-chart [series]="options.series" [chart]="options.chart" [labels]="options.labels" [colors]="options.colors" [legend]="options.legend" [dataLabels]="options.dataLabels" [plotOptions]="options.plotOptions" [tooltip]="options.tooltip"></apx-chart>
               </div>
             </div>
 
-            <!-- NEW: Signups Over Time Chart -->
+            <!-- Signups Over Time Chart -->
             <div class="chart-card large">
                 <h3 class="chart-title">New Signups (Last 30 Days)</h3>
                 <div *ngIf="signupsOverTimeOptions$ | async as options" class="chart-wrapper">
-                  <apx-chart
-                    [series]="options.series"
-                    [chart]="options.chart"
-                    [xaxis]="options.xaxis"
-                    [yaxis]="options.yaxis"
-                    [stroke]="options.stroke"
-                    [tooltip]="options.tooltip"
-                    [dataLabels]="options.dataLabels"
-                    [grid]="options.grid"
-                    [fill]="options.fill"
-                    [colors]="options.colors"
-                  ></apx-chart>
+                  <apx-chart [series]="options.series" [chart]="options.chart" [xaxis]="options.xaxis" [yaxis]="options.yaxis" [stroke]="options.stroke" [tooltip]="options.tooltip" [dataLabels]="options.dataLabels" [grid]="options.grid" [fill]="options.fill" [colors]="options.colors"></apx-chart>
                 </div>
             </div>
 
@@ -120,18 +97,7 @@
             <div class="chart-card full-width">
               <h3 class="chart-title">Top Email Domains</h3>
                <div *ngIf="emailDomainOptions$ | async as options" class="chart-wrapper">
-                <apx-chart
-                  [series]="options.series"
-                  [chart]="options.chart"
-                  [plotOptions]="options.plotOptions"
-                  [xaxis]="options.xaxis"
-                  [yaxis]="options.yaxis"
-                  [grid]="options.grid"
-                  [tooltip]="options.tooltip"
-                  [legend]="options.legend"
-                  [colors]="options.colors"
-                  [dataLabels]="options.dataLabels"
-                ></apx-chart>
+                <apx-chart [series]="options.series" [chart]="options.chart" [plotOptions]="options.plotOptions" [xaxis]="options.xaxis" [yaxis]="options.yaxis" [grid]="options.grid" [tooltip]="options.tooltip" [legend]="options.legend" [colors]="options.colors" [dataLabels]="options.dataLabels"></apx-chart>
               </div>
             </div>
 

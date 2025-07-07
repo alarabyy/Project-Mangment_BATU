@@ -1,43 +1,72 @@
-<main class="page-container">
-  <div class="form-wrapper">
-    <header class="form-header">
-      <h1 class="page-title">Create New Department</h1>
-      <p class="page-subtitle">Fill in the details for the new department.</p>
-    </header>
+<main class="container">
+  <header class="header">
+    <div class="header-content">
+      <i class="fas fa-plus-circle header-icon"></i>
+      <h1 class="header-title">Add New Department</h1>
+    </div>
+    <button (click)="cancel()" class="btn btn-secondary" title="Back to Departments List">
+      <i class="fas fa-arrow-alt-circle-left"></i>
+      <span>Back to List</span>
+    </button>
+  </header>
 
-    <form #departmentForm="ngForm" (ngSubmit)="onSubmit(departmentForm)" novalidate>
+  <div class="form-container fade-in">
+    <form (ngSubmit)="createDepartment()" #departmentForm="ngForm" class="department-form">
       <div class="form-group">
         <label for="name">Department Name</label>
-        <input type="text" id="name" name="name" class="form-input" placeholder="e.g., Computer Science" [(ngModel)]="departmentModel.name" #name="ngModel" required>
-        <div *ngIf="name.invalid && name.touched" class="validation-error">Name is required.</div>
+        <input type="text" id="name" name="name" [(ngModel)]="departmentModel.name" required class="form-input"
+               placeholder="e.g., Computer Science" minlength="3" maxlength="100" #name="ngModel">
+        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="error-text">
+          <small *ngIf="name.errors?.['required']">Department name is required.</small>
+          <small *ngIf="name.errors?.['minlength']">Name must be at least 3 characters.</small>
+        </div>
       </div>
 
       <div class="form-group">
         <label for="description">Description</label>
-        <textarea id="description" name="description" class="form-input" placeholder="A brief description" [(ngModel)]="departmentModel.description" #description="ngModel" required></textarea>
-        <div *ngIf="description.invalid && description.touched" class="validation-error">Description is required.</div>
+        <textarea id="description" name="description" [(ngModel)]="departmentModel.description" required class="form-input"
+                  placeholder="Provide a brief description of the department." rows="4" minlength="10" #description="ngModel"></textarea>
+        <div *ngIf="description.invalid && (description.dirty || description.touched)" class="error-text">
+          <small *ngIf="description.errors?.['required']">Description is required.</small>
+          <small *ngIf="description.errors?.['minlength']">Description must be at least 10 characters.</small>
+        </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="facultyId">Faculty ID</label>
-          <input type="number" id="facultyId" name="facultyId" class="form-input" placeholder="e.g., 101" [(ngModel)]="departmentModel.facultyId" #facultyId="ngModel" required min="1">
-          <div *ngIf="facultyId.invalid && facultyId.touched" class="validation-error">Valid Faculty ID is required.</div>
+          <input type="number" id="facultyId" name="facultyId" [(ngModel)]="departmentModel.facultyId" required class="form-input"
+                 placeholder="Enter numeric Faculty ID" min="1" #facultyId="ngModel">
+          <div *ngIf="facultyId.invalid && (facultyId.dirty || facultyId.touched)" class="error-text">
+            <small>Valid Faculty ID is required.</small>
+          </div>
         </div>
         <div class="form-group">
           <label for="headId">Head ID</label>
-          <input type="number" id="headId" name="headId" class="form-input" placeholder="e.g., 202" [(ngModel)]="departmentModel.headId" #headId="ngModel" required min="1">
-          <div *ngIf="headId.invalid && headId.touched" class="validation-error">Valid Head ID is required.</div>
+          <input type="number" id="headId" name="headId" [(ngModel)]="departmentModel.headId" required class="form-input"
+                 placeholder="Enter numeric Head ID" min="1" #headId="ngModel">
+          <div *ngIf="headId.invalid && (headId.dirty || headId.touched)" class="error-text">
+            <small>Valid Head ID is required.</small>
+          </div>
         </div>
       </div>
 
-      <button type="submit" class="submit-btn" [disabled]="isLoading || departmentForm.invalid">
-        <span *ngIf="!isLoading">Create Department</span>
-        <span *ngIf="isLoading" class="loader"></span>
-      </button>
+      <div *ngIf="saveSuccess" class="success-message">
+        <i class="fas fa-check-circle"></i>
+        Department created successfully! Redirecting...
+      </div>
 
-      <div *ngIf="errorMessage" class="feedback-area alert-danger">
-        {{ errorMessage }}
+      <div *ngIf="errorMessage && !saveSuccess" class="form-error-box">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving || departmentForm.invalid">
+          <span *ngIf="!isSaving"><i class="fas fa-plus"></i> Add Department</span>
+          <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Adding...</span>
+        </button>
       </div>
     </form>
   </div>

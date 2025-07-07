@@ -8,8 +8,8 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { MyProfileComponent } from './components/my-profile/my-profile.component';
-import { PrivacyPolicyComponent } from './components/privacy/privacy.component';
-import { documentaionComponent } from './components/documentaion/documentaion.component';
+import { PrivacyPolicyComponent } from './components/Components/privacy/privacy.component';
+import { documentaionComponent } from './components/Components/documentaion/documentaion.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { DepartmentCreateComponent } from './components/Departments/department-create/department-create.component';
 import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
@@ -23,10 +23,11 @@ import { EditCategoryComponent } from './components/category/edit-category/edit-
 import { AddProjectComponent } from './components/project/add-project/add-project.component';
 import { ProjectListComponent } from './components/project/project-list/project-list.component';
 import { EditProjectComponent } from './components/project/edit-project/edit-project.component';
-import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
-import { NotificationsPageComponent } from './components/notifications-page/notifications-page.component';
+import { UnauthorizedComponent } from './components/Components/unauthorized/unauthorized.component';
+import { NotificationsPageComponent } from './components/Components/notifications-page/notifications-page.component';
 import { UserManagementComponent } from './components/User/user-management/user-management.component';
 import { UserAnalyticsComponent } from './components/User/user-analytics/user-analytics.component';
+import { MyProjectsComponent } from './components/project/my-projects/my-projects.component';
 
 export const routes: Routes = [
   // Public Routes
@@ -43,6 +44,8 @@ export const routes: Routes = [
 
   { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
   { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
+    {
+    path: 'my-projects', component: MyProjectsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] }},
   // ========================================================
 
   // Admin-Only Routes

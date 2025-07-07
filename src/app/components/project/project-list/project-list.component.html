@@ -2,65 +2,56 @@
   <header class="list-header">
     <h1>Project Dashboard</h1>
     <a routerLink="/projects/add" class="btn btn-primary">
-      Add New Project
+      <i class="fas fa-plus"></i> Add New Project
     </a>
   </header>
 
   <div class="projects-grid">
     <ng-container *ngIf="projects$ | async as projects; else loading">
-      <p *ngIf="projects.length === 0" class="empty-message">No projects found. Why not add one?</p>
 
-      <!-- routerLink removed from the main div. The card is no longer a link. -->
-      <div class="project-card" *ngFor="let project of projects">
+      <p *ngIf="projects.length === 0" class="empty-message">No projects found. Let's create the first one!</p>
 
-        <!-- Card Header: Title and Grade -->
-        <div class="card-header">
-          <h3>{{ project.title }}</h3>
-          <span class="grade-badge">Grade: {{ project.grade }}</span>
+      <!-- استخدام routerLink على البطاقة بأكملها للتنقل إلى صفحة التعديل -->
+      <a *ngFor="let project of projects" [routerLink]="['/projects/edit', project.id]" class="project-card">
+
+        <!-- غلاف صورة المشروع -->
+        <div class="card-image-wrapper">
+          <img [src]="getProjectCoverImage(project)" [alt]="project.title + ' cover image'" class="card-image">
         </div>
 
-        <!-- Card Body: Description and Problem Statement -->
-        <div class="card-body">
-          <div class="card-section">
-            <h4>Description</h4>
-            <p class="description">{{ project.description || 'No description available.' }}</p>
-          </div>
-          <div class="card-section">
-            <h4>Problem Statement</h4>
-            <p class="description">{{ project.problemStatement || 'Not specified.' }}</p>
-          </div>
-        </div>
-
-        <!-- Details Section: Tech and Tools -->
-        <div class="card-details">
-            <p><strong>Technologies:</strong> {{ project.technologies }}</p>
-            <p><strong>Tools Used:</strong> {{ project.toolsUsed }}</p>
-        </div>
-
-        <!-- Card Footer: IDs and Actions -->
-        <div class="card-footer">
-          <div class="id-group">
-            <span title="Leader ID">L: {{ project.leaderId }}</span>
-            <span title="Category ID">C: {{ project.categoryId }}</span>
-            <span title="Department ID">D: {{ project.departmentId }}</span>
+        <div class="card-content">
+          <div class="card-header">
+            <h3>{{ project.title }}</h3>
+            <span class="grade-badge">
+              {{ project.grade != null ? 'Grade: ' + project.grade : 'Not Graded' }}
+            </span>
           </div>
 
-          <!-- Actions section now contains both Edit and Delete buttons -->
-          <div class="card-actions">
-            <a [routerLink]="['/projects/edit', project.id]" (click)="$event.stopPropagation()" class="btn-icon btn-edit" title="Edit Project">
-              Edit
-            </a>
-            <button (click)="deleteProject(project.id, $event)" class="btn-icon btn-danger" title="Delete Project">
-              Delete
-            </button>
+          <div class="card-body">
+            <p class="description">{{ project.description || 'No description provided.' | slice:0:120 }}{{ (project.description?.length || 0) > 120 ? '...' : '' }}</p>
+          </div>
+
+          <div class="card-footer">
+            <div class="id-group">
+              <span title="Project ID">ID: {{ project.id }}</span>
+              <span title="Leader ID">L: {{ project.leaderId }}</span>
+            </div>
+            <div class="card-actions">
+              <!-- زر الحذف موجود هنا ولكن التنقل يتم عبر البطاقة -->
+              <button (click)="deleteProject(project.id, $event)" class="btn-icon btn-danger" title="Delete Project">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </a>
     </ng-container>
 
     <ng-template #loading>
-      <div class="loading-spinner"></div>
-      <p>Loading projects...</p>
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading projects...</p>
+      </div>
     </ng-template>
   </div>
 </div>

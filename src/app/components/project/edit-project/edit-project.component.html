@@ -1,105 +1,108 @@
-<div class="form-container">
-  <h1>{{ pageTitle }}</h1>
-
-  <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
-
-    <!-- Project Title -->
-    <div class="form-group">
-      <label for="title">Project Title</label>
-      <input type="text" id="title" formControlName="title" class="form-control" [class.is-invalid]="f['title'].invalid && f['title'].touched">
-      <div *ngIf="f['title'].touched && f['title'].errors" class="error-message">
-        <small *ngIf="f['title'].errors?.['required']">Project title is required.</small>
-        <small *ngIf="f['title'].errors?.['minlength']">Title must be at least 3 characters long.</small>
-      </div>
+<div class="container">
+  <div class="header">
+    <div class="header-content">
+      <i class="header-icon fas fa-edit"></i>
+      <h1 class="header-title">{{ pageTitle }}</h1>
     </div>
+  </div>
 
-    <!-- Description -->
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea id="description" formControlName="description" class="form-control" rows="3" [class.is-invalid]="f['description'].invalid && f['description'].touched"></textarea>
-      <div *ngIf="f['description'].touched && f['description'].errors" class="error-message">
-        <small *ngIf="f['description'].errors?.['required']">Description is required.</small>
-      </div>
-    </div>
-
-    <!-- Problem Statement -->
-    <div class="form-group">
-      <label for="problemStatement">Problem Statement</label>
-      <textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3" [class.is-invalid]="f['problemStatement'].invalid && f['problemStatement'].touched"></textarea>
-      <div *ngIf="f['problemStatement'].touched && f['problemStatement'].errors" class="error-message">
-        <small *ngIf="f['problemStatement'].errors?.['required']">Problem Statement is required.</small>
-      </div>
-    </div>
-
-    <!-- Technologies -->
-    <div class="form-group">
-      <label for="technologies">Technologies Used</label>
-      <input type="text" id="technologies" formControlName="technologies" class="form-control" [class.is-invalid]="f['technologies'].invalid && f['technologies'].touched">
-      <div *ngIf="f['technologies'].touched && f['technologies'].errors" class="error-message">
-        <small *ngIf="f['technologies'].errors?.['required']">Technologies are required.</small>
-      </div>
-    </div>
-
-    <!-- Tools Used -->
-    <div class="form-group">
-      <label for="toolsUsed">Tools Used</label>
-      <input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control" [class.is-invalid]="f['toolsUsed'].invalid && f['toolsUsed'].touched">
-      <div *ngIf="f['toolsUsed'].touched && f['toolsUsed'].errors" class="error-message">
-        <small *ngIf="f['toolsUsed'].errors?.['required']">Tools used are required.</small>
-      </div>
-    </div>
-
-    <!-- Numeric Inputs in a row -->
-    <div class="form-row">
-      <!-- Grade -->
+  <div class="form-container">
+    <!-- Form for Project Details -->
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
+        <!-- ... حقول النموذج الأساسية تبقى كما هي ... -->
       <div class="form-group">
-        <label for="grade">Grade</label>
-        <input type="number" id="grade" formControlName="grade" class="form-control" [class.is-invalid]="f['grade'].invalid && f['grade'].touched">
-        <div *ngIf="f['grade'].touched && f['grade'].errors" class="error-message">
-          <small *ngIf="f['grade'].errors?.['required']">Grade is required.</small>
-          <small *ngIf="f['grade'].errors?.['min']">Grade cannot be negative.</small>
+        <label for="title">Project Title</label>
+        <input type="text" id="title" formControlName="title" class="form-control">
+      </div>
+      <!-- ... باقي الحقول ... -->
+       <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" formControlName="description" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="problemStatement">Problem Statement</label>
+        <textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="technologies">Technologies Used</label>
+        <input type="text" id="technologies" formControlName="technologies" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="toolsUsed">Tools Used</label>
+        <input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="grade">Grade</label>
+          <input type="number" id="grade" formControlName="grade" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="leaderId">Leader ID</label>
+          <input type="text" id="leaderId" formControlName="leaderId" class="form-control">
         </div>
       </div>
 
-      <!-- Leader ID -->
-      <div class="form-group">
-        <label for="leaderId">Leader ID</label>
-        <input type="number" id="leaderId" formControlName="leaderId" class="form-control" [class.is-invalid]="f['leaderId'].invalid && f['leaderId'].touched">
-        <div *ngIf="f['leaderId'].touched && f['leaderId'].errors" class="error-message">
-          <small *ngIf="f['leaderId'].errors?.['required']">Leader ID is required.</small>
-          <small *ngIf="f['leaderId'].errors?.['pattern']">Leader ID must be a valid number.</small>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="categoryId">Category ID</label>
+          <input type="number" id="categoryId" formControlName="categoryId" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="departmentId">Department ID</label>
+          <input type="number" id="departmentId" formControlName="departmentId" class="form-control">
         </div>
       </div>
-    </div>
-
-    <div class="form-row">
-      <!-- Category ID -->
-      <div class="form-group">
-        <label for="categoryId">Category ID</label>
-        <input type="number" id="categoryId" formControlName="categoryId" class="form-control" [class.is-invalid]="f['categoryId'].invalid && f['categoryId'].touched">
-        <div *ngIf="f['categoryId'].touched && f['categoryId'].errors" class="error-message">
-          <small *ngIf="f['categoryId'].errors?.['required']">Category ID is required.</small>
-          <small *ngIf="f['categoryId'].errors?.['pattern']">Category ID must be a valid number.</small>
-        </div>
+        <!-- Action Buttons for the main form -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Saving...' : 'Update Project Details' }}
+        </button>
       </div>
+    </form>
+  </div>
 
-      <!-- Department ID -->
+  <!-- ======================= 🔽 قسم إدارة الصور الجديد 🔽 ======================= -->
+  <div class="images-section-container">
+    <h2 class="section-title">
+      <i class="fas fa-images"></i> Project Images
+    </h2>
+
+    <!-- Image Upload Form -->
+    <div class="image-upload-form">
       <div class="form-group">
-        <label for="departmentId">Department ID</label>
-        <input type="number" id="departmentId" formControlName="departmentId" class="form-control" [class.is-invalid]="f['departmentId'].invalid && f['departmentId'].touched">
-        <div *ngIf="f['departmentId'].touched && f['departmentId'].errors" class="error-message">
-          <small *ngIf="f['departmentId'].errors?.['required']">Department ID is required.</small>
-          <small *ngIf="f['departmentId'].errors?.['pattern']">Department ID must be a valid number.</small>
+        <label for="imageUpload">Upload New Image</label>
+        <div class="upload-controls">
+          <input type="file" id="imageUpload" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/gif" class="form-control-file">
+          <button (click)="onImageUpload()" class="btn btn-primary" [disabled]="!selectedFile || isUploading">
+            <span *ngIf="isUploading"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>
+            <span *ngIf="!isUploading"><i class="fas fa-upload"></i> Upload</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="form-actions">
-      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">
-        {{ isSubmitting ? 'Saving...' : 'Update Project' }}
-      </button>
+    <!-- Image Gallery -->
+    <div *ngIf="project && project.images && project.images.length > 0; else noImages" class="image-gallery">
+      <div *ngFor="let image of project.images" class="image-card">
+        <img [src]="image.url" [alt]="project.title + ' image'">
+        <button (click)="deleteImage(image.id)" class="btn-delete-image" title="Delete Image" [disabled]="imagesBeingDeleted.has(image.id)">
+          <i class="fas fa-times"></i>
+        </button>
+        <div *ngIf="imagesBeingDeleted.has(image.id)" class="delete-overlay">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+      </div>
     </div>
-  </form>
+    <ng-template #noImages>
+      <p class="empty-message">This project has no images yet. Upload one above!</p>
+    </ng-template>
+  </div>
+  <!-- ======================================================================== -->
 </div>

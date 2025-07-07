@@ -1,40 +1,36 @@
 <div class="container">
-  <!-- Header Section -->
   <header class="header">
     <div class="header-content">
-      <i class="fas fa-tags header-icon"></i> <!-- Changed icon for categories -->
+      <i class="fas fa-tags header-icon"></i>
       <h1 class="header-title">Categories Dashboard</h1>
     </div>
-    <button (click)="addCategory()" class="btn btn-primary pulse-hover">
+    <button (click)="addCategory()" class="btn btn-primary">
       <i class="fas fa-plus-circle"></i>
       <span>New Category</span>
     </button>
   </header>
 
-  <!-- Content Area -->
   <main class="content">
-    <!-- Loading State -->
     <div *ngIf="isLoading" class="state-container fade-in">
       <div class="spinner"></div>
-      <p class="state-text">Fetching categories from server...</p>
+      <p class="state-text">Fetching categories...</p>
     </div>
 
-    <!-- Error State -->
-    <div *ngIf="errorMessage" class="state-container error-message fade-in">
+    <div *ngIf="errorMessage && !isLoading" class="state-container error-message fade-in">
       <i class="fas fa-exclamation-triangle"></i>
       <p class="state-text">{{ errorMessage }}</p>
+      <button (click)="loadCategories()" class="btn btn-secondary" style="margin-top: 1rem;">Retry</button>
     </div>
 
-    <!-- Empty State -->
     <div *ngIf="!isLoading && !errorMessage && categories.length === 0" class="state-container fade-in">
       <i class="fas fa-box-open"></i>
       <p class="state-text">No categories found. Let's create the first one!</p>
     </div>
 
-    <!-- Data List -->
     <div *ngIf="!isLoading && !errorMessage && categories.length > 0" class="category-grid">
+      <!-- استخدام trackBy لتحسين الأداء -->
       <div
-        *ngFor="let category of categories; let i = index"
+        *ngFor="let category of categories; let i = index; trackBy: trackByCategory"
         class="category-card fade-in-up"
         [style.--item-index]="i"
         [class.deleting]="deletingCategoryIds.has(category.id)">
@@ -43,19 +39,18 @@
           <h2 class="card-title">{{ category.name }}</h2>
           <span class="card-id">#{{ category.id }}</span>
         </div>
-
         <div class="card-body">
           <p class="card-description">{{ category.description }}</p>
         </div>
-
         <div class="card-actions">
-          <button (click)="editCategory(category.id)" class="btn btn-secondary">
+          <button (click)="editCategory(category.id)" class="btn btn-secondary" [disabled]="deletingCategoryIds.has(category.id)">
             <i class="fas fa-pencil-alt"></i>
             <span>Edit</span>
           </button>
-          <button (click)="deleteCategory(category.id)" class="btn btn-danger">
-            <i class="fas fa-trash-alt"></i>
-            <span>Delete</span>
+          <button (click)="deleteCategory(category.id)" class="btn btn-danger" [disabled]="deletingCategoryIds.has(category.id)">
+            <!-- أيقونة ديناميكية تعكس حالة الحذف -->
+            <i class="fas" [class.fa-trash-alt]="!deletingCategoryIds.has(category.id)" [class.fa-spinner]="deletingCategoryIds.has(category.id)" [class.fa-spin]="deletingCategoryIds.has(category.id)"></i>
+            <span>{{ deletingCategoryIds.has(category.id) ? 'Deleting...' : 'Delete' }}</span>
           </button>
         </div>
       </div>

@@ -1,24 +1,14 @@
-/*
- *  STYLE SHEET FOR USER MANAGEMENT PAGE V3 - PROFESSIONAL & ANIMATED
- *  - Uses the provided color palette for a sleek, modern look.
- *  - Fully responsive and supports Light/Dark modes.
- *  - Features advanced animations and hover effects.
- */
-
 :host {
   display: block;
-  padding: 3rem 2rem; /* More vertical padding */
+  padding: 3rem 2rem;
   background-color: var(--bg-color);
   min-height: calc(100vh - var(--navbar-height));
   transition: background-color var(--transition-speed-normal) var(--easing-curve-elegant);
 }
-
 .user-management-container {
   max-width: 960px;
   margin: 0 auto;
 }
-
-/* Page Header */
 .page-header {
   margin-bottom: 3rem;
   animation: fadeInDown var(--transition-speed-slow) var(--easing-curve-elegant);
@@ -35,7 +25,6 @@
   margin-top: 0.5rem;
   max-width: 500px;
 }
-
 .header-actions {
   margin-top: 2rem;
 }
@@ -74,15 +63,12 @@
 .search-box input:focus ~ .search-icon {
   color: var(--primary-accent);
 }
-
-/* User List & Rows */
 .feed {
   background-color: var(--surface-color);
   border-radius: var(--border-radius-large);
   border: 1px solid var(--border-color);
   overflow: hidden;
 }
-
 @keyframes row-slide-in {
   from { opacity: 0; transform: translateX(-20px); }
   to { opacity: 1; transform: translateX(0); }
@@ -99,16 +85,16 @@
   position: relative;
   overflow: hidden;
   animation: row-slide-in var(--transition-speed-slow) var(--easing-curve-elegant) backwards;
-  animation-delay: var(--animation-delay, 0s); /* For staggered effect */
+  animation-delay: var(--animation-delay, 0s);
 }
 .user-row:last-child {
   border-bottom: none;
 }
-.user-row::before { /* Glow effect on hover */
+.user-row::before {
   content: '';
   position: absolute;
   top: 0;
-  left: -100%; /* Start off-screen */
+  left: -100%;
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, var(--primary-accent-translucent), transparent);
@@ -122,30 +108,22 @@
   background-color: var(--bg-light-hover, #f5f5f5);
 }
 .user-row:hover::before {
-  left: 100%; /* Move across the element */
+  left: 100%;
 }
-
-/* Row Content */
 .user-info { line-height: 1.4; }
 .user-name { font-size: 1.1rem; font-weight: var(--font-weight-semibold); color: var(--text-color); margin: 0; }
 .user-email { font-size: 0.9rem; color: var(--subtle-text-color); margin-top: 0.1rem; }
-
 .user-id-container { text-align: left; }
 .user-id { font-family: monospace; font-size: 0.9rem; color: var(--subtle-text-color); }
-
 .role-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 4px 12px; border-radius: var(--border-radius-pill); font-size: 0.8rem; font-weight: var(--font-weight-medium); }
 .role-badge.admin { background-color: rgba(248, 81, 73, 0.1); color: var(--error-color); }
 .role-badge.student { background-color: rgba(0, 180, 216, 0.1); color: var(--secondary-accent); }
 .role-badge.doctor { background-color: rgba(255, 193, 7, 0.15); color: #ffc107; }
-
-/* States (Error, Empty, Skeleton) */
 .error-message, .empty-state-container { text-align: center; padding: 5rem 1rem; }
 .error-message i, .empty-state-container i { font-size: 3.5rem; margin-bottom: 1.5rem; opacity: 0.5; color: var(--primary-accent); }
 .error-message i { color: var(--error-color); }
 .empty-state-container h2, .error-message h2 { font-size: 1.5rem; font-weight: var(--font-weight-bold); color: var(--text-color); }
 .empty-state-container p, .error-message p { font-size: 1rem; color: var(--subtle-text-color); margin-top: 0.5rem; }
-
-/* Skeleton Loader with Shimmer */
 @keyframes shimmer { 100% { transform: translateX(100%); } }
 .user-row-skeleton {
   padding: 1.25rem 1.75rem;
@@ -167,8 +145,6 @@
 :host-context(body.light-theme-active) .line { background-color: #e9ecef; }
 .line.long { width: 60%; }
 .line.short { width: 40%; }
-
-/* Responsive */
 @media (max-width: 768px) {
   :host { padding: 2rem 1rem; }
   .user-row { grid-template-columns: 1fr; gap: 0.5rem; text-align: center; }
@@ -176,46 +152,40 @@
   .user-email { font-size: 0.85rem; }
   .header-actions { justify-content: center; }
 }
- .custom-nav-btn {
-    background: linear-gradient(135deg, #02980c, #0072ff);
-    border: none;
-    padding: 0;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 114, 255, 0.2);
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-  }
-
-  .custom-nav-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(2, 146, 69, 0.35);
-  }
-
-  .custom-nav-btn a {
-    display: flex;
-    align-items: center;
-    padding: 12px 18px;
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    transition: background-color 0.3s ease;
-  }
-
-  .custom-nav-btn a:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-
-  .custom-nav-btn .menu-icon {
-    margin-right: 10px;
-    font-size: 18px;
-  }
-
-  .custom-nav-btn .menu-text {
-    display: inline-block;
-  }
-
-  .custom-nav-btn .active-link {
-    font-weight: bold;
-    text-decoration: underline;
-  }
+.custom-nav-btn {
+  background: linear-gradient(135deg, #02980c, #0072ff);
+  border: none;
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 114, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.custom-nav-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(2, 146, 69, 0.35);
+}
+.custom-nav-btn a {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
+}
+.custom-nav-btn a:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.custom-nav-btn .menu-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+.custom-nav-btn .menu-text {
+  display: inline-block;
+}
+.custom-nav-btn .active-link {
+  font-weight: bold;
+  text-decoration: underline;
+}
