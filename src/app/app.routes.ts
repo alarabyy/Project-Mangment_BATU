@@ -24,6 +24,9 @@ import { AddProjectComponent } from './components/project/add-project/add-projec
 import { ProjectListComponent } from './components/project/project-list/project-list.component';
 import { EditProjectComponent } from './components/project/edit-project/edit-project.component';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+import { NotificationsPageComponent } from './components/notifications-page/notifications-page.component';
+import { UserManagementComponent } from './components/user-management/user-management.component';
+import { UserAnalyticsComponent } from './components/user-analytics/user-analytics.component';
 
 export const routes: Routes = [
   // Public Routes
@@ -36,15 +39,23 @@ export const routes: Routes = [
 
   // ================= 🔽 تم التعديل هنا 🔽 =================
   // Shared Protected Routes
-  { path: 'projects/add', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
-  { path: 'projects', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
-  { path: 'projects/edit/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
+
 
   { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
   { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
   // ========================================================
 
   // Admin-Only Routes
+
+  { path: 'notifications', component: NotificationsPageComponent }, // <-- Add this line
+
+  { path: 'projects/add', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'projects', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'projects/edit/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'users', component: UserManagementComponent , canActivate: [RoleGuard], data: { roles: ['admin'] }}, // Add this route
+  { path: 'user-analytics', component: UserAnalyticsComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
+
+
   { path: 'FacultyList', component: FacultyListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'add-faculty', component: AddFacultyComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'facultyEdit/:id', component: FacultyEditComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
