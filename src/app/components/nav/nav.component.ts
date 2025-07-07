@@ -1,5 +1,3 @@
-// File: src/app/components/nav/nav.component.ts
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
@@ -15,12 +13,15 @@ import { ThemeService } from '../../Services/theme-service.service';
   styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit, OnDestroy {
+  // --- Component State ---
   isDarkMode = false;
   isMenuOpen = false;
   userRole: string | null = null;
   currentYear: number = new Date().getFullYear();
-  private subscriptions: Subscription = new Subscription();
 
+  private subscriptions = new Subscription();
+
+  // --- Constructor & Lifecycle Hooks ---
   constructor(
     public authService: AuthService,
     private themeService: ThemeService,
@@ -28,20 +29,21 @@ export class NavComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Subscription to theme changes
     const themeSub = this.themeService.isDarkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
-      // Optional: Add/remove a class from the body for global dark mode styling
       document.body.classList.toggle('dark-theme', isDark);
     });
 
-    // On route change, get the user role and close the menu
+    // Subscription to router events to close the menu on navigation
     const routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.userRole = this.authService.getUserRole();
-      this.isMenuOpen = false; // Always close menu on navigation
+      this.isMenuOpen = false; // Automatically close menu
     });
 
+    // Initialize user role on component load
     this.userRole = this.authService.getUserRole();
 
     this.subscriptions.add(themeSub);
@@ -49,28 +51,28 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Clean up subscriptions and global classes to prevent memory leaks
     this.subscriptions.unsubscribe();
-     // Clean up body class
     document.body.classList.remove('dark-theme');
   }
 
+  // --- Public Methods ---
+
+  /** Toggles the application's dark mode. */
   toggleDarkMode(): void {
     this.themeService.toggleDarkMode();
   }
 
+  /** Toggles the visibility of the sidebar menu. */
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  // This function is called when a menu link is clicked
-  onMenuItemClick(path: string): void {
-    this.router.navigate([path]);
-    // The menu will close automatically because of the router event subscription in ngOnInit
-  }
-
+  /** Logs the user out and navigates to the login page. */
   onLogout(): void {
     this.authService.logout();
     this.userRole = null;
-    this.onMenuItemClick('/auth/login'); // Use the same function to navigate
+    this.isMenuOpen = false; // Close menu on logout
+    this.router.navigate(['/auth/login']);
   }
 }

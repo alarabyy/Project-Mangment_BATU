@@ -1,10 +1,17 @@
-<!-- The Backdrop for closing the menu -->
+<!-- Backdrop Overlay: Closes the menu when clicked -->
 <div class="backdrop" [class.show]="isMenuOpen" (click)="toggleMenu()"></div>
 
+<!-- Top Navigation Bar -->
 <nav class="navbar" [class.dark]="isDarkMode">
   <!-- Left Section: Menu Toggle -->
   <div class="navbar-section left">
-    <button class="menu-toggle navbar-icon-btn" [class.active]="isMenuOpen" (click)="toggleMenu()" aria-label="Toggle Menu">
+    <button
+      class="menu-toggle navbar-icon-btn"
+      [class.active]="isMenuOpen"
+      (click)="toggleMenu()"
+      aria-label="Toggle Menu"
+      [attr.aria-expanded]="isMenuOpen"
+    >
       <div class="hamburger"><span></span><span></span><span></span></div>
     </button>
   </div>
@@ -17,21 +24,21 @@
     </a>
   </div>
 
-  <!-- Right Section: Actions -->
+  <!-- Right Section: Action Buttons -->
   <div class="navbar-section right">
     <ng-container *ngIf="authService.isLoggedIn()">
       <a routerLink="/notifications" class="navbar-icon-btn" title="Notifications"><i class="fas fa-bell"></i></a>
       <a routerLink="/MyProfile" class="navbar-icon-btn" title="My Profile"><i class="fas fa-user-graduate"></i></a>
     </ng-container>
     <button class="dark-mode-toggle navbar-icon-btn" (click)="toggleDarkMode()" title="Toggle Dark Mode">
-        <i class="fas" [ngClass]="isDarkMode ? 'fa-sun' : 'fa-moon'"></i>
+      <i class="fas" [ngClass]="isDarkMode ? 'fa-sun' : 'fa-moon'"></i>
     </button>
   </div>
 </nav>
 
-<!-- Sidebar Menu -->
+<!-- Sidebar Flyout Menu -->
 <div class="dropdown-menu" [class.show]="isMenuOpen" [class.dark]="isDarkMode">
-  <!-- Menu Header -->
+  <!-- Menu Header with User Info -->
   <header class="menu-header" *ngIf="authService.isLoggedIn()">
     <div class="user-profile-compact">
       <i class="fas fa-user-circle menu-profile-icon"></i>
@@ -40,49 +47,55 @@
         <p>Project Contributor</p>
       </div>
     </div>
-    <!-- The close button is now handled by the backdrop, but you can keep it as an alternative -->
-    <!-- <button class="close-menu-btn navbar-icon-btn" (click)="toggleMenu()">×</button> -->
   </header>
 
-  <!-- Menu Items -->
+  <!-- Menu Navigation Links -->
   <ul class="menu-items">
+    <!-- General Links for Logged-in Users -->
     <ng-container *ngIf="authService.isLoggedIn()">
       <li class="menu-category"><span><i class="fas fa-compass"></i> General</span></li>
-      <li><a (click)="onMenuItemClick('/MyProjects')" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-folder-open"></i></span>MyProjects</a></li>
-      <li><a (click)="onMenuItemClick('/Chat')" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-comments"></i></span>Ask AI</a></li>
-      <li><a (click)="onMenuItemClick('/MyProfile')" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-id-card"></i></span>My Profile</a></li>
+      <li><a routerLink="/MyProjects" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-folder-open"></i></span>My Projects</a></li>
+      <li><a routerLink="/Chat" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-comments"></i></span>Ask AI</a></li>
+      <li><a routerLink="/MyProfile" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-id-card"></i></span>My Profile</a></li>
     </ng-container>
 
+    <!-- Admin Specific Links -->
     <ng-container *ngIf="userRole === 'admin'">
       <li class="menu-category"><span><i class="fas fa-user-shield"></i> Admin Panel</span></li>
-      <li><a (click)="onMenuItemClick('/projects')" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-folder-open"></i></span>Projects</a></li>
-      <li><a (click)="onMenuItemClick('/FacultyList')"><span class="menu-icon"><i class="fas fa-university"></i></span>Faculties</a></li>
-      <li><a (click)="onMenuItemClick('/DepartmentsList')"><span class="menu-icon"><i class="fas fa-building"></i></span>Departments</a></li>
-      <li><a (click)="onMenuItemClick('/CategoryList')"><span class="menu-icon"><i class="fas fa-tags"></i></span>Categories</a></li>
+      <li><a routerLink="/projects" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-cogs"></i></span>Manage Projects</a></li>
+      <li><a routerLink="/FacultyList" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-university"></i></span>Faculties</a></li>
+      <li><a routerLink="/DepartmentsList" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-building"></i></span>Departments</a></li>
+      <li><a routerLink="/CategoryList" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-tags"></i></span>Categories</a></li>
     </ng-container>
 
+    <!-- Student Specific Links -->
     <ng-container *ngIf="userRole === 'student'">
-        <li class="menu-category"><span><i class="fas fa-user-graduate"></i> Student Zone</span></li>
-        <li><a (click)="onMenuItemClick('/projects/add')"><span class="menu-icon"><i class="fas fa-plus-circle"></i></span>Add Project</a></li>
+      <li class="menu-category"><span><i class="fas fa-user-graduate"></i> Student Zone</span></li>
+      <li><a routerLink="/projects/add" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-plus-circle"></i></span>Add Project</a></li>
     </ng-container>
 
+    <!-- Doctor/Professor Specific Links -->
     <ng-container *ngIf="userRole === 'doctor' || userRole === 'professor'">
-        <li class="menu-category"><span><i class="fas fa-user-md"></i> Doctor Tools</span></li>
-        <li><a (click)="onMenuItemClick('/projects/add')"><span class="menu-icon"><i class="fas fa-plus-circle"></i></span>Add Project Idea</a></li>
+      <li class="menu-category"><span><i class="fas fa-chalkboard-teacher"></i> Professor Tools</span></li>
+      <li><a routerLink="/projects/add" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-lightbulb"></i></span>Add Project Idea</a></li>
     </ng-container>
 
-    <li style="height: 1px; background: var(--border-light); margin: 16px 0;"></li>
+    <!-- Separator (Handled by CSS on the element before it) -->
+    <li class="menu-separator"></li>
 
-    <li><a (click)="onMenuItemClick('/Privacy')"><span class="menu-icon"><i class="fas fa-life-ring"></i></span>Help & Support</a></li>
-    <li><a (click)="onMenuItemClick('/documentaion')"><span class="menu-icon"><i class="fas fa-book-open"></i></span>Documentation</a></li>
+    <!-- Help & Auth Links -->
+    <li><a routerLink="/Privacy" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-life-ring"></i></span>Help & Support</a></li>
+    <li><a routerLink="/documentation" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-book-open"></i></span>Documentation</a></li>
 
+    <!-- Auth Links for Guests -->
     <ng-container *ngIf="!authService.isLoggedIn()">
-      <li><a (click)="onMenuItemClick('/Login')"><span class="menu-icon"><i class="fas fa-sign-in-alt"></i></span>Login</a></li>
-      <li><a (click)="onMenuItemClick('/SignUp')"><span class="menu-icon"><i class="fas fa-user-plus"></i></span>Sign Up</a></li>
+      <li><a routerLink="/Login" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-sign-in-alt"></i></span>Login</a></li>
+      <li><a routerLink="/SignUp" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-user-plus"></i></span>Sign Up</a></li>
     </ng-container>
 
+    <!-- Logout for Logged-in Users -->
     <li *ngIf="authService.isLoggedIn()">
-      <a (click)="onLogout()" style="cursor: pointer;"><span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</a>
+      <a (click)="onLogout()" class="logout-btn"><span class="menu-icon"><i class="fas fa-sign-out-alt"></i></span>Logout</a>
     </li>
   </ul>
 
