@@ -2,14 +2,33 @@
   <main class="analytics-container">
     <header class="page-header">
       <div class="header-content">
-        <h1>User Analytics</h1>
-        <p>An overview of user demographics and distribution.</p>
+        <h1>User Intelligence</h1>
+        <p>A deep-dive into user behavior, demographics, and activity patterns.</p>
+      </div>
+      <div class="header-filters">
+        <div class="filter-group">
+          <label for="role-filter">Role</label>
+          <select id="role-filter" (change)="onRoleFilterChange($event)">
+            <option value="all">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="student">Student</option>
+            <option value="doctor">Doctor</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="status-filter">Status</label>
+          <select id="status-filter" (change)="onStatusFilterChange($event)">
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
       </div>
     </header>
 
-    <!-- Skeleton Loader -->
     <ng-container *ngIf="state.isLoading">
-      <div class="analytics-grid">
+      <div class="analytics-grid skeleton-grid">
         <div class="kpi-card-skeleton" *ngFor="let i of [1,2,3,4]"></div>
         <div class="chart-card-skeleton large"></div>
         <div class="chart-card-skeleton large"></div>
@@ -17,108 +36,84 @@
       </div>
     </ng-container>
 
-    <!-- Error Message -->
     <div *ngIf="state.error && !state.isLoading" class="error-message">
-      <i class="fas fa-exclamation-triangle"></i>
-      <h2>Could Not Load Analytics</h2>
-      <p>{{ state.error }}</p>
+      <p>Error: {{ state.error }}</p>
     </div>
 
-    <!-- Main Content -->
     <ng-container *ngIf="!state.isLoading && !state.error">
-      <ng-container *ngIf="kpiData$ | async as kpiData">
-        <div class="analytics-grid">
-          <!-- KPI Cards -->
-          <div class="kpi-card">
-            <i class="fas fa-users kpi-icon"></i>
-            <div class="kpi-content">
-              <span class="kpi-value">{{ kpiData.total }}</span>
-              <span class="kpi-title">Total Users</span>
+      <div *ngIf="filteredUsers$ | async as users">
+        <ng-container *ngIf="kpiData$ | async as kpiData">
+          <div class="analytics-grid">
+            <!-- KPI Cards -->
+            <div class="kpi-card">
+              <i class="fas fa-users kpi-icon"></i>
+              <div class="kpi-content">
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.total">0</span>
+                <span class="kpi-title">Total Users</span>
+              </div>
             </div>
-          </div>
-          <div class="kpi-card">
-            <i class="fas fa-user-tag kpi-icon"></i>
-            <div class="kpi-content">
-              <span class="kpi-value">{{ kpiData.mostCommonRole }}</span>
-              <span class="kpi-title">Most Common Role</span>
+            <div class="kpi-card">
+              <i class="fas fa-user-check kpi-icon"></i>
+              <div class="kpi-content">
+                <!-- FIX: Added attributes for animation consistency -->
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.active">0</span>
+                <span class="kpi-title">Active Users</span>
+              </div>
             </div>
-          </div>
-          <div class="kpi-card">
-            <i class="fas fa-sitemap kpi-icon"></i>
-            <div class="kpi-content">
-              <span class="kpi-value">{{ kpiData.roles }}</span>
-              <span class="kpi-title">Distinct Roles</span>
+            <div class="kpi-card">
+              <i class="fas fa-calendar-alt kpi-icon"></i>
+              <div class="kpi-content">
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.newLastMonth">0</span>
+                <span class="kpi-title">New Last 30 Days</span>
+              </div>
             </div>
-          </div>
-          <div class="kpi-card">
-            <i class="fas fa-user-edit kpi-icon"></i>
-            <div class="kpi-content">
-              <span class="kpi-value">{{ kpiData.incomplete }}</span>
-              <span class="kpi-title">Incomplete Profiles</span>
+            <div class="kpi-card">
+              <i class="fas fa-user-clock kpi-icon"></i>
+              <div class="kpi-content">
+                <!-- FIX: Added attributes for animation consistency -->
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.inactive">0</span>
+                <span class="kpi-title">Inactive Users</span>
+              </div>
             </div>
-          </div>
 
-          <!-- Main Charts & Lists -->
-          <div class="chart-card large">
-            <h3 class="chart-title">Role Distribution</h3>
-            <!--
-              ==========================================================
-              ==            HERE IS THE FIRST & MAIN FIX            ==
-              ==========================================================
-              - Using the non-null assertion operator (!) tells TypeScript
-                that we are sure 'options' and its properties are not undefined.
-            -->
-            <ng-container *ngIf="roleChartOptions$ | async as options">
-              <apx-chart
-                [series]="options.series!"
-                [chart]="options.chart!"
-                [labels]="options.labels!"
-                [colors]="options.colors!"
-                [plotOptions]="options.plotOptions!"
-                [dataLabels]="options.dataLabels!"
-                [legend]="options.legend!"
-                [tooltip]="options.tooltip!"
-                [stroke]="options.stroke!">
-              </apx-chart>
-            </ng-container>
-          </div>
-
-          <div class="chart-card large">
-            <h3 class="chart-title">Latest Registered Users</h3>
-            <ul class="recent-users-list">
-              <li *ngFor="let user of (recentUsers$ | async)">
-                <div class="user-info">
-                  <span class="user-name">{{ user.firstName }} {{ user.lastname }}</span>
-                  <span class="user-email">{{ user.email }}</span>
-                </div>
-                <div class="user-meta">
-                  <span class="role-badge" [ngClass]="getRoleName(user.role).name.toLowerCase()">
-                    <i class="fas" [ngClass]="getRoleName(user.role).icon"></i>
-                  </span>
-                  <span class="timestamp">{{ getTimeAgo(user.createdAt) }}</span>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div class="chart-card full-width">
-            <h3 class="chart-title">Top 5 User Email Domains</h3>
-            <ng-container *ngIf="domainChartOptions$ | async as options">
+            <!-- Main Charts & Lists -->
+            <div class="chart-card large">
+              <h3 class="chart-title">Annual Activity Heatmap</h3>
+              <div *ngIf="activityHeatmapOptions$ | async as options">
                 <apx-chart
-                  [series]="options.series!"
-                  [chart]="options.chart!"
-                  [plotOptions]="options.plotOptions!"
-                  [xaxis]="options.xaxis!"
-                  [yaxis]="options.yaxis!"
-                  [grid]="options.grid!"
-                  [tooltip]="options.tooltip!"
-                  [legend]="options.legend!"
-                  [colors]="options.colors!">
-                </apx-chart>
-            </ng-container>
+                  [series]="options.series"
+                  [chart]="options.chart"
+                  [plotOptions]="options.plotOptions"
+                  [dataLabels]="options.dataLabels"
+                  [legend]="options.legend"
+                  [yaxis]="options.yaxis"
+                  [tooltip]="options.tooltip"
+                ></apx-chart>
+              </div>
+            </div>
+
+            <div class="chart-card large">
+              <h3 class="chart-title">User Geodistribution</h3>
+              <div *ngIf="geoChartOptions$ | async as options">
+                <apx-chart
+                  [series]="options.series"
+                  [chart]="options.chart"
+                  [plotOptions]="options.plotOptions"
+                  [xaxis]="options.xaxis"
+                  [yaxis]="options.yaxis"
+                  [grid]="options.grid"
+                  [tooltip]="options.tooltip"
+                  [legend]="options.legend"
+                  [colors]="options.colors"
+                  [dataLabels]="options.dataLabels"
+                ></apx-chart>
+              </div>
+            </div>
+
+            <!-- Data Table will go here in a future step -->
           </div>
-        </div>
-      </ng-container>
+        </ng-container>
+      </div>
     </ng-container>
   </main>
 </ng-container>

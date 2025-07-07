@@ -1,9 +1,9 @@
+import { UserAnalyticsComponent } from './user-analytics.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserAnalyticsComponent } from './user-analytics.component';
 
 describe('UserAnalyticsComponent', () => {
-  let component: UserAnalyticsComponent;
+  let component: UserAnalyticsComponent
   let fixture: ComponentFixture<UserAnalyticsComponent>;
 
   beforeEach(async () => {
