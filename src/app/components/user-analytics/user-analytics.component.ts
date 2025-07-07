@@ -13,7 +13,7 @@ interface AnalyticsState { users: User[]; isLoading: boolean; error: string | nu
 @Component({
   selector: 'app-user-analytics',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule, DatePipe],
+  imports: [CommonModule, NgApexchartsModule],
   templateUrl: './user-analytics.component.html',
   styleUrls: ['./user-analytics.component.css']
 })
