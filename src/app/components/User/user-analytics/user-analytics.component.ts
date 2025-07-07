@@ -3,9 +3,9 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { Observable, of, BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { map, catchError, startWith, shareReplay } from 'rxjs/operators';
-import { User } from '../../models/user';
+import { User } from '../../../models/user';
 import { subDays, format, eachDayOfInterval, startOfDay } from 'date-fns';
-import { UserService } from '../../Services/user.service';
+import { UserService } from '../../../Services/user.service';
 
 type ChartOptions = Partial<{ series: any; chart: any; plotOptions: any; labels: any; colors: any; dataLabels: any; legend: any; tooltip: any; stroke: any; xaxis: any; yaxis: any; grid: any; fill: any; title: any; subtitle: any; }>;
 interface AnalyticsState { users: User[]; isLoading: boolean; error: string | null; }

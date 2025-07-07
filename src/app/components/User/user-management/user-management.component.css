@@ -176,3 +176,46 @@
   .user-email { font-size: 0.85rem; }
   .header-actions { justify-content: center; }
 }
+ .custom-nav-btn {
+    background: linear-gradient(135deg, #02980c, #0072ff);
+    border: none;
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 114, 255, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+
+  .custom-nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(2, 146, 69, 0.35);
+  }
+
+  .custom-nav-btn a {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: background-color 0.3s ease;
+  }
+
+  .custom-nav-btn a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .custom-nav-btn .menu-icon {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+
+  .custom-nav-btn .menu-text {
+    display: inline-block;
+  }
+
+  .custom-nav-btn .active-link {
+    font-weight: bold;
+    text-decoration: underline;
+  }

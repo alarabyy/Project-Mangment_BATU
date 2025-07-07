@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Observable, BehaviorSubject, combineLatest, of } from 'rxjs';
 import { map, debounceTime, distinctUntilChanged, startWith, catchError, tap } from 'rxjs/operators';
-import { User } from '../../models/user';
-import { UserService } from '../../Services/user.service';
+import { User } from '../../../models/user';
+import { UserService } from '../../../Services/user.service';
 
 // Interface for the component's reactive state, which drives the UI
 interface UserManagementState {

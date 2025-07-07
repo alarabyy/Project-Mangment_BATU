@@ -25,8 +25,8 @@ import { ProjectListComponent } from './components/project/project-list/project-
 import { EditProjectComponent } from './components/project/edit-project/edit-project.component';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 import { NotificationsPageComponent } from './components/notifications-page/notifications-page.component';
-import { UserManagementComponent } from './components/user-management/user-management.component';
-import { UserAnalyticsComponent } from './components/user-analytics/user-analytics.component';
+import { UserManagementComponent } from './components/User/user-management/user-management.component';
+import { UserAnalyticsComponent } from './components/User/user-analytics/user-analytics.component';
 
 export const routes: Routes = [
   // Public Routes
