@@ -7,9 +7,7 @@ import { CategoryService } from '../../../Services/category.service';
 import { DepartmentService } from '../../../Services/department.service';
 import { Category } from '../../../models/category';
 import { Department } from '../../../models/department';
-import { finalize } from 'rxjs';
-// 1. استيراد الموديل المفقود لضمان سلامة الأنواع
-import { Project } from '../../../models/project';
+import { finalize, switchMap, forkJoin, of, tap, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-add-project',
@@ -23,6 +21,7 @@ export class AddProjectComponent implements OnInit {
   isSubmitting = false;
   categories: Category[] = [];
   departments: Department[] = [];
+  selectedFiles: File[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -32,65 +31,65 @@ export class AddProjectComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {
-    this.initializeForm();
-    this.loadDropdownData();
-  }
+  ngOnInit(): void { this.initializeForm(); this.loadDropdownData(); }
 
-  // 3. تم توحيد تهيئة الفورم لتكون منطقية ومتوافقة مع الـ HTML
   initializeForm(): void {
     this.projectForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      // جعل الحقل اختيارياً مع التحقق من القيمة إذا أدخلت
       grade: [null, [Validators.min(0), Validators.max(100)]],
       technologies: ['', Validators.required],
       toolsUsed: ['', Validators.required],
       problemStatement: ['', Validators.required],
-      // استخدام valdiator للتحقق من أن المدخل هو رقم
       leaderId: [null, [Validators.required, Validators.pattern("^[0-9]*$")]],
       categoryId: [null, Validators.required],
       departmentId: [null, Validators.required]
     });
   }
 
-  // استخدام الخدمات الحقيقية لتحميل بيانات القوائم المنسدلة
   loadDropdownData(): void {
     this.categoryService.getAllCategories().subscribe(data => this.categories = data);
     this.departmentService.getAllDepartments().subscribe(data => this.departments = data);
   }
 
-  // Getter للوصول السهل لعناصر التحكم في الفورم من الـ HTML
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) { this.selectedFiles = Array.from(input.files); }
+  }
+
   get f() { return this.projectForm.controls; }
 
-  // 2. تحسين منطق onSubmit لاستخدام استجابة الـ API وتوجيه المستخدم لصفحة التعديل
   onSubmit(): void {
-    if (this.projectForm.invalid) {
-      this.projectForm.markAllAsTouched();
-      return;
-    }
-
+    if (this.projectForm.invalid) { this.projectForm.markAllAsTouched(); return; }
     this.isSubmitting = true;
-    // تحويل قيمة الفورم إلى النوع الذي تتوقعه الخدمة لضمان سلامة الأنواع
-    const projectData = this.projectForm.value as Omit<Project, 'id'>;
+    const projectData = this.projectForm.value;
 
     this.projectService.createProject(projectData).pipe(
+      switchMap(newProject => {
+        if (!newProject || !newProject.id) {
+          return throwError(() => new Error('API did not return a valid project after creation.'));
+        }
+        if (this.selectedFiles.length === 0) { return of(newProject); }
+
+        const uploadObservables = this.selectedFiles.map(file =>
+          this.projectService.uploadImage(newProject.id, file)
+        );
+        return forkJoin(uploadObservables).pipe(
+          tap(() => console.log('All images uploaded successfully for new project.'))
+        );
+      }),
       finalize(() => this.isSubmitting = false)
     ).subscribe({
-      next: (newProject) => {
-        console.log('Project created successfully:', newProject);
-        // توجيه المستخدم لصفحة التعديل مع `id` المشروع الجديد
-        // هذا يسمح للمستخدم بإضافة الصور والتفاصيل مباشرة بعد الإنشاء
-        this.router.navigate(['/projects/edit', newProject.id]);
+      next: () => {
+        console.log('Project creation process complete.');
+        this.router.navigate(['/projects']);
       },
       error: (err) => {
-        console.error('Error creating project:', err);
-        // يمكنك هنا عرض رسالة خطأ للمستخدم
+        console.error('An error occurred during project creation process:', err);
+        alert('Failed to create the project. Please check the console for details.');
       }
     });
   }
 
-  onCancel(): void {
-    this.router.navigate(['/projects']);
-  }
+  onCancel(): void { this.router.navigate(['/projects']); }
 }

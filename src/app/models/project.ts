@@ -1,25 +1,33 @@
-// واجهة لتمثيل كائن الصورة
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Department {
+  id: number;
+  name: string;
+}
+
 export interface ProjectImage {
   id: number;
   url: string;
   projectId: number;
 }
 
-/**
- * يمثل كائن المشروع كما هو معرف في ה-API.
- */
 export interface Project {
   id: number;
   title: string;
   description: string;
   grade: number | null;
-  leaderId: string;
-  categoryId: number;
-  departmentId: number;
-  problemStatement?: string;
-  technologies?: string;
-  toolsUsed?: string;
-
-  // [تمت الإضافة] مصفوفة لتخزين صور المشروع
-  images?: ProjectImage[];
+  technologies: string;
+  toolsUsed: string;
+  problemStatement: string;
+  images: ProjectImage[];
+  submissionDate: string | null;
+  startDate: string;
+  leaderId: number;
+  category: Category;
+  department: Department;
+  students: any[];
+  supervisers: any[];
 }

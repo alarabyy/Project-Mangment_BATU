@@ -6,103 +6,61 @@
     </div>
   </div>
 
-  <div class="form-container">
-    <!-- Form for Project Details -->
-    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
-        <!-- ... حقول النموذج الأساسية تبقى كما هي ... -->
-      <div class="form-group">
-        <label for="title">Project Title</label>
-        <input type="text" id="title" formControlName="title" class="form-control">
-      </div>
-      <!-- ... باقي الحقول ... -->
-       <div class="form-group">
-        <label for="description">Description</label>
-        <textarea id="description" formControlName="description" class="form-control" rows="3"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="problemStatement">Problem Statement</label>
-        <textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="technologies">Technologies Used</label>
-        <input type="text" id="technologies" formControlName="technologies" class="form-control">
-      </div>
-
-      <div class="form-group">
-        <label for="toolsUsed">Tools Used</label>
-        <input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control">
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="grade">Grade</label>
-          <input type="number" id="grade" formControlName="grade" class="form-control">
-        </div>
-
-        <div class="form-group">
-          <label for="leaderId">Leader ID</label>
-          <input type="text" id="leaderId" formControlName="leaderId" class="form-control">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="categoryId">Category ID</label>
-          <input type="number" id="categoryId" formControlName="categoryId" class="form-control">
-        </div>
-
-        <div class="form-group">
-          <label for="departmentId">Department ID</label>
-          <input type="number" id="departmentId" formControlName="departmentId" class="form-control">
-        </div>
-      </div>
-        <!-- Action Buttons for the main form -->
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">
-          {{ isSubmitting ? 'Saving...' : 'Update Project Details' }}
-        </button>
-      </div>
-    </form>
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading project details...</p>
   </div>
 
-  <!-- ======================= 🔽 قسم إدارة الصور الجديد 🔽 ======================= -->
-  <div class="images-section-container">
-    <h2 class="section-title">
-      <i class="fas fa-images"></i> Project Images
-    </h2>
-
-    <!-- Image Upload Form -->
-    <div class="image-upload-form">
-      <div class="form-group">
-        <label for="imageUpload">Upload New Image</label>
-        <div class="upload-controls">
-          <input type="file" id="imageUpload" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/gif" class="form-control-file">
-          <button (click)="onImageUpload()" class="btn btn-primary" [disabled]="!selectedFile || isUploading">
-            <span *ngIf="isUploading"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>
-            <span *ngIf="!isUploading"><i class="fas fa-upload"></i> Upload</span>
+  <div *ngIf="!isLoading && project">
+    <div class="form-container">
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form-group"><label for="title">Project Title</label><input type="text" id="title" formControlName="title" class="form-control"></div>
+        <div class="form-group"><label for="description">Description</label><textarea id="description" formControlName="description" class="form-control" rows="3"></textarea></div>
+        <div class="form-group"><label for="problemStatement">Problem Statement</label><textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3"></textarea></div>
+        <div class="form-group"><label for="technologies">Technologies Used</label><input type="text" id="technologies" formControlName="technologies" class="form-control"></div>
+        <div class="form-group"><label for="toolsUsed">Tools Used</label><input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control"></div>
+        <div class="form-row">
+          <div class="form-group"><label for="grade">Grade</label><input type="number" id="grade" formControlName="grade" class="form-control"></div>
+          <div class="form-group"><label for="leaderId">Leader ID</label><input type="text" id="leaderId" formControlName="leaderId" class="form-control"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label for="categoryId">Category ID</label><input type="number" id="categoryId" formControlName="categoryId" class="form-control"></div>
+          <div class="form-group"><label for="departmentId">Department ID</label><input type="number" id="departmentId" formControlName="departmentId" class="form-control"></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">
+            <i class="fas" [class.fa-save]="!isSubmitting" [class.fa-spinner]="isSubmitting" [class.fa-spin]="isSubmitting"></i>
+            {{ isSubmitting ? 'Saving...' : 'Update Project Details' }}
           </button>
         </div>
-      </div>
+      </form>
     </div>
 
-    <!-- Image Gallery -->
-    <div *ngIf="project && project.images && project.images.length > 0; else noImages" class="image-gallery">
-      <div *ngFor="let image of project.images" class="image-card">
-        <img [src]="image.url" [alt]="project.title + ' image'">
-        <button (click)="deleteImage(image.id)" class="btn-delete-image" title="Delete Image" [disabled]="imagesBeingDeleted.has(image.id)">
-          <i class="fas fa-times"></i>
-        </button>
-        <div *ngIf="imagesBeingDeleted.has(image.id)" class="delete-overlay">
-          <i class="fas fa-spinner fa-spin"></i>
+    <div class="images-section-container">
+      <h2 class="section-title"><i class="fas fa-images"></i> Project Images</h2>
+      <div class="image-upload-form">
+        <div class="form-group">
+          <label for="imageUpload">Upload New Image</label>
+          <div class="upload-controls">
+            <input type="file" id="imageUpload" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/gif" class="form-control-file">
+            <button (click)="onImageUpload()" class="btn btn-primary" [disabled]="!selectedFile || isUploading">
+              <span *ngIf="isUploading"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>
+              <span *ngIf="!isUploading"><i class="fas fa-upload"></i> Upload</span>
+            </button>
+          </div>
         </div>
       </div>
+      <div *ngIf="project.images && project.images.length > 0; else noImages" class="image-gallery">
+        <div *ngFor="let image of project.images" class="image-card">
+          <img [src]="image.url" [alt]="project.title + ' image'" (error)="onImageError($event)">
+          <button (click)="deleteImage(image)" class="btn-delete-image" title="Delete Image" [disabled]="imagesBeingDeleted.has(image.id)">
+            <i class="fas fa-times"></i>
+          </button>
+          <div *ngIf="imagesBeingDeleted.has(image.id)" class="delete-overlay"><i class="fas fa-spinner fa-spin"></i></div>
+        </div>
+      </div>
+      <ng-template #noImages><p class="empty-message">This project has no images yet. Upload one above!</p></ng-template>
     </div>
-    <ng-template #noImages>
-      <p class="empty-message">This project has no images yet. Upload one above!</p>
-    </ng-template>
   </div>
-  <!-- ======================================================================== -->
 </div>

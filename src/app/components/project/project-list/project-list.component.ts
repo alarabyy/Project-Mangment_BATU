@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ProjectService } from '../../../Services/project.service';
 import { Project } from '../../../models/project';
 
@@ -14,8 +14,9 @@ import { Project } from '../../../models/project';
 })
 export class ProjectListComponent implements OnInit {
   projects$!: Observable<Project[]>;
+  private readonly placeholderImage = 'assets/images/project-placeholder.png';
 
-  constructor(private projectService: ProjectService) {}
+  constructor(private projectService: ProjectService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadProjects();
@@ -26,24 +27,34 @@ export class ProjectListComponent implements OnInit {
   }
 
   deleteProject(id: number, event: MouseEvent): void {
-    event.stopPropagation(); // منع التنقل إلى صفحة التعديل عند النقر على زر الحذف
-    if (confirm('Are you sure you want to delete this project?')) {
+    event.stopPropagation();
+    if (confirm('Are you sure you want to permanently delete this project?')) {
       this.projectService.deleteProject(id).subscribe({
-        next: () => {
-          console.log(`Project with id ${id} was deleted successfully.`);
-          this.loadProjects(); // إعادة تحميل القائمة بعد الحذف
-        },
+        next: () => this.loadProjects(),
         error: (err) => console.error('Error deleting project:', err)
       });
     }
   }
 
-  // دالة مساعدة للحصول على صورة العرض الأولى للمشروع
+  viewDetails(id: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.router.navigate(['/projects', id]);
+  }
+
+  editProject(id: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.router.navigate(['/projects/edit', id]);
+  }
+
   getProjectCoverImage(project: Project): string {
-    if (project.images && project.images.length > 0) {
-      return project.images[0].url; // إرجاع رابط أول صورة
+    if (project.images && project.images.length > 0 && project.images[0]?.url) {
+      return project.images[0].url;
     }
-    // إرجاع صورة افتراضية في حالة عدم وجود صور
-    return 'assets/images/project-placeholder.png';
+    return this.placeholderImage;
+  }
+
+  onImageError(event: Event): void {
+    const element = event.target as HTMLImageElement;
+    element.src = this.placeholderImage;
   }
 }

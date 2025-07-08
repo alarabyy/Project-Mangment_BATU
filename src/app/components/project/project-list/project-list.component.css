@@ -1,185 +1,20 @@
-:host {
-  display: block;
-  background-color: var(--bg-color);
-  min-height: 100vh;
-}
-.list-container {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: auto;
-  font-family: var(--font-family-base);
-}
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.list-header h1 {
-  font-size: 2.2rem;
-  font-weight: var(--font-weight-bold);
-  color: var(--text-color);
-}
-
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
-}
-
-.project-card {
-  background-color: var(--surface-color);
-  border-radius: var(--border-radius-large);
-  border: 1px solid var(--border-color-translucent);
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  text-decoration: none; /* لإزالة الخط تحت الرابط */
-  color: inherit; /* ليرث لون النص العادي */
-}
-
-.project-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: var(--box-shadow-lg);
-  border-color: var(--primary-accent);
-}
-
-.card-image-wrapper {
-  width: 100%;
-  height: 200px; /* ارتفاع ثابت للصور */
-  background-color: var(--bg-color);
-}
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* لضمان ملء الصورة للمساحة بشكل جيد */
-}
-
-.card-content {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  gap: 1rem;
-}
-
-.card-header h3 {
-  font-size: 1.25rem;
-  margin: 0;
-  font-weight: var(--font-weight-semibold);
-  line-height: 1.3;
-}
-
-.card-body {
-  flex-grow: 1;
-}
-
-.description {
-  color: var(--subtle-text-color);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin: 0;
-  min-height: 54px; /* ارتفاع تقريبي لثلاثة أسطر */
-}
-
-.card-footer {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color-translucent);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.grade-badge {
-  background-color: var(--primary-accent-translucent);
-  color: var(--primary-accent);
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--border-radius-pill);
-  font-size: 0.8rem;
-  font-weight: var(--font-weight-medium);
-  flex-shrink: 0;
-}
-
-.id-group {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.75rem;
-  color: var(--subtle-text-color);
-}
-
-.card-actions {
-  display: flex;
-}
-
-.btn-primary {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--border-radius-pill);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  text-decoration: none;
-  background-color: var(--primary-accent);
-  color: var(--bg-color);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-icon {
-  background-color: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--subtle-text-color);
-  cursor: pointer;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  position: relative;
-  z-index: 2; /* لضمان ظهوره فوق الرابط */
-}
-
-.btn-icon.btn-danger:hover {
-  background-color: rgba(248, 81, 73, 0.1);
-  border-color: var(--error-color);
-  color: var(--error-color);
-}
-
-.loading-container, .empty-message {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 4rem 1rem;
-  color: var(--subtle-text-color);
-  font-size: 1.2rem;
-}
-
-.loading-spinner {
-  border: 5px solid var(--surface-color);
-  border-top-color: var(--primary-accent);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+:host { display: block; background-color: var(--bg-color); min-height: 100vh; }
+.list-container { padding: 2rem; max-width: 1400px; margin: auto; }
+.list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.list-header h1 { font-size: 2.2rem; font-weight: var(--font-weight-bold); margin: 0; }
+.table-wrapper { overflow-x: auto; }
+.projects-table { width: 100%; border-collapse: collapse; background-color: var(--surface-color); border-radius: var(--border-radius-large); overflow: hidden; box-shadow: var(--box-shadow-md); }
+.projects-table th, .projects-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+.projects-table thead { background-color: var(--bg-color); }
+.projects-table th { font-weight: var(--font-weight-semibold); color: var(--subtle-text-color); }
+.project-thumbnail { width: 60px; height: 40px; object-fit: cover; border-radius: var(--border-radius-base); }
+.grade-badge { padding: 0.25rem 0.5rem; border-radius: var(--border-radius-pill); background-color: var(--primary-accent-translucent); color: var(--primary-accent); font-weight: var(--font-weight-medium); }
+.actions-group { display: flex; gap: 0.5rem; }
+.btn-icon { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: inline-flex; justify-content: center; align-items: center; transition: background-color 0.2s ease; }
+.btn-icon.btn-view { color: #3b82f6; } .btn-icon.btn-view:hover { background-color: rgba(59, 130, 246, 0.1); }
+.btn-icon.btn-edit { color: #f97316; } .btn-icon.btn-edit:hover { background-color: rgba(249, 115, 22, 0.1); }
+.btn-icon.btn-danger { color: #ef4444; } .btn-icon.btn-danger:hover { background-color: rgba(239, 68, 68, 0.1); }
+.loading-container, .empty-message { text-align: center; padding: 4rem; color: var(--subtle-text-color); font-size: 1.2rem; }
+.loading-spinner { border: 5px solid var(--border-color); border-top-color: var(--primary-accent); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-primary { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-pill); /* other btn styles */ }
