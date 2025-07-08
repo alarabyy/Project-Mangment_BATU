@@ -37,8 +37,9 @@
       <div class="form-row">
         <div class="form-group"><label for="grade">Grade (Optional)</label><input type="number" id="grade" formControlName="grade" class="form-control"></div>
         <div class="form-group">
-          <label for="leaderId">Leader ID</label><input type="text" id="leaderId" formControlName="leaderId" class="form-control" [class.is-invalid]="f['leaderId'].invalid && f['leaderId'].touched">
-          <div *ngIf="f['leaderId'].touched && f['leaderId'].errors" class="error-message"><small *ngIf="f['leaderId'].errors?.['required']">Leader ID is required.</small></div>
+          <!-- FIXED: Changed formControlName to teamLeaderId -->
+          <label for="teamLeaderId">Leader ID</label><input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control" [class.is-invalid]="f['teamLeaderId'].invalid && f['teamLeaderId'].touched">
+          <div *ngIf="f['teamLeaderId'].touched && f['teamLeaderId'].errors" class="error-message"><small *ngIf="f['teamLeaderId'].errors?.['required']">Leader ID is required.</small></div>
         </div>
       </div>
       <div class="form-group">

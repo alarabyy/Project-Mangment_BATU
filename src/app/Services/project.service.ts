@@ -31,18 +31,16 @@ export class ProjectService {
     return this.http.delete(`${this.apiUrl}/delete`, { params });
   }
 
-  // Frontend sends 'Files' with an 's' as per backend ProjectFilesUploadRequest
+  // FIXED: The backend's ProjectFilesUploadRequest expects 'Id' and 'Files'.
   uploadImage(projectId: number, file: File): Observable<any> {
     const formData = new FormData();
-    // Backend expects 'Id', not 'projectId' in the form data for this request
     formData.append('Id', projectId.toString());
-    formData.append('Files', file, file.name); // 'Files' with an 's'
+    formData.append('Files', file, file.name);
     return this.http.post(`${this.apiUrl}/images/upload`, formData);
   }
 
-  // Frontend sends 'Files' with an 's' as per backend ProjectFilesDeleteRequest
+  // The backend's ProjectFilesDeleteRequest expects a POST with 'id' and 'files'.
   deleteImage(projectId: number, fileNames: string[]): Observable<any> {
-    // Backend expects a POST request with this structure
     const payload = { id: projectId, files: fileNames };
     return this.http.post(`${this.apiUrl}/images/delete`, payload);
   }

@@ -1,15 +1,5 @@
-export interface Category {
-  id: number;
-  name: string;
-}
-
-export interface Department {
-  id: number;
-  name: string;
-}
-
-// ProjectImage interface is no longer needed on the frontend
-// as the backend returns an array of strings.
+import { Category } from './category';
+import { Department } from './department';
 
 export interface Project {
   id: number;
@@ -19,10 +9,10 @@ export interface Project {
   technologies: string;
   toolsUsed: string;
   problemStatement: string;
-  images: string[]; // FIXED: This is now an array of strings (filenames)
+  images: string[];
   submissionDate: string | null;
   startDate: string;
-  leaderId: number;
+  teamLeaderId: number; // The correct property name
   category: Category;
   department: Department;
   students: any[];

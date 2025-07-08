@@ -22,7 +22,7 @@ export class EditProjectComponent implements OnInit {
   pageTitle = 'Loading Project...';
   selectedFiles: File[] = [];
   isUploading = false;
-  imagesBeingDeleted = new Set<string>(); // Set of filenames
+  imagesBeingDeleted = new Set<string>();
   private projectId!: number;
 
   public readonly imageBaseUrl = environment.imageBaseUrl;
@@ -38,6 +38,7 @@ export class EditProjectComponent implements OnInit {
     this.loadProjectData();
   }
 
+  // FIXED: Changed form control name to 'teamLeaderId'
   initializeForm(): void {
     this.projectForm = this.fb.group({
       id: [this.projectId],
@@ -47,7 +48,7 @@ export class EditProjectComponent implements OnInit {
       technologies: ['', Validators.required],
       toolsUsed: ['', Validators.required],
       grade: [null, [Validators.min(0), Validators.max(100)]],
-      leaderId: ['', Validators.required],
+      teamLeaderId: ['', Validators.required], // Corrected name
       categoryId: [null, Validators.required],
       departmentId: [null, Validators.required]
     });
@@ -60,6 +61,7 @@ export class EditProjectComponent implements OnInit {
       next: (projectData) => {
         this.project = projectData;
         this.pageTitle = `Edit: ${projectData.title}`;
+        // FIXED: Used the correct property 'teamLeaderId'
         this.projectForm.patchValue({
              id: projectData.id,
              title: projectData.title,
@@ -68,7 +70,7 @@ export class EditProjectComponent implements OnInit {
              technologies: projectData.technologies,
              toolsUsed: projectData.toolsUsed,
              grade: projectData.grade,
-             leaderId: projectData.leaderId,
+             teamLeaderId: projectData.teamLeaderId, // Corrected property
              categoryId: projectData.category?.id,
              departmentId: projectData.department?.id
         });
@@ -82,10 +84,29 @@ export class EditProjectComponent implements OnInit {
   onSubmit(): void {
     if (this.projectForm.invalid) { this.projectForm.markAllAsTouched(); return; }
     this.isSubmitting = true;
-    this.projectService.updateProject(this.projectForm.value).pipe(finalize(() => this.isSubmitting = false))
+
+    // FIXED: The payload now uses correct property names
+    const formValue = this.projectForm.value;
+    const payload = {
+      Id: formValue.id,
+      Title: formValue.title,
+      Description: formValue.description,
+      Technologies: formValue.technologies,
+      ToolsUsed: formValue.toolsUsed,
+      ProblemStatement: formValue.problemStatement,
+      // Backend Edit method expects 'LeaderId', not 'TeamLeaderId'
+      LeaderId: Number(formValue.teamLeaderId),
+      CategoryId: formValue.categoryId,
+      DepartmentId: formValue.departmentId,
+    };
+
+    this.projectService.updateProject(payload).pipe(finalize(() => this.isSubmitting = false))
     .subscribe({
       next: () => this.router.navigate(['/ProjectDetails', this.projectId]),
-      error: (err) => console.error('Error updating project:', err)
+      error: (err) => {
+        console.error('Error updating project:', err);
+        alert('Failed to update the project.');
+      }
     });
   }
 
@@ -97,12 +118,7 @@ export class EditProjectComponent implements OnInit {
   onImageUpload(): void {
     if (this.selectedFiles.length === 0) return;
     this.isUploading = true;
-
-    // As per backend, upload happens one by one or in a loop
-    const uploadObservables = this.selectedFiles.map(file =>
-      this.projectService.uploadImage(this.projectId, file)
-    );
-
+    const uploadObservables = this.selectedFiles.map(file => this.projectService.uploadImage(this.projectId, file));
     forkJoin(uploadObservables).pipe(finalize(() => {
       this.isUploading = false; this.selectedFiles = [];
       const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
@@ -112,7 +128,6 @@ export class EditProjectComponent implements OnInit {
 
   deleteImage(filename: string): void {
     if (!filename) { console.error("Filename is empty"); return; }
-
     if (confirm(`Are you sure you want to delete this image? (${filename})`)) {
       this.imagesBeingDeleted.add(filename);
       this.projectService.deleteImage(this.project!.id, [filename]).pipe(finalize(() => this.imagesBeingDeleted.delete(filename)))
