@@ -5,13 +5,14 @@ import { Observable, BehaviorSubject, tap, throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../environments/environment';
 
+// واجهات لأنواع البيانات
 export interface UserProfile {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  imageUrl: string;
-  role: string | string[]; // تم تحديث الواجهة لتقبل مصفوفة
+  imageUrl: string | null; // قد تكون الصورة null
+  role: string | string[];
 }
 
 export interface LoginResponse {
@@ -23,27 +24,17 @@ export interface LoginResponse {
 })
 export class AuthService {
   private authApiUrl = `${environment.apiUrl}/auth`;
-  private userApiUrl = `${environment.apiUrl}/user`;
+  private userApiUrl = `${environment.apiUrl}/user`; // تأكد من أن هذا هو المسار الصحيح
   private authTokenKey = 'authToken';
 
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this._isAuthenticated.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     this.checkInitialAuthState();
   }
 
-  private checkInitialAuthState(): void {
-    const token = this.getToken();
-    if (token && !this.isTokenExpired(token)) {
-      this._isAuthenticated.next(true);
-    } else {
-      this._isAuthenticated.next(false);
-    }
-  }
+  // --- دوال المصادقة الأساسية ---
 
   public register(userData: any): Observable<any> {
     return this.http.post(`${this.authApiUrl}/register`, userData);
@@ -60,28 +51,37 @@ export class AuthService {
     );
   }
 
+  public logout(): void {
+    localStorage.removeItem(this.authTokenKey);
+    this._isAuthenticated.next(false);
+    this.router.navigate(['/Login']);
+  }
+
+  // --- FIX: إعادة إضافة الدالة المفقودة ---
   public getUserProfileFromApi(): Observable<UserProfile> {
     const userId = this.getUserId();
     if (!userId) {
       const errorMsg = "[AuthService] Cannot fetch profile, User ID not found in token.";
       console.error(errorMsg);
+      // استخدام throwError لإرجاع Observable بخطأ
       return throwError(() => new Error(errorMsg));
     }
 
+    // تأكد من أن الـ endpoint صحيح. قد يكون 'profile' أو 'users'
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
     console.log(`[AuthService] Fetching profile from: ${profileUrl}`);
     return this.http.get<UserProfile>(profileUrl, { headers: this.getAuthHeaders() });
   }
 
-  public logout(): void {
-    localStorage.removeItem(this.authTokenKey);
-    this._isAuthenticated.next(false);
-    this.router.navigate(['/login']);
+  // --- دوال مساعدة للتعامل مع التوكن ---
+
+  private checkInitialAuthState(): void {
+    const token = this.getToken();
+    this._isAuthenticated.next(!!token && !this.isTokenExpired(token));
   }
 
   public isLoggedIn(): boolean {
-    const token = this.getToken();
-    return !!token && !this.isTokenExpired(token);
+    return this._isAuthenticated.value;
   }
 
   public getToken(): string | null {
@@ -94,57 +94,33 @@ export class AuthService {
     try {
       return jwtDecode(token);
     } catch (error) {
-      console.error("Could not decode token", error);
       return null;
     }
   }
 
   public getUserId(): string | null {
-    const decodedToken = this.getDecodedToken();
-    if (!decodedToken) return null;
-
-    const userId =
-      decodedToken.id ||
-      decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
-      decodedToken.nameid ||
-      decodedToken.sub;
-
-    if (!userId) {
-      console.warn("[AuthService] User ID claim (id, nameidentifier, sub) not found in token.", decodedToken);
-    }
-    return String(userId) || null;
+    const decoded = this.getDecodedToken();
+    return decoded ? (decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || decoded.nameid || decoded.sub) : null;
   }
 
   public getUserRole(): string | null {
-    const decodedToken = this.getDecodedToken();
-    if (!decodedToken) return null;
-
-    const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decodedToken.role;
-
-    if (!role) {
-      console.warn("[AuthService] Role claim (role) not found in token.", decodedToken);
-    }
-
+    const decoded = this.getDecodedToken();
+    if (!decoded) return null;
+    const role = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
     return Array.isArray(role) ? role[0]?.toLowerCase() : role?.toLowerCase() || null;
   }
 
   private isTokenExpired(token: string): boolean {
     try {
       const decoded: { exp: number } = jwtDecode(token);
-      if (typeof decoded.exp === 'undefined') {
-        return true;
-      }
       return decoded.exp < (Date.now() / 1000);
-    } catch (err) {
+    } catch {
       return true;
     }
   }
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
-    if (token) {
-      return new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    }
-    return new HttpHeaders();
+    return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
   }
 }

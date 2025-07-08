@@ -1,74 +1,59 @@
+/*
+ * ===================================================================
+ *  Professional Animated Popup Component Stylesheet
+ * ===================================================================
+ */
+
 :host {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none; /* Allows clicks to pass through when hidden */
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 1050; display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
 }
-
 .popup-overlay {
-  pointer-events: auto; /* Re-enable clicks when visible */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
-  animation: fadeIn 0.3s ease-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  pointer-events: auto; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(10, 20, 30, 0.7); backdrop-filter: blur(8px);
+  animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
 }
-
+.popup-overlay.fade-out { animation: fadeOut 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards; }
 .popup-container {
-  background-color: var(--surface-color);
-  color: var(--text-color);
-  border-radius: var(--border-radius-large);
-  padding: 2rem 1.5rem;
-  width: 100%;
-  max-width: 450px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transform: scale(0.9);
-  animation: scaleIn 0.4s ease-out forwards;
+  background-color: var(--surface-color, #ffffff); color: var(--text-color, #111111);
+  border-radius: var(--border-radius-large, 16px); padding: 2.5rem 1.5rem 1.5rem;
+  width: 100%; max-width: 420px; text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-color-translucent, rgba(255, 255, 255, 0.1));
+  animation: slideInUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
-
-@media (min-width: 600px) { .popup-container { padding: 2.5rem; } }
-
-.popup-icon { font-size: 4rem; margin-bottom: 1rem; }
-.popup-icon .fa-check-circle { color: var(--success-color, #28a745); }
-.popup-icon .fa-exclamation-triangle { color: var(--error-color, #dc3545); }
-.popup-icon .fa-question-circle { color: var(--info-color, #17a2b8); }
-
-.popup-title { font-size: 1.5rem; font-weight: var(--font-weight-bold); margin: 0 0 0.5rem 0; }
-@media (min-width: 600px) { .popup-title { font-size: 1.75rem; } }
-
-.popup-message { font-size: 1rem; color: var(--subtle-text-color); line-height: 1.6; margin-bottom: 2rem; }
+.popup-container.slide-out-down { animation: slideOutDown 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards; }
+@media (min-width: 600px) { .popup-container { padding: 3rem 2rem 2rem; } }
+.popup-icon-wrapper {
+  margin: -6rem auto 1rem; width: 80px; height: 80px; border-radius: 50%;
+  background-color: var(--surface-color, #ffffff); display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); position: relative; z-index: 2;
+}
+.popup-icon { font-size: 3rem; line-height: 1; }
+.popup-container.success .popup-icon { color: var(--success-color, #28a745); }
+.popup-container.error .popup-icon { color: var(--error-color, #e74c3c); }
+.popup-container.confirm .popup-icon { color: var(--info-color, #3498db); }
+.popup-title { font-size: 1.6rem; font-weight: var(--font-weight-bold, 700); margin: 0 0 0.75rem 0; line-height: 1.2; }
+@media (min-width: 600px) { .popup-title { font-size: 1.8rem; } }
+.popup-message { font-size: 1rem; color: var(--subtle-text-color, #6c757d); line-height: 1.6; margin-bottom: 2rem; }
 .popup-actions { display: flex; flex-direction: column-reverse; gap: 0.75rem; }
 @media (min-width: 600px) { .popup-actions { flex-direction: row; justify-content: center; } }
-
-.btn { padding: 0.75rem 1.5rem; border-radius: var(--border-radius-base); font-weight: var(--font-weight-semibold); cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; border: 1px solid transparent; }
+.btn {
+  padding: 0.8rem 1.5rem; border-radius: var(--border-radius-base, 8px); font-weight: var(--font-weight-semibold, 600);
+  cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; justify-content: center;
+  gap: 0.5rem; width: 100%; border: 2px solid transparent;
+}
 @media (min-width: 600px) { .btn { width: auto; } }
-
-/* Button styling based on popup type */
-.popup-container.success .btn-primary { background-color: var(--success-color, #28a745); color: white; border-color: var(--success-color, #28a745); }
-.popup-container.success .btn-primary:hover { background-color: #218838; border-color: #218838; }
-
-.popup-container.error .btn-primary { background-color: var(--error-color, #dc3545); color: white; border-color: var(--error-color, #dc3545); }
-.popup-container.error .btn-primary:hover { background-color: #c82333; border-color: #c82333; }
-
-.popup-container.confirm .btn-primary { background-color: var(--primary-accent, #007bff); color: white; border-color: var(--primary-accent, #007bff); }
-.popup-container.confirm .btn-primary:hover { background-color: var(--primary-accent-hover, #0056b3); border-color: var(--primary-accent-hover, #0056b3); }
-
-.btn-secondary { background-color: transparent; color: var(--text-color); border-color: var(--border-color); }
-.btn-secondary:hover { background-color: var(--bg-color); }
-
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); }
+.btn-primary { color: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.btn-secondary { background-color: transparent; color: var(--text-color, #333); border-color: var(--border-color, #dee2e6); }
+.btn-secondary:hover { background-color: var(--bg-color, #f8f9fa); border-color: var(--text-color, #333); }
+.popup-container.success .btn-primary { background-color: var(--success-color, #28a745); }
+.popup-container.error .btn-primary { background-color: var(--error-color, #e74c3c); }
+.popup-container.confirm .btn-primary { background-color: var(--info-color, #3498db); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes slideInUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slideOutDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(30px); opacity: 0; } }

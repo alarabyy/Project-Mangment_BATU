@@ -1,10 +1,9 @@
-// File: src/app/components/sign-up/sign-up.component.ts
-
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../Services/auth.service';
+import { PopupService } from '../../Services/popup.service'; // لاستخدام الـ Popup الاحترافي
 
 @Component({
   selector: 'app-sign-up',
@@ -17,23 +16,28 @@ export class SignUpComponent implements OnInit {
   signupForm!: FormGroup;
   showPassword = false;
   isSubmitting = false;
-  errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private popupService: PopupService // حقن خدمة الـ Popup
+  ) {}
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({
-      firstName: ['', [Validators.required]],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
       middleName: [''],
-      lastName: ['', [Validators.required]],
-      gender: ['0', Validators.required],
-      role: ['0', Validators.required],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      gender: ['0', Validators.required], // 0: Male, 1: Female
+      role: ['0', Validators.required], // 0: Student, 1: Doctor, 2: Admin
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$')]]
     });
   }
 
   get f() { return this.signupForm.controls; }
+
   togglePassword(): void { this.showPassword = !this.showPassword; }
 
   submitSignup(): void {
@@ -43,32 +47,30 @@ export class SignUpComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    this.errorMessage = null;
 
-    // ================= 🔽 تم التعديل هنا 🔽 =================
-    // إنشاء الـ payload بأسماء حقول camelCase لتطابق مواصفات الـ API
+    // تحويل القيم النصية إلى أرقام قبل إرسالها
     const payload = {
-      firstName: this.signupForm.value.firstName,
-      middleName: this.signupForm.value.middleName,
-      lastName: this.signupForm.value.lastName,
-      email: this.signupForm.value.email,
-      password: this.signupForm.value.password,
+      ...this.signupForm.value,
       gender: +this.signupForm.value.gender,
       role: +this.signupForm.value.role
     };
-    // ========================================================
 
     this.authService.register(payload).subscribe({
       next: () => {
-        alert('Account created successfully! Please log in.');
-        this.router.navigate(['/Login']);
+        this.isSubmitting = false;
+        // استخدام الـ Popup الاحترافي بدلاً من alert
+        this.popupService.showSuccess(
+          'Account Created!',
+          'Your account has been created successfully. You can now log in.',
+          () => this.router.navigate(['/Login']) // التنقل إلى صفحة الدخول بعد الضغط على OK
+        );
       },
       error: (err) => {
-        // يمكننا الآن عرض رسالة الخطأ القادمة من الخادم مباشرة
-        this.errorMessage = err.error?.message || err.error?.title || 'Registration failed. Please check your details.';
         this.isSubmitting = false;
-      },
-      complete: () => { this.isSubmitting = false; }
+        const errorMessage = err.error?.message || err.error?.title || 'Registration failed. Please check your details and try again.';
+        // عرض الخطأ باستخدام الـ Popup
+        this.popupService.showError('Registration Failed', errorMessage);
+      }
     });
   }
 }
