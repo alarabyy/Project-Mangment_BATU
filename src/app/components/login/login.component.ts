@@ -63,16 +63,16 @@ export class LoginComponent implements OnInit {
     const role = this.authService.getUserRole();
     switch (role) {
       case 'admin':
-        this.router.navigate(['/FacultyList']);
+        this.router.navigate(['/Home']);
         break;
       // ================= 🔽 تم التعديل هنا 🔽 =================
       case 'doctor':
       case 'professor': // تعامل مع professor بنفس طريقة doctor
-        this.router.navigate(['/projects']);
+        this.router.navigate(['/Home']);
         break;
       // ========================================================
       case 'student':
-        this.router.navigate(['/projects']);
+        this.router.navigate(['/Home']);
         break;
       default:
         this.router.navigate(['/Home']);
