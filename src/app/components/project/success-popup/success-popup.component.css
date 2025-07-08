@@ -1,79 +1,112 @@
+/*
+  CSS for Professional and Animated Popup Component
+  - Uses CSS variables for easy theme integration.
+  - Mobile-first and fully responsive design.
+  - Smooth, non-jarring animations.
+*/
+
 :host {
+  /* This ensures the component itself is a positioned layer */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1000;
+  z-index: 1050; /* High z-index to be on top of everything */
+  display: flex; /* Key for vertical and horizontal centering */
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Allows clicks to pass through when the popup is hidden */
+}
+
+/* The semi-transparent background overlay */
+.popup-overlay {
+  pointer-events: auto; /* Re-enables pointer events for the visible overlay */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 20, 30, 0.7); /* A modern, dark overlay */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* For Safari */
+  animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
 }
 
-.popup-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
-  animation: fadeIn 0.3s ease-out;
-}
-
+/* The main popup content box */
 .popup-container {
-  position: relative;
-  background-color: var(--surface-color);
-  color: var(--text-color);
-  border-radius: var(--border-radius-large);
-  padding: 2rem 1.5rem;
+  background-color: var(--surface-color, #ffffff);
+  color: var(--text-color, #111111);
+  border-radius: var(--border-radius-large, 16px);
+  padding: 2rem 1.5rem 1.5rem;
   width: 100%;
-  max-width: 450px;
+  max-width: 420px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transform: scale(0.9);
-  animation: scaleIn 0.4s ease-out forwards;
-  z-index: 1001;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-color-translucent, rgba(255, 255, 255, 0.1));
+  /* The main animation for the popup box */
+  animation: slideInUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
+             scaleIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  transform: translateY(20px);
+  opacity: 0;
 }
 
 @media (min-width: 600px) {
   .popup-container {
-    padding: 2.5rem;
+    padding: 2.5rem 2rem 2rem;
   }
+}
+
+/* Styling for the icon section */
+.popup-icon-wrapper {
+  margin: -5rem auto 1rem; /* Pulls the icon up to sit on the edge */
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--surface-color, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .popup-icon {
-  font-size: 4rem;
-  color: #28a745;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  line-height: 1;
 }
 
+/* Dynamic coloring based on popup type */
+.popup-container.success .popup-icon { color: var(--success-color, #28a745); }
+.popup-container.error .popup-icon { color: var(--error-color, #e74c3c); }
+.popup-container.confirm .popup-icon { color: var(--info-color, #3498db); }
+
+
+/* Title and Message styling */
 .popup-title {
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-bold);
-  margin: 0 0 0.5rem 0;
+  font-size: 1.6rem;
+  font-weight: var(--font-weight-bold, 700);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.2;
 }
-
-@media (min-width: 600px) {
-  .popup-title {
-    font-size: 1.75rem;
-  }
-}
+@media (min-width: 600px) { .popup-title { font-size: 1.8rem; } }
 
 .popup-message {
   font-size: 1rem;
-  color: var(--subtle-text-color);
+  color: var(--subtle-text-color, #6c757d);
   line-height: 1.6;
   margin-bottom: 2rem;
 }
 
+/* Action buttons styling */
 .popup-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse; /* Puts primary button on bottom for mobile */
   gap: 0.75rem;
 }
-
 @media (min-width: 600px) {
   .popup-actions {
     flex-direction: row;
@@ -82,56 +115,65 @@
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--border-radius-base);
-  font-weight: var(--font-weight-semibold);
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius-base, 8px);
+  font-weight: var(--font-weight-semibold, 600);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
+  border: 2px solid transparent;
 }
+@media (min-width: 600px) { .btn { width: auto; } }
 
-@media (min-width: 600px) {
-  .btn {
-    width: auto;
-  }
-}
-
+/* Primary Button (Confirm, OK, etc.) */
 .btn-primary {
-  background-color: #28a745;
   color: white;
-  border: 1px solid #28a745;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .btn-primary:hover {
-  background-color: #218838;
-  border-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
+/* Secondary Button (Cancel, Close, etc.) */
 .btn-secondary {
   background-color: transparent;
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
+  color: var(--text-color, #333);
+  border-color: var(--border-color, #dee2e6);
 }
 .btn-secondary:hover {
-  background-color: var(--bg-color);
+  background-color: var(--bg-color, #f8f9fa);
+  border-color: var(--text-color, #333);
 }
 
+/* Dynamic coloring for primary button */
+.popup-container.success .btn-primary { background-color: var(--success-color, #28a745); }
+.popup-container.error .btn-primary { background-color: var(--error-color, #e74c3c); }
+.popup-container.confirm .btn-primary { background-color: var(--info-color, #3498db); }
+
+
+/* Animation keyframes */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes scaleIn {
+  from { transform: scale(0.95); }
+  to { transform: scale(1); }
+}
+
+@keyframes slideInUp {
   from {
+    transform: translateY(30px);
     opacity: 0;
-    transform: scale(0.8);
   }
   to {
+    transform: translateY(0);
     opacity: 1;
-    transform: scale(1);
   }
 }

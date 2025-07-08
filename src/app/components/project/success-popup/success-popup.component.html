@@ -1,17 +1,38 @@
-<div class="popup-overlay" (click)="onCancel()">
-  <div class="popup-container" (click)="$event.stopPropagation()">
-    <div class="popup-icon">
-      <i class="fas fa-check-circle"></i>
+<!-- الخلفية التي تغطي الشاشة -->
+<div class="popup-overlay" (click)="onOverlayClick()">
+
+  <!-- صندوق الـ Popup نفسه -->
+  <!-- يتوقف انتشار النقرة هنا لمنع إغلاق الـ Popup عند النقر بداخله -->
+  <div class="popup-container" [ngClass]="popupType" (click)="$event.stopPropagation()">
+
+    <!-- الأيقونة الديناميكية -->
+    <div class="popup-icon-wrapper">
+      <div class="popup-icon">
+        <i class="fas" [ngClass]="{
+          'fa-check-circle': popupType === 'success',
+          'fa-exclamation-triangle': popupType === 'error',
+          'fa-question-circle': popupType === 'confirm'
+        }"></i>
+      </div>
     </div>
+
+    <!-- المحتوى -->
     <h2 class="popup-title">{{ title }}</h2>
     <p class="popup-message">{{ message }}</p>
+
+    <!-- الأزرار -->
     <div class="popup-actions">
+      <!-- زر الإلغاء/الإغلاق -->
       <button class="btn btn-secondary" (click)="onCancel()">
         {{ cancelButtonText }}
       </button>
-      <button *ngIf="confirmNavigationPath" class="btn btn-primary" (click)="onConfirm()">
+
+      <!-- زر التأكيد/المتابعة -->
+      <!-- يظهر فقط إذا كان هناك مسار تنقل له أو إذا كان النوع 'confirm' -->
+      <button *ngIf="confirmNavigationPath || popupType === 'confirm'" class="btn btn-primary" (click)="onConfirm()">
         {{ confirmButtonText }}
       </button>
     </div>
   </div>
+
 </div>

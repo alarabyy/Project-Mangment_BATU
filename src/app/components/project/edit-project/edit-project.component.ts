@@ -26,7 +26,7 @@ export class EditProjectComponent implements OnInit {
   private projectId!: number;
 
   public readonly imageBaseUrl = environment.imageBaseUrl;
-  public readonly placeholderImage = '/project-placeholder.png';
+  public readonly placeholderImage = 'project-placeholder.png';
 
   constructor(private fb: FormBuilder, private projectService: ProjectService, private router: Router, private route: ActivatedRoute) {}
 

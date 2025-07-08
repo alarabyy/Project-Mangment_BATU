@@ -12,9 +12,13 @@ export interface Project {
   images: string[];
   submissionDate: string | null;
   startDate: string;
-  teamLeaderId: number; // The correct property name
-  category: Category;
-  department: Department;
+  teamLeaderId: number;
+
+  // FIX: Make category and department optional to match backend reality.
+  // This will make the ?. operator valid and remove the warnings.
+  category: Category | null;
+  department: Department | null;
+
   students: any[];
   supervisers: any[];
 }

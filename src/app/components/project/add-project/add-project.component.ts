@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
 import { Category } from '../../../models/category';
 import { Department } from '../../../models/department';
 import { SuccessPopupComponent } from '../success-popup/success-popup.component';
+// Corrected import path
 
 @Component({
   selector: 'app-add-project',
