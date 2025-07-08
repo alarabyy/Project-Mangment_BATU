@@ -3,8 +3,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
-import { Project, ProjectImage } from '../../../models/project';
-import { finalize } from 'rxjs';
+import { Project } from '../../../models/project';
+import { finalize, forkJoin } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-edit-project',
@@ -19,22 +20,19 @@ export class EditProjectComponent implements OnInit {
   isSubmitting = false;
   isLoading = true;
   pageTitle = 'Loading Project...';
-  selectedFile: File | null = null;
+  selectedFiles: File[] = [];
   isUploading = false;
-  imagesBeingDeleted = new Set<number>();
+  imagesBeingDeleted = new Set<string>(); // Set of filenames
   private projectId!: number;
+
+  public readonly imageBaseUrl = environment.imageBaseUrl;
   private readonly placeholderImage = 'assets/images/project-placeholder.png';
 
-  constructor(
-    private fb: FormBuilder,
-    private projectService: ProjectService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private fb: FormBuilder, private projectService: ProjectService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    if (!idParam) { this.router.navigate(['/projects']); return; }
+    if (!idParam) { this.router.navigate(['/ProjectList']); return; }
     this.projectId = +idParam;
     this.initializeForm();
     this.loadProjectData();
@@ -57,19 +55,25 @@ export class EditProjectComponent implements OnInit {
 
   loadProjectData(): void {
     this.isLoading = true;
-    this.projectService.getProjectById(this.projectId).pipe(
-      finalize(() => this.isLoading = false)
-    ).subscribe({
+    this.projectService.getProjectById(this.projectId).pipe(finalize(() => this.isLoading = false))
+    .subscribe({
       next: (projectData) => {
         this.project = projectData;
         this.pageTitle = `Edit: ${projectData.title}`;
         this.projectForm.patchValue({
-          ...projectData,
-          categoryId: projectData.category.id,
-          departmentId: projectData.department.id
+             id: projectData.id,
+             title: projectData.title,
+             description: projectData.description,
+             problemStatement: projectData.problemStatement,
+             technologies: projectData.technologies,
+             toolsUsed: projectData.toolsUsed,
+             grade: projectData.grade,
+             leaderId: projectData.leaderId,
+             categoryId: projectData.category?.id,
+             departmentId: projectData.department?.id
         });
       },
-      error: (err) => { this.router.navigate(['/not-found']); }
+      error: () => this.router.navigate(['/not-found'])
     });
   }
 
@@ -78,59 +82,53 @@ export class EditProjectComponent implements OnInit {
   onSubmit(): void {
     if (this.projectForm.invalid) { this.projectForm.markAllAsTouched(); return; }
     this.isSubmitting = true;
-    this.projectService.updateProject(this.projectForm.value).pipe(
-      finalize(() => this.isSubmitting = false)
-    ).subscribe({
-      next: () => this.router.navigate(['/projects', this.projectId]),
+    this.projectService.updateProject(this.projectForm.value).pipe(finalize(() => this.isSubmitting = false))
+    .subscribe({
+      next: () => this.router.navigate(['/ProjectDetails', this.projectId]),
       error: (err) => console.error('Error updating project:', err)
     });
   }
 
-  onFileSelected(event: Event): void {
+  onFilesSelected(event: Event): void {
     const element = event.currentTarget as HTMLInputElement;
-    this.selectedFile = element.files ? element.files[0] : null;
+    this.selectedFiles = element.files ? Array.from(element.files) : [];
   }
 
   onImageUpload(): void {
-    if (!this.selectedFile) return;
+    if (this.selectedFiles.length === 0) return;
     this.isUploading = true;
-    this.projectService.uploadImage(this.projectId, this.selectedFile).pipe(
-      finalize(() => {
-        this.isUploading = false;
-        this.selectedFile = null;
-        const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-      })
-    ).subscribe({
-      next: () => this.loadProjectData(),
-      error: (err) => console.error('Error uploading image:', err)
-    });
+
+    // As per backend, upload happens one by one or in a loop
+    const uploadObservables = this.selectedFiles.map(file =>
+      this.projectService.uploadImage(this.projectId, file)
+    );
+
+    forkJoin(uploadObservables).pipe(finalize(() => {
+      this.isUploading = false; this.selectedFiles = [];
+      const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+    })).subscribe({ next: () => this.loadProjectData(), error: (err) => console.error('Error uploading images:', err) });
   }
 
-  deleteImage(image: ProjectImage): void {
-    const fileName = image.url.split('/').pop();
-    if (!fileName) { console.error("Could not extract filename from URL:", image.url); return; }
+  deleteImage(filename: string): void {
+    if (!filename) { console.error("Filename is empty"); return; }
 
-    if (confirm(`Are you sure you want to delete this image? (${fileName})`)) {
-      this.imagesBeingDeleted.add(image.id);
-      this.projectService.deleteImage(this.project!.id, [fileName]).pipe(
-        finalize(() => this.imagesBeingDeleted.delete(image.id))
-      ).subscribe({
+    if (confirm(`Are you sure you want to delete this image? (${filename})`)) {
+      this.imagesBeingDeleted.add(filename);
+      this.projectService.deleteImage(this.project!.id, [filename]).pipe(finalize(() => this.imagesBeingDeleted.delete(filename)))
+      .subscribe({
         next: () => this.loadProjectData(),
-        error: (err) => {
-          console.error('Error deleting image:', err);
-          alert('Failed to delete the image. Check the console for more details.');
-        }
+        error: (err) => { console.error('Error deleting image:', err); alert('Failed to delete the image.'); }
       });
     }
   }
 
-  onCancel(): void {
-    this.router.navigate(['/projects', this.projectId]);
-  }
+  onCancel(): void { this.router.navigate(['/ProjectDetails', this.projectId]); }
 
   onImageError(event: Event): void {
     const element = event.target as HTMLImageElement;
-    element.src = this.placeholderImage;
+    if(element.src !== this.placeholderImage) {
+        element.src = this.placeholderImage;
+    }
   }
 }

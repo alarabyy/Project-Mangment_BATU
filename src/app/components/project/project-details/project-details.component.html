@@ -7,74 +7,58 @@
   <div *ngIf="errorMessage" class="error-container">
     <i class="fas fa-exclamation-triangle"></i>
     <p>{{ errorMessage }}</p>
-    <a routerLink="/projects" class="btn btn-secondary">Back to List</a>
+    <a routerLink="/ProjectList" class="btn btn-secondary">Back to List</a>
   </div>
 
   <div *ngIf="!isLoading && !errorMessage && project" class="project-layout">
     <div class="image-gallery-section">
       <div class="main-image-wrapper">
-        <img [src]="mainImage" [alt]="project.title + ' main image'" (error)="onImageError($event)">
+        <img [src]="getMainImageUrl()" [alt]="project.title + ' main image'" (error)="onImageError($event)">
       </div>
       <div class="thumbnail-strip" *ngIf="project.images && project.images.length > 1">
-        <img *ngFor="let image of project.images"
-             [src]="image.url"
+        <img *ngFor="let filename of project.images"
+             [src]="imageBaseUrl + filename"
              [alt]="project.title + ' thumbnail'"
-             (click)="selectImage(image.url)"
-             [class.active]="image.url === mainImage"
+             (click)="selectImage(filename)"
+             [class.active]="filename === mainImageFilename"
              (error)="onImageError($event)">
       </div>
+       <div *ngIf="!project.images || project.images.length === 0" class="no-images-placeholder">
+          <i class="fas fa-image"></i>
+          <p>No images available for this project.</p>
+       </div>
     </div>
 
     <div class="details-content-section">
       <header class="details-header">
         <h1>{{ project.title }}</h1>
         <div class="header-actions">
-          <a routerLink="/projects" class="btn btn-secondary">
+          <a routerLink="/ProjectList" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back
           </a>
-          <a [routerLink]="['/projects/edit', project.id]" class="btn btn-primary">
+          <a [routerLink]="['/EditProject', project.id]" class="btn btn-primary">
             <i class="fas fa-edit"></i> Edit
           </a>
         </div>
       </header>
 
       <p class="project-description">{{ project.description }}</p>
+
       <h3 class="section-title">Problem Statement</h3>
       <p>{{ project.problemStatement }}</p>
 
       <div class="info-grid">
-        <div class="info-item">
-          <label><i class="fas fa-medal"></i> Grade</label>
-          <span>{{ project.grade ?? 'Not Graded' }}</span>
-        </div>
-        <div class="info-item">
-          <label><i class="fas fa-user-tie"></i> Leader ID</label>
-          <span>{{ project.leaderId }}</span>
-        </div>
-        <div class="info-item">
-          <label><i class="fas fa-tags"></i> Category</label>
-          <span>{{ project.category.name }}</span>
-        </div>
-        <div class="info-item">
-          <label><i class="fas fa-building"></i> Department</label>
-          <span>{{ project.department.name }}</span>
-        </div>
-        <div class="info-item">
-          <label><i class="fas fa-calendar-alt"></i> Start Date</label>
-          <span>{{ project.startDate | date:'longDate' }}</span>
-        </div>
+        <div class="info-item"><label><i class="fas fa-medal"></i> Grade</label><span>{{ project.grade ?? 'Not Graded' }}</span></div>
+        <div class="info-item"><label><i class="fas fa-user-tie"></i> Leader ID</label><span>{{ project.leaderId }}</span></div>
+        <div class="info-item"><label><i class="fas fa-tags"></i> Category</label><span>{{ project.category?.name ?? 'Uncategorized' }}</span></div>
+        <div class="info-item"><label><i class="fas fa-building"></i> Department</label><span>{{ project.department?.name ?? 'No Department' }}</span></div>
+        <div class="info-item"><label><i class="fas fa-calendar-alt"></i> Start Date</label><span>{{ project.startDate | date:'longDate' }}</span></div>
       </div>
 
       <h3 class="section-title">Technical Details</h3>
       <div class="tech-grid">
-        <div class="tech-item">
-          <h4><i class="fas fa-cogs"></i> Technologies</h4>
-          <p>{{ project.technologies }}</p>
-        </div>
-        <div class="tech-item">
-          <h4><i class="fas fa-tools"></i> Tools Used</h4>
-          <p>{{ project.toolsUsed }}</p>
-        </div>
+        <div class="tech-item"><h4><i class="fas fa-cogs"></i> Technologies</h4><p>{{ project.technologies }}</p></div>
+        <div class="tech-item"><h4><i class="fas fa-tools"></i> Tools Used</h4><p>{{ project.toolsUsed }}</p></div>
       </div>
     </div>
   </div>

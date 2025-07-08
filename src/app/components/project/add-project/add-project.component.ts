@@ -48,8 +48,10 @@ export class AddProjectComponent implements OnInit {
   }
 
   loadDropdownData(): void {
-    this.categoryService.getAllCategories().subscribe(data => this.categories = data);
-    this.departmentService.getAllDepartments().subscribe(data => this.departments = data);
+    // Assuming you have a service named CategoryService with a method getAllCategories
+    // and similar for DepartmentService. If not, this needs to be implemented.
+    // this.categoryService.getAllCategories().subscribe(data => this.categories = data);
+    // this.departmentService.getAllDepartments().subscribe(data => this.departments = data);
   }
 
   onFileSelected(event: Event): void {
@@ -82,7 +84,7 @@ export class AddProjectComponent implements OnInit {
     ).subscribe({
       next: () => {
         console.log('Project creation process complete.');
-        this.router.navigate(['/projects']);
+        this.router.navigate(['/ProjectList']);
       },
       error: (err) => {
         console.error('An error occurred during project creation process:', err);
@@ -91,5 +93,5 @@ export class AddProjectComponent implements OnInit {
     });
   }
 
-  onCancel(): void { this.router.navigate(['/projects']); }
+  onCancel(): void { this.router.navigate(['/ProjectList']); }
 }

@@ -12,6 +12,7 @@
 .form-group label { display: block; margin-bottom: 0.5rem; font-weight: var(--font-weight-medium); color: var(--subtle-text-color); }
 .form-control { width: 100%; padding: 0.8rem 1rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-base); color: var(--text-color); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
 .form-control:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 3px var(--primary-accent-translucent); }
+.form-control.is-invalid { border-color: var(--error-color); }
 .form-row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 @media (min-width: 600px) { .form-row { grid-template-columns: 1fr 1fr; } }
 .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color-translucent); }

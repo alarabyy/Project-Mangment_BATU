@@ -1,65 +1,57 @@
 <div class="list-container">
   <header class="list-header">
     <h1>Project Dashboard</h1>
-    <a routerLink="/projects/add" class="btn btn-primary">
+    <a routerLink="/AddProject" class="btn btn-primary">
       <i class="fas fa-plus"></i> Add New Project
     </a>
   </header>
 
-  <div class="table-wrapper">
-    <table class="projects-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Title</th>
-          <th>Category</th>
-          <th>Department</th>
-          <th>Grade</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngIf="projects$ | async as projects; else loadingOrError">
-          <tr *ngIf="projects.length === 0">
-            <td colspan="6" class="empty-message">No projects found. Let's create the first one!</td>
-          </tr>
-          <tr *ngFor="let project of projects">
-            <td>
-              <img [src]="getProjectCoverImage(project)" class="project-thumbnail" alt="Project thumbnail" (error)="onImageError($event)">
-            </td>
-            <td data-label="Title">{{ project.title }}</td>
-            <td data-label="Category">{{ project.category.name }}</td>
-            <td data-label="Department">{{ project.department.name }}</td>
-            <td data-label="Grade">
-              <span class="grade-badge">{{ project.grade ?? 'N/A' }}</span>
-            </td>
-            <td data-label="Actions">
-              <div class="actions-group">
-                <button (click)="viewDetails(project.id, $event)" class="btn btn-icon btn-view" title="View Details">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button (click)="editProject(project.id, $event)" class="btn btn-icon btn-edit" title="Edit Project">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button (click)="deleteProject(project.id, $event)" class="btn btn-icon btn-danger" title="Delete Project">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
-  </div>
+  <ng-container *ngIf="projects$ | async as projects; else loadingOrError">
+    <div *ngIf="projects.length > 0; else noProjects" class="projects-grid">
+      <div *ngFor="let project of projects" class="project-card">
+        <div class="card-header">
+          <h2 class="card-title">{{ project.title }}</h2>
+          <span class="grade-badge">{{ project.grade ?? 'N/A' }}</span>
+        </div>
+        <div class="card-body">
+          <div class="card-info-item">
+            <span class="label">Category:</span>
+            <span>{{ project.category?.name ?? 'Uncategorized' }}</span>
+          </div>
+          <div class="card-info-item">
+            <span class="label">Department:</span>
+            <span>{{ project.department?.name ?? 'No Department' }}</span>
+          </div>
+          <p class="card-description">{{ project.description | slice:0:120 }}...</p>
+        </div>
+        <div class="card-footer">
+          <div class="actions-group">
+            <a [routerLink]="['/ProjectDetails', project.id]" class="btn btn-secondary">
+              <i class="fas fa-eye"></i> Details
+            </a>
+            <button (click)="deleteProject(project.id, $event)" class="btn btn-danger">
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noProjects>
+      <div class="empty-message">
+        <h3>No projects found.</h3>
+        <p>Let's create the first one!</p>
+        <a routerLink="/AddProject" class="btn btn-primary">
+          <i class="fas fa-plus"></i> Add New Project
+        </a>
+      </div>
+    </ng-template>
+  </ng-container>
 
   <ng-template #loadingOrError>
-    <tr>
-      <td colspan="6">
-        <div class="loading-container">
-          <div class="loading-spinner"></div>
-          <p>Loading projects...</p>
-        </div>
-      </td>
-    </tr>
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading projects...</p>
+    </div>
   </ng-template>
 </div>

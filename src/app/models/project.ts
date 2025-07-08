@@ -8,11 +8,8 @@ export interface Department {
   name: string;
 }
 
-export interface ProjectImage {
-  id: number;
-  url: string;
-  projectId: number;
-}
+// ProjectImage interface is no longer needed on the frontend
+// as the backend returns an array of strings.
 
 export interface Project {
   id: number;
@@ -22,7 +19,7 @@ export interface Project {
   technologies: string;
   toolsUsed: string;
   problemStatement: string;
-  images: ProjectImage[];
+  images: string[]; // FIXED: This is now an array of strings (filenames)
   submissionDate: string | null;
   startDate: string;
   leaderId: number;
