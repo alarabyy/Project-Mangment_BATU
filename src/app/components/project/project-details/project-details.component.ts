@@ -20,7 +20,7 @@ export class ProjectDetailsComponent implements OnInit {
   mainImageFilename: string | null = null;
 
   public readonly imageBaseUrl = environment.imageBaseUrl;
-  private readonly placeholderImage = 'assets/images/project-placeholder.png';
+  public readonly placeholderImage = '/project-placeholder.png';
 
   constructor(private route: ActivatedRoute, private router: Router, private projectService: ProjectService) {}
 
@@ -40,21 +40,15 @@ export class ProjectDetailsComponent implements OnInit {
     .subscribe({
       next: (data) => {
         this.project = data;
-        this.setInitialMainImage(data);
+        if (data.images && data.images.length > 0) {
+            this.mainImageFilename = data.images[0];
+        }
       },
       error: (err) => {
         console.error('Failed to load project details', err);
         this.errorMessage = 'Could not load project. It may not exist or the ID is incorrect.';
       }
     });
-  }
-
-  setInitialMainImage(project: Project): void {
-    if (project.images && project.images.length > 0) {
-      this.mainImageFilename = project.images[0];
-    } else {
-      this.mainImageFilename = null;
-    }
   }
 
   selectImage(filename: string): void {
@@ -65,6 +59,7 @@ export class ProjectDetailsComponent implements OnInit {
     if (this.mainImageFilename) {
       return this.imageBaseUrl + this.mainImageFilename;
     }
+    // This will only be reached if there are no images.
     return this.placeholderImage;
   }
 

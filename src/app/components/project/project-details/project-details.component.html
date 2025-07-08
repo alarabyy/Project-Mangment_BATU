@@ -15,6 +15,7 @@
       <div class="main-image-wrapper">
         <img [src]="getMainImageUrl()" [alt]="project.title + ' main image'" (error)="onImageError($event)">
       </div>
+
       <div class="thumbnail-strip" *ngIf="project.images && project.images.length > 1">
         <img *ngFor="let filename of project.images"
              [src]="imageBaseUrl + filename"
@@ -23,10 +24,6 @@
              [class.active]="filename === mainImageFilename"
              (error)="onImageError($event)">
       </div>
-       <div *ngIf="!project.images || project.images.length === 0" class="no-images-placeholder">
-          <i class="fas fa-image"></i>
-          <p>No images available for this project.</p>
-       </div>
     </div>
 
     <div class="details-content-section">
@@ -49,7 +46,6 @@
 
       <div class="info-grid">
         <div class="info-item"><label><i class="fas fa-medal"></i> Grade</label><span>{{ project.grade ?? 'Not Graded' }}</span></div>
-        <!-- FIXED: Changed project.leaderId to project.teamLeaderId -->
         <div class="info-item"><label><i class="fas fa-user-tie"></i> Leader ID</label><span>{{ project.teamLeaderId }}</span></div>
         <div class="info-item"><label><i class="fas fa-tags"></i> Category</label><span>{{ project.category?.name ?? 'Uncategorized' }}</span></div>
         <div class="info-item"><label><i class="fas fa-building"></i> Department</label><span>{{ project.department?.name ?? 'No Department' }}</span></div>

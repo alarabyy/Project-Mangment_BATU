@@ -1,4 +1,15 @@
-<main class="container">
+<app-success-popup
+  *ngIf="showSuccessPopup"
+  [title]="popupTitle"
+  [message]="popupMessage"
+  [confirmButtonText]="'Go to List'"
+  [cancelButtonText]="'Close'"
+  (close)="closePopup()"
+  [confirmNavigationPath]="'/ProjectList'"
+  [cancelNavigationPath]="'/ProjectList'"
+></app-success-popup>
+
+<main class="container" [class.blurred]="showSuccessPopup">
   <header class="header">
     <div class="header-content"><i class="fas fa-plus-circle header-icon"></i><h1 class="header-title">Create New Project</h1></div>
     <button (click)="onCancel()" class="btn btn-secondary" title="Back to Projects List"><i class="fas fa-arrow-alt-circle-left"></i><span>Back to List</span></button>
@@ -37,16 +48,11 @@
       <div class="form-row">
         <div class="form-group"><label for="grade">Grade (Optional)</label><input type="number" id="grade" formControlName="grade" class="form-control"></div>
         <div class="form-group">
-          <!-- FIXED: Changed formControlName to teamLeaderId -->
           <label for="teamLeaderId">Leader ID</label><input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control" [class.is-invalid]="f['teamLeaderId'].invalid && f['teamLeaderId'].touched">
           <div *ngIf="f['teamLeaderId'].touched && f['teamLeaderId'].errors" class="error-message"><small *ngIf="f['teamLeaderId'].errors?.['required']">Leader ID is required.</small></div>
         </div>
       </div>
-      <div class="form-group">
-        <label for="projectImages">Project Images (Optional)</label>
-        <input type="file" id="projectImages" (change)="onFileSelected($event)" multiple class="form-control-file" accept="image/*">
-        <div *ngIf="selectedFiles.length > 0" class="file-list"><strong>Selected files:</strong><ul><li *ngFor="let file of selectedFiles">{{ file.name }} ({{ (file.size / 1024).toFixed(2) }} KB)</li></ul></div>
-      </div>
+
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
         <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting"><span *ngIf="!isSubmitting"><i class="fas fa-plus"></i> Create Project</span><span *ngIf="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Creating...</span></button>

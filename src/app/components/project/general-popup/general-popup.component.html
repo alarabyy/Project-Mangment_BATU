@@ -1,0 +1,21 @@
+<div class="popup-overlay" *ngIf="state.isOpen" (click)="onCancel()">
+  <div class="popup-container" [ngClass]="state.type || 'info'" (click)="$event.stopPropagation()">
+    <div class="popup-icon">
+      <i class="fas" [ngClass]="{
+        'fa-check-circle': state.type === 'success',
+        'fa-exclamation-triangle': state.type === 'error',
+        'fa-question-circle': state.type === 'confirm'
+      }"></i>
+    </div>
+    <h2 class="popup-title">{{ state.title }}</h2>
+    <p class="popup-message">{{ state.message }}</p>
+    <div class="popup-actions">
+      <button *ngIf="state.type === 'confirm'" class="btn btn-secondary" (click)="onCancel()">
+        {{ state.cancelButtonText }}
+      </button>
+      <button class="btn btn-primary" (click)="onConfirm()">
+        {{ state.confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div>

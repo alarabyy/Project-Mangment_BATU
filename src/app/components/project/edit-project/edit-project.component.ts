@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
 import { Project } from '../../../models/project';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -26,7 +26,7 @@ export class EditProjectComponent implements OnInit {
   private projectId!: number;
 
   public readonly imageBaseUrl = environment.imageBaseUrl;
-  private readonly placeholderImage = 'assets/images/project-placeholder.png';
+  public readonly placeholderImage = '/project-placeholder.png';
 
   constructor(private fb: FormBuilder, private projectService: ProjectService, private router: Router, private route: ActivatedRoute) {}
 
@@ -38,7 +38,6 @@ export class EditProjectComponent implements OnInit {
     this.loadProjectData();
   }
 
-  // FIXED: Changed form control name to 'teamLeaderId'
   initializeForm(): void {
     this.projectForm = this.fb.group({
       id: [this.projectId],
@@ -48,7 +47,7 @@ export class EditProjectComponent implements OnInit {
       technologies: ['', Validators.required],
       toolsUsed: ['', Validators.required],
       grade: [null, [Validators.min(0), Validators.max(100)]],
-      teamLeaderId: ['', Validators.required], // Corrected name
+      teamLeaderId: ['', Validators.required],
       categoryId: [null, Validators.required],
       departmentId: [null, Validators.required]
     });
@@ -61,7 +60,6 @@ export class EditProjectComponent implements OnInit {
       next: (projectData) => {
         this.project = projectData;
         this.pageTitle = `Edit: ${projectData.title}`;
-        // FIXED: Used the correct property 'teamLeaderId'
         this.projectForm.patchValue({
              id: projectData.id,
              title: projectData.title,
@@ -70,7 +68,7 @@ export class EditProjectComponent implements OnInit {
              technologies: projectData.technologies,
              toolsUsed: projectData.toolsUsed,
              grade: projectData.grade,
-             teamLeaderId: projectData.teamLeaderId, // Corrected property
+             teamLeaderId: projectData.teamLeaderId,
              categoryId: projectData.category?.id,
              departmentId: projectData.department?.id
         });
@@ -85,7 +83,6 @@ export class EditProjectComponent implements OnInit {
     if (this.projectForm.invalid) { this.projectForm.markAllAsTouched(); return; }
     this.isSubmitting = true;
 
-    // FIXED: The payload now uses correct property names
     const formValue = this.projectForm.value;
     const payload = {
       Id: formValue.id,
@@ -94,7 +91,6 @@ export class EditProjectComponent implements OnInit {
       Technologies: formValue.technologies,
       ToolsUsed: formValue.toolsUsed,
       ProblemStatement: formValue.problemStatement,
-      // Backend Edit method expects 'LeaderId', not 'TeamLeaderId'
       LeaderId: Number(formValue.teamLeaderId),
       CategoryId: formValue.categoryId,
       DepartmentId: formValue.departmentId,
@@ -118,12 +114,18 @@ export class EditProjectComponent implements OnInit {
   onImageUpload(): void {
     if (this.selectedFiles.length === 0) return;
     this.isUploading = true;
-    const uploadObservables = this.selectedFiles.map(file => this.projectService.uploadImage(this.projectId, file));
-    forkJoin(uploadObservables).pipe(finalize(() => {
-      this.isUploading = false; this.selectedFiles = [];
-      const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
-      if (fileInput) fileInput.value = '';
-    })).subscribe({ next: () => this.loadProjectData(), error: (err) => console.error('Error uploading images:', err) });
+
+    this.projectService.uploadImages(this.projectId, this.selectedFiles).pipe(
+      finalize(() => {
+        this.isUploading = false;
+        this.selectedFiles = [];
+        const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+      })
+    ).subscribe({
+      next: () => this.loadProjectData(),
+      error: (err) => console.error('Error uploading images:', err)
+    });
   }
 
   deleteImage(filename: string): void {
@@ -138,12 +140,15 @@ export class EditProjectComponent implements OnInit {
     }
   }
 
-  onCancel(): void { this.router.navigate(['/ProjectDetails', this.projectId]); }
+  onCancel(): void {
+    this.router.navigate(['/ProjectDetails', this.projectId]);
+  }
 
   onImageError(event: Event): void {
     const element = event.target as HTMLImageElement;
-    if(element.src !== this.placeholderImage) {
-        element.src = this.placeholderImage;
+    if (element.src !== this.placeholderImage) {
+      console.warn(`Image not found, replacing with placeholder: ${element.src}`);
+      element.src = this.placeholderImage;
     }
   }
 }

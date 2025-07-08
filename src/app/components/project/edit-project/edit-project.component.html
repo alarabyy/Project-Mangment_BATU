@@ -14,7 +14,7 @@
   <div *ngIf="!isLoading && project">
     <div class="form-container">
       <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
-        <div class="form-group"><label for="title">Project Title</label><input type="text" id="title" formControlName="title" class="form-control" [class.is-invalid]="f['title'].invalid && f['title'].touched"></div>
+        <div class="form-group"><label for="title">Project Title</label><input type="text" id="title" formControlName="title" class="form-control"></div>
         <div class="form-group"><label for="description">Description</label><textarea id="description" formControlName="description" class="form-control" rows="3"></textarea></div>
         <div class="form-group"><label for="problemStatement">Problem Statement</label><textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3"></textarea></div>
         <div class="form-row">
@@ -23,11 +23,11 @@
         </div>
         <div class="form-row">
           <div class="form-group"><label for="grade">Grade</label><input type="number" id="grade" formControlName="grade" class="form-control"></div>
-          <div class="form-group"><label for="leaderId">Leader ID</label><input type="text" id="leaderId" formControlName="leaderId" class="form-control"></div>
+          <div class="form-group"><label for="teamLeaderId">Leader ID</label><input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label for="categoryId">Category ID</label><input type="number" id="categoryId" formControlName="categoryId" class="form-control" placeholder="Enter Category ID"></div>
-          <div class="form-group"><label for="departmentId">Department ID</label><input type="number" id="departmentId" formControlName="departmentId" class="form-control" placeholder="Enter Department ID"></div>
+          <div class="form-group"><label for="categoryId">Category ID</label><input type="number" id="categoryId" formControlName="categoryId" class="form-control"></div>
+          <div class="form-group"><label for="departmentId">Department ID</label><input type="number" id="departmentId" formControlName="departmentId" class="form-control"></div>
         </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
@@ -41,6 +41,7 @@
 
     <div class="images-section-container">
       <h2 class="section-title"><i class="fas fa-images"></i> Manage Project Images</h2>
+
       <div class="image-upload-form">
           <label for="imageUpload">Upload New Image(s)</label>
           <div class="upload-controls">
@@ -52,16 +53,22 @@
           </div>
       </div>
 
-      <div *ngIf="project.images && project.images.length > 0; else noImages" class="image-gallery">
+      <div *ngIf="project.images && project.images.length > 0; else noImagesTemplate" class="image-gallery">
         <div *ngFor="let filename of project.images; let i = index" class="image-card">
-          <img [src]="imageBaseUrl + filename" [alt]="project.title + ' image ' + i" (error)="onImageError($event)">
+          <img [src]="imageBaseUrl + filename" [alt]="project.title + ' image ' + (i + 1)" (error)="onImageError($event)">
           <button (click)="deleteImage(filename)" class="btn-delete-image" title="Delete Image" [disabled]="imagesBeingDeleted.has(filename)">
             <i class="fas fa-times"></i>
           </button>
           <div *ngIf="imagesBeingDeleted.has(filename)" class="delete-overlay"><i class="fas fa-spinner fa-spin"></i></div>
         </div>
       </div>
-      <ng-template #noImages><p class="empty-message">This project has no images yet. Upload one above!</p></ng-template>
+
+      <ng-template #noImagesTemplate>
+        <div class="empty-message">
+          <i class="fas fa-photo-video"></i>
+          <p>This project has no images yet. Upload one above!</p>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>

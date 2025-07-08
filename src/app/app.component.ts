@@ -7,11 +7,12 @@ import { LoaderComponent } from "./components/Components/loader/loader.component
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { FooterComponent } from './components/Components/footer/footer.component';
+import { GeneralPopupComponent } from "./components/project/general-popup/general-popup.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule ,HttpClientModule ,FormsModule , RouterOutlet, NavComponent, CommonModule, FooterComponent, FloatingControlsComponent, LoaderComponent],
+  imports: [CommonModule, HttpClientModule, FormsModule, RouterOutlet, NavComponent, CommonModule, FooterComponent, FloatingControlsComponent, LoaderComponent, GeneralPopupComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

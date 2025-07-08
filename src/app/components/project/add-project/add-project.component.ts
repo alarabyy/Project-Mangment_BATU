@@ -5,14 +5,15 @@ import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
 import { CategoryService } from '../../../Services/category.service';
 import { DepartmentService } from '../../../Services/department.service';
-import { finalize, switchMap, forkJoin, of, tap, throwError } from 'rxjs';
+import { finalize } from 'rxjs';
 import { Category } from '../../../models/category';
 import { Department } from '../../../models/department';
+import { SuccessPopupComponent } from '../success-popup/success-popup.component';
 
 @Component({
   selector: 'app-add-project',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SuccessPopupComponent],
   templateUrl: './add-project.component.html',
   styleUrls: ['./add-project.component.css']
 })
@@ -21,7 +22,10 @@ export class AddProjectComponent implements OnInit {
   isSubmitting = false;
   categories: Category[] = [];
   departments: Department[] = [];
-  selectedFiles: File[] = [];
+
+  showSuccessPopup = false;
+  popupTitle = '';
+  popupMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -44,7 +48,6 @@ export class AddProjectComponent implements OnInit {
       technologies: ['', Validators.required],
       toolsUsed: ['', Validators.required],
       problemStatement: ['', Validators.required],
-      // Backend's Project Entity expects TeamLeaderId
       teamLeaderId: [null, [Validators.required, Validators.pattern("^[0-9]*$")]],
       categoryId: [null, Validators.required],
       departmentId: [null, Validators.required]
@@ -62,11 +65,6 @@ export class AddProjectComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) { this.selectedFiles = Array.from(input.files); }
-  }
-
   get f() { return this.projectForm.controls; }
 
   onSubmit(): void {
@@ -76,50 +74,33 @@ export class AddProjectComponent implements OnInit {
     }
     this.isSubmitting = true;
 
-    // The payload must match the backend's ProjectCreateRequest DTO
-    const formValue = this.projectForm.value;
-    const payload = {
-      title: formValue.title,
-      description: formValue.description,
-      grade: formValue.grade ?? 0,
-      technologies: formValue.technologies,
-      toolsUsed: formValue.toolsUsed,
-      problemStatement: formValue.problemStatement,
-      // The backend service expects 'LeaderId', which maps to 'TeamLeaderId'
-      LeaderId: Number(formValue.teamLeaderId),
-      categoryId: formValue.categoryId,
-      departmentId: formValue.departmentId
-    };
+    const payload = { ...this.projectForm.value, LeaderId: Number(this.projectForm.value.teamLeaderId) };
 
     this.projectService.createProject(payload).pipe(
-      switchMap(newProject => {
-        if (!newProject || !newProject.id) {
-          return throwError(() => new Error('API did not return a valid project with an ID after creation.'));
-        }
-        if (this.selectedFiles.length === 0) {
-          return of(newProject);
-        }
-        const uploadObservables = this.selectedFiles.map(file =>
-          this.projectService.uploadImage(newProject.id, file)
-        );
-        return forkJoin(uploadObservables).pipe(
-          tap(() => console.log('All images uploaded successfully.'))
-        );
-      }),
       finalize(() => this.isSubmitting = false)
     ).subscribe({
-      next: () => {
-        console.log('Project creation process complete.');
-        this.router.navigate(['/ProjectList']);
+      next: (response) => {
+        if (typeof response === 'string' && response.trim() !== '') {
+            alert(response);
+        } else {
+            this.popupTitle = 'Project Created!';
+            this.popupMessage = 'Your project has been successfully created. Find it in the project list to edit it and upload images.';
+            this.showSuccessPopup = true;
+        }
       },
       error: (err) => {
-        console.error('An error occurred during project creation process:', err);
-        // Display the actual error message from the backend if available
-        const errorMessage = err.error || 'Failed to create the project. Please check the form data.';
+        console.error('An error occurred during project creation:', err);
+        const errorMessage = err.error || 'Failed to create the project.';
         alert(errorMessage);
       }
     });
   }
 
-  onCancel(): void { this.router.navigate(['/ProjectList']); }
+  onCancel(): void {
+    this.router.navigate(['/ProjectList']);
+  }
+
+  closePopup(): void {
+    this.showSuccessPopup = false;
+  }
 }

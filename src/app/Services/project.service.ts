@@ -18,8 +18,9 @@ export class ProjectService {
     return this.http.get<Project>(`${this.apiUrl}/get/${id}`);
   }
 
-  createProject(projectData: any): Observable<Project> {
-    return this.http.post<Project>(`${this.apiUrl}/create`, projectData);
+  // FIX: Changed the expected response type to 'text' to work with the current backend.
+  createProject(projectData: any): Observable<string> {
+    return this.http.post(`${this.apiUrl}/create`, projectData, { responseType: 'text' });
   }
 
   updateProject(projectData: any): Observable<any> {
@@ -31,15 +32,15 @@ export class ProjectService {
     return this.http.delete(`${this.apiUrl}/delete`, { params });
   }
 
-  // FIXED: The backend's ProjectFilesUploadRequest expects 'Id' and 'Files'.
-  uploadImage(projectId: number, file: File): Observable<any> {
+  uploadImages(projectId: number, files: File[]): Observable<any> {
     const formData = new FormData();
     formData.append('Id', projectId.toString());
-    formData.append('Files', file, file.name);
+    files.forEach(file => {
+      formData.append('Files', file, file.name);
+    });
     return this.http.post(`${this.apiUrl}/images/upload`, formData);
   }
 
-  // The backend's ProjectFilesDeleteRequest expects a POST with 'id' and 'files'.
   deleteImage(projectId: number, fileNames: string[]): Observable<any> {
     const payload = { id: projectId, files: fileNames };
     return this.http.post(`${this.apiUrl}/images/delete`, payload);

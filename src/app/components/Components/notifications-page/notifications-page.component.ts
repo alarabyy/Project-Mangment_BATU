@@ -2,14 +2,9 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription, BehaviorSubject } from 'rxjs';
 import { AppNotification } from '../../../models/notification';
-// **هذا هو المسار الصحيح والموحّد للخدمة**
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { PopupService } from '../../../Services/popup.service'; // Import PopupService
 import { NotificationService } from '../../../Services/notification-proxy.service';
-
-interface GroupedNotifications {
-  [key: string]: AppNotification[];
-}
 
 @Component({
   selector: 'app-notifications-page',
@@ -21,10 +16,11 @@ interface GroupedNotifications {
 export class NotificationsPageComponent implements OnInit, OnDestroy {
   private notificationsSubscription!: Subscription;
   isLoading = true;
-  groupedNotifications$ = new BehaviorSubject<GroupedNotifications>({});
+  groupedNotifications$ = new BehaviorSubject<any>({});
 
   constructor(
     private notificationService: NotificationService,
+    private popupService: PopupService, // Inject PopupService
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -37,6 +33,27 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  // FIX: Using the popup service for confirmation
+  clearAllNotifications(): void {
+    this.popupService.showConfirm({
+      title: 'Clear All Notifications?',
+      message: 'Are you sure you want to delete all notifications? This action cannot be undone.',
+      confirmButtonText: 'Yes, Clear All',
+      onConfirm: () => {
+        this.notificationService.clearAll();
+        // Optional: show a success feedback
+        this.popupService.showSuccess('Cleared!', 'All notifications have been deleted.');
+      }
+    });
+  }
+
+  deleteNotification(id: number, event: Event): void {
+    event.stopPropagation();
+    // No need for a popup for a single delete, it's quick. But you could add it.
+    this.notificationService.deleteNotification(id);
+  }
+
+  // ... rest of the component logic (groupNotifications, getTimeAgo, etc. remain the same)
   ngOnDestroy(): void {
     if (this.notificationsSubscription) {
       this.notificationsSubscription.unsubscribe();
@@ -44,7 +61,7 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
   }
 
   private groupNotifications(notifications: AppNotification[]): void {
-    const groups: GroupedNotifications = {};
+    const groups: { [key: string]: AppNotification[] } = {};
     notifications.forEach(n => {
       const date = new Date(n.timestamp);
       let groupKey: string;
@@ -57,29 +74,18 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
     this.groupedNotifications$.next(groups);
   }
 
-  getGroupKeys(groups: GroupedNotifications | null): string[] {
+  getGroupKeys(groups: any | null): string[] {
     return groups ? Object.keys(groups) : [];
   }
 
   getTimeAgo(date: Date | string): string {
     if (!date) return '';
-    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: enUS });
+    return formatDistanceToNow(new Date(date), { addSuffix: true });
   }
 
   toggleRead(id: number, event: Event): void {
     event.stopPropagation();
     this.notificationService.toggleReadStatus(id);
-  }
-
-  deleteNotification(id: number, event: Event): void {
-    event.stopPropagation();
-    this.notificationService.deleteNotification(id);
-  }
-
-  clearAllNotifications(): void {
-    if (confirm('Are you sure you want to delete all notifications? This action cannot be undone.')) {
-      this.notificationService.clearAll();
-    }
   }
 
   trackById(index: number, item: AppNotification): number {

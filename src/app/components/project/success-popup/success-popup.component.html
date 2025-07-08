@@ -1,0 +1,17 @@
+<div class="popup-overlay" (click)="onCancel()">
+  <div class="popup-container" (click)="$event.stopPropagation()">
+    <div class="popup-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h2 class="popup-title">{{ title }}</h2>
+    <p class="popup-message">{{ message }}</p>
+    <div class="popup-actions">
+      <button class="btn btn-secondary" (click)="onCancel()">
+        {{ cancelButtonText }}
+      </button>
+      <button *ngIf="confirmNavigationPath" class="btn btn-primary" (click)="onConfirm()">
+        {{ confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div>
