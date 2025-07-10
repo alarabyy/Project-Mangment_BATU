@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { FooterComponent } from './components/Components/footer/footer.component';
 import { GeneralPopupComponent } from "./components/project/general-popup/general-popup.component";
+import { NavigationControlsComponent } from "./components/Components/navigation-controls/navigation-controls.component";
 
 @Component({
   selector: 'app-root',

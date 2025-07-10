@@ -1,28 +1,195 @@
-:host { display: block; background-color: var(--bg-color); min-height: 100vh; }
-.list-container { padding: 2rem; max-width: 1400px; margin: auto; }
-.list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
-.list-header h1 { font-size: 2.2rem; font-weight: var(--font-weight-bold); margin: 0; }
-.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
-.project-card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-large); box-shadow: var(--box-shadow-md); padding: 1.5rem; display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.project-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
-.card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-color-translucent); padding-bottom: 1rem; margin-bottom: 1rem; }
-.card-title { font-size: 1.25rem; font-weight: var(--font-weight-semibold); margin: 0; line-height: 1.3; }
-.grade-badge { padding: 0.25rem 0.6rem; border-radius: var(--border-radius-pill); background-color: var(--primary-accent-translucent); color: var(--primary-accent); font-weight: var(--font-weight-medium); font-size: 0.8rem; flex-shrink: 0; }
-.card-body { flex-grow: 1; }
-.card-info-item { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem; }
-.card-info-item .label { color: var(--subtle-text-color); font-weight: var(--font-weight-medium); }
-.card-description { font-size: 0.95rem; color: var(--subtle-text-color); line-height: 1.6; margin-top: 1rem; }
-.card-footer { margin-top: 1.5rem; }
-.actions-group { display: flex; gap: 0.75rem; justify-content: flex-end; }
-.btn { padding: 0.6rem 1.2rem; border-radius: var(--border-radius-base); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: var(--font-weight-semibold); cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; }
-.btn-primary { background-color: var(--primary-accent); color: var(--bg-color); border-color: var(--primary-accent); }
-.btn-primary:hover { background-color: var(--primary-accent-hover); }
-.btn-secondary { background-color: transparent; color: var(--text-color); border-color: var(--border-color); }
-.btn-secondary:hover { background-color: var(--surface-color); border-color: var(--text-color); }
-.btn-danger { background-color: var(--error-color-translucent); color: var(--error-color); border-color: var(--error-color-translucent); }
-.btn-danger:hover { background-color: var(--error-color); color: white; }
-.loading-container, .empty-message { text-align: center; padding: 4rem; color: var(--subtle-text-color); }
-.loading-spinner { border: 5px solid var(--border-color); border-top-color: var(--primary-accent); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+/* Ensure FontAwesome is available, or use Bootstrap Icons as needed */
+/* @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"); */
+
+:host {
+  display: block;
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  padding-bottom: 2rem; /* Add some bottom padding */
+}
+.list-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: auto;
+}
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.list-header h1 {
+  font-size: 2.2rem;
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  color: var(--text-color);
+}
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+.project-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--box-shadow-md);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* Removed cursor: pointer; here to indicate that the whole card is not for navigation */
+  overflow: hidden; /* Ensures rounded corners */
+}
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--box-shadow-lg); /* Larger shadow on hover */
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-color-translucent);
+  padding: 1.5rem;
+  background-color: var(--surface-color); /* Ensure consistent background */
+}
+.card-title {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  line-height: 1.3;
+  color: var(--text-color);
+}
+/* Removed grade-badge styling */
+
+.card-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+  color: var(--text-color); /* Default text color */
+}
+.card-description {
+  font-size: 0.95rem;
+  color: var(--subtle-text-color);
+  line-height: 1.6;
+  margin-top: 0;
+  margin-bottom: 0.75rem; /* Adjusted margin */
+}
+.card-detail-text { /* New style for problem statement or other basic text details */
+    font-size: 0.95rem;
+    color: var(--subtle-text-color);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+.card-detail-text strong {
+    color: var(--text-color);
+    font-weight: var(--font-weight-medium);
+}
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto; /* Push info section to the bottom of the body */
+}
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.info-item .label {
+  color: var(--subtle-text-color);
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.card-footer {
+  padding: 0 1.5rem 1.5rem;
+  margin-top: 1.5rem; /* Ensure consistent spacing before footer */
+  display: flex;
+  justify-content: flex-end;
+  background-color: var(--surface-color); /* Ensure consistent background */
+}
+/* Buttons */
+.actions-group {
+    display: flex;
+    gap: 0.75rem; /* Spacing between Edit and Delete buttons */
+}
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius-base);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+.btn-primary {
+  background-color: var(--primary-accent);
+  color: var(--bg-color); /* Text should contrast with green */
+  border-color: var(--primary-accent);
+}
+.btn-primary:hover {
+  background-color: var(--primary-accent-hover);
+}
+.btn-secondary { /* Style for the Edit button */
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+.btn-secondary:hover {
+    background-color: var(--bg-light-hover); /* Lighter surface on hover */
+    border-color: var(--text-color);
+}
+.btn-danger {
+  background-color: var(--error-color-translucent, rgba(248, 81, 73, 0.1));
+  color: var(--error-color, #f85149);
+  border-color: var(--error-color-translucent, rgba(248, 81, 73, 0.1));
+}
+.btn-danger:hover {
+  background-color: var(--error-color, #f85149);
+  color: white;
+}
+/* State Containers (Loading, Error, Empty) */
+.state-container {
+  text-align: center;
+  padding: 4rem;
+  color: var(--subtle-text-color);
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-large);
+  margin-top: 2rem;
+  box-shadow: var(--box-shadow-sm);
+}
+.loading-spinner {
+  border: 5px solid var(--border-color);
+  border-top-color: var(--primary-accent);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
-.empty-message h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-.empty-message p { margin-bottom: 1.5rem; }
+.empty-message h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+.empty-message p {
+  margin-bottom: 1.5rem;
+}
+.error-text {
+  color: var(--error-color);
+  font-weight: var(--font-weight-medium);
+}
+.state-container i {
+    font-size: 3rem; /* Adjust icon size */
+    margin-bottom: 1rem;
+}
+.error-container i { color: var(--error-color); }
+.empty-message i { color: var(--subtle-text-color); } /* For folder-x icon if used */

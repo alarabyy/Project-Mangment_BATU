@@ -5,13 +5,12 @@ import { Observable, BehaviorSubject, tap, throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../environments/environment';
 
-// واجهات لأنواع البيانات
 export interface UserProfile {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  imageUrl: string | null; // قد تكون الصورة null
+  imageUrl: string | null;
   role: string | string[];
 }
 
@@ -24,7 +23,7 @@ export interface LoginResponse {
 })
 export class AuthService {
   private authApiUrl = `${environment.apiUrl}/auth`;
-  private userApiUrl = `${environment.apiUrl}/user`; // تأكد من أن هذا هو المسار الصحيح
+  private userApiUrl = `${environment.apiUrl}/user`;
   private authTokenKey = 'authToken';
 
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
@@ -33,8 +32,6 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {
     this.checkInitialAuthState();
   }
-
-  // --- دوال المصادقة الأساسية ---
 
   public register(userData: any): Observable<any> {
     return this.http.post(`${this.authApiUrl}/register`, userData);
@@ -57,23 +54,16 @@ export class AuthService {
     this.router.navigate(['/Login']);
   }
 
-  // --- FIX: إعادة إضافة الدالة المفقودة ---
   public getUserProfileFromApi(): Observable<UserProfile> {
     const userId = this.getUserId();
     if (!userId) {
       const errorMsg = "[AuthService] Cannot fetch profile, User ID not found in token.";
       console.error(errorMsg);
-      // استخدام throwError لإرجاع Observable بخطأ
       return throwError(() => new Error(errorMsg));
     }
-
-    // تأكد من أن الـ endpoint صحيح. قد يكون 'profile' أو 'users'
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
-    console.log(`[AuthService] Fetching profile from: ${profileUrl}`);
     return this.http.get<UserProfile>(profileUrl, { headers: this.getAuthHeaders() });
   }
-
-  // --- دوال مساعدة للتعامل مع التوكن ---
 
   private checkInitialAuthState(): void {
     const token = this.getToken();
@@ -119,7 +109,7 @@ export class AuthService {
     }
   }
 
-  private getAuthHeaders(): HttpHeaders {
+  public getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
   }

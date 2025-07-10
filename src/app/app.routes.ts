@@ -32,6 +32,11 @@ import { FacultyEditComponent } from './components/faculty/faculty-edit/faculty-
 import { CategoryListComponent } from './components/category/category-list/category-list.component';
 import { AddCategoryComponent } from './components/category/add-category/add-category.component';
 import { EditCategoryComponent } from './components/category/edit-category/edit-category.component';
+import { AddblogsComponent } from './components/blogs/addblogs/addblogs.component';
+import { DetailsBlogComponent } from './components/blogs/detail-blog/details-blog.component';
+import { AllblogsComponent } from './components/blogs/allblogs/allblogs.component';
+import { EditBlogComponent } from './components/blogs/edit-blog/edit-blog.component';
+import { MyProjectsComponent } from './components/project/my-projects/my-projects.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -55,6 +60,7 @@ export const routes: Routes = [
   { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
   { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor' ] } },
   { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'my-projects', component: MyProjectsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
 
   // ------------------------ ADMIN-ONLY ROUTES ----------------------
   // General Admin
@@ -77,6 +83,12 @@ export const routes: Routes = [
   { path: 'add-category', component: AddCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'categoryEdit/:id', component: EditCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
+
+  // blogs  Management
+  { path: 'blogs', component: AllblogsComponent },
+  { path: 'blog/:id', component: DetailsBlogComponent },
+  { path: 'add-blog', component: AddblogsComponent },
+  { path: 'edit-blog/:id', component: EditBlogComponent },
   // --------------------- REDIRECTS & WILDCARD --------------------
   { path: '', redirectTo: 'Home', pathMatch: 'full' },
   { path: '**', redirectTo: '/Home' }

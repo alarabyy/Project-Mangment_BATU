@@ -1,58 +1,61 @@
-<div class="container">
-  <header class="header">
-    <div class="header-content">
-      <i class="fas fa-user-cog header-icon"></i>
-      <h1 class="header-title">My Projects</h1>
-    </div>
-    <button (click)="addProject()" class="btn btn-primary">
-      <i class="fas fa-plus-circle"></i>
-      <span>New Project</span>
-    </button>
-  </header>
+<div class="my-projects-container">
+  <div class="header">
+    <h2 class="header-title">My Projects</h2>
+    <!-- MODIFIED: routerLink points to the AddProject component path -->
+    <a routerLink="/AddProject" class="btn-add-project">
+      <i class="bi bi-plus-circle-fill"></i>
+      <span>Add New Project</span>
+    </a>
+  </div>
 
-  <main class="content">
-    <div *ngIf="isLoading" class="state-container fade-in">
-      <div class="spinner"></div>
-      <p class="state-text">Fetching your projects...</p>
-    </div>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="state-container">
+    <div class="spinner"></div>
+    <p class="state-text">Loading projects...</p>
+  </div>
 
-    <div *ngIf="errorMessage && !isLoading" class="state-container error-message fade-in">
-      <i class="fas fa-exclamation-triangle"></i>
-      <p class="state-text">{{ errorMessage }}</p>
-      <button (click)="loadMyProjects()" class="btn btn-secondary" style="margin-top: 1rem;">Retry</button>
-    </div>
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="state-container error-container">
+    <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+    <p class="state-text">{{ error }}</p>
+  </div>
 
-    <div *ngIf="!isLoading && !errorMessage && projects.length === 0" class="state-container fade-in">
-      <i class="fas fa-folder-open"></i>
-      <p class="state-text">You have no projects yet. Let's create the first one!</p>
-    </div>
-
-    <!-- تم تعديل كل الخصائص إلى camelCase لتطابق موديل Project -->
-    <div *ngIf="!isLoading && !errorMessage && projects.length > 0" class="project-grid">
-      <div *ngFor="let project of projects; trackBy: trackByProjectId" class="project-card fade-in-up">
-        <div class="card-header">
-          <h3 class="card-title">{{ project.title }}</h3>
-          <span class="grade-badge" [class.no-grade]="!project.grade">
-            {{ project.grade ? 'Grade: ' + project.grade : 'Not Graded' }}
-          </span>
-        </div>
-        <div class="card-body">
-          <p class="description">{{ project.description || 'No description provided.' }}</p>
-        </div>
-        <div class="card-footer">
-          <div class="id-group">
-            <span title="Leader ID">L: {{ project.leaderId }}</span>
-          </div>
-          <div class="card-actions">
-            <button (click)="editProject(project.id)" class="btn btn-icon btn-edit" title="Edit Project">
-              <i class="fas fa-pencil-alt"></i>
-            </button>
-            <button (click)="deleteProject(project.id)" class="btn btn-icon btn-danger" [disabled]="deletingProjectIds.has(project.id)" title="Delete Project">
-              <i class="fas" [class.fa-trash-alt]="!deletingProjectIds.has(project.id)" [class.fa-spinner]="deletingProjectIds.has(project.id)" [class.fa-spin]="deletingProjectIds.has(project.id)"></i>
-            </button>
+  <!-- Content Display -->
+  <div *ngIf="myProjects$ | async as projects; else noProjectsTemplate">
+    <div *ngIf="!isLoading && !error">
+      <div *ngIf="projects.length > 0; else noProjectsTemplate">
+        <div class="projects-grid">
+          <!-- Loop over each project and display it in a card -->
+          <div *ngFor="let project of projects" class="project-card">
+            <div class="card-header">
+              <h5 class="card-title">{{ project.title }}</h5>
+            </div>
+            <div class="card-body">
+              <p class="card-description">{{ project.description | slice:0:150 }}...</p>
+              <div class="details-section">
+                <p><strong>Technologies:</strong> {{ project.technologies }}</p>
+                <p><strong>Tools Used:</strong> {{ project.toolsUsed }}</p>
+              </div>
+            </div>
+            <div class="card-footer">
+              <!-- MODIFIED: routerLink now correctly points to ProjectDetails with the project's ID -->
+              <a [routerLink]="['/ProjectDetails', project.id]" class="btn-details">
+                <span>View Details</span>
+                <i class="bi bi-arrow-right-short"></i>
+              </a>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </main>
+  </div>
+
+  <!-- Template for when there are no projects -->
+  <ng-template #noProjectsTemplate>
+    <div *ngIf="!isLoading && !error" class="state-container no-projects-container">
+      <i class="bi bi-folder-x no-projects-icon"></i>
+      <p class="state-text">You don't have any projects yet.</p>
+      <p class="state-subtext">Get started by adding your first project.</p>
+    </div>
+  </ng-template>
 </div>

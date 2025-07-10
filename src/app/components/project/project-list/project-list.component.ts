@@ -3,7 +3,8 @@ import { Observable } from 'rxjs';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { ProjectService } from '../../../Services/project.service';
-import { Project } from '../../../models/project';
+import { Project } from '../../../models/project'; // Using the full Project interface
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-project-list',
@@ -14,6 +15,8 @@ import { Project } from '../../../models/project';
 })
 export class ProjectListComponent implements OnInit {
   projects$!: Observable<Project[]>;
+  isLoading = true;
+  error: string | null = null;
 
   constructor(private projectService: ProjectService, private router: Router) {}
 
@@ -22,16 +25,28 @@ export class ProjectListComponent implements OnInit {
   }
 
   loadProjects(): void {
-    this.projects$ = this.projectService.getProjects();
+    this.isLoading = true;
+    this.error = null;
+    this.projectService.getProjects().pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: (data) => {
+        this.projects$ = new Observable(observer => observer.next(data));
+      },
+      error: (err) => {
+        console.error('Error loading projects:', err);
+        this.error = 'Failed to load projects. Please try again later.';
+      }
+    });
   }
 
   deleteProject(id: number, event: MouseEvent): void {
-    event.stopPropagation();
+    event.stopPropagation(); // Prevent the card's routerLink from firing
     if (confirm('Are you sure you want to permanently delete this project? This action cannot be undone.')) {
       this.projectService.deleteProject(id).subscribe({
         next: () => {
           console.log(`Project with id ${id} deleted successfully.`);
-          this.loadProjects();
+          this.loadProjects(); // Refresh the list after deletion
         },
         error: (err) => {
           console.error('Error deleting project:', err);

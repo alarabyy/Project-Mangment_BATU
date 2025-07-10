@@ -1,0 +1,104 @@
+.form-page-container {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 750px;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-large);
+  padding: 2.5rem;
+  box-shadow: var(--box-shadow-lg);
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-header h1 {
+  font-size: 2rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.close-button {
+  font-size: 1.5rem;
+  color: var(--subtle-text-color);
+  text-decoration: none;
+  transition: color var(--transition-speed-fast) ease;
+}
+.close-button:hover {
+  color: var(--error-color);
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.75rem;
+}
+
+.form-control {
+  width: 100%;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  padding: 14px;
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: all var(--transition-speed-fast) ease-in-out;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px var(--primary-accent-translucent);
+}
+
+.file-input {
+  width: 100%;
+}
+
+.submit-button {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background-color: var(--primary-accent);
+  color: #000000;
+  padding: 16px;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--border-radius-base);
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--primary-accent-hover);
+  transform: translateY(-2px);
+}
+
+.submit-button:disabled {
+  background-color: var(--subtle-text-color);
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}

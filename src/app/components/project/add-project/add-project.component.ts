@@ -98,7 +98,7 @@ export class AddProjectComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/ProjectList']);
+    this.router.navigate(['/Home']);
   }
 
   closePopup(): void {

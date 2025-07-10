@@ -6,11 +6,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { routes } from './app.routes';
 import { loaderInterceptor } from './interceptors/loader.interceptor';
 import { notificationInterceptor } from './interceptors/notification.interceptor';
+import { AsyncPipe } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    importProvidersFrom(HttpClientModule, FormsModule, ReactiveFormsModule),
+    importProvidersFrom(HttpClientModule, FormsModule, ReactiveFormsModule , AsyncPipe),
     provideHttpClient(
       withFetch(),
       withInterceptors([

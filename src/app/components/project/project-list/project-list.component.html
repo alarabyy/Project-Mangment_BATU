@@ -6,52 +6,63 @@
     </a>
   </header>
 
-  <ng-container *ngIf="projects$ | async as projects; else loadingOrError">
-    <div *ngIf="projects.length > 0; else noProjects" class="projects-grid">
-      <div *ngFor="let project of projects" class="project-card">
-        <div class="card-header">
-          <h2 class="card-title">{{ project.title }}</h2>
-          <span class="grade-badge">{{ project.grade ?? 'N/A' }}</span>
-        </div>
-        <div class="card-body">
-          <div class="card-info-item">
-            <span class="label">Category:</span>
-            <span>{{ project.category?.name ?? 'Uncategorized' }}</span>
+  <!-- Conditional Rendering for Loading State -->
+  <div *ngIf="isLoading" class="state-container">
+    <div class="loading-spinner"></div>
+    <p>Loading projects...</p>
+  </div>
+
+  <!-- Conditional Rendering for Error State -->
+  <div *ngIf="!isLoading && error" class="state-container error-container">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Conditional Rendering for Projects Grid or No Projects State -->
+  <ng-container *ngIf="!isLoading && !error">
+    <ng-container *ngIf="(projects$ | async) as projects">
+      <!-- Check if projects array has items -->
+      <div *ngIf="projects.length > 0" class="projects-grid">
+        <div *ngFor="let project of projects" class="project-card">
+          <div class="card-header">
+            <h2 class="card-title">{{ project.title }}</h2>
           </div>
-          <div class="card-info-item">
-            <span class="label">Department:</span>
-            <span>{{ project.department?.name ?? 'No Department' }}</span>
+          <div class="card-body">
+            <p class="card-description">{{ project.description | slice:0:150 }}...</p>
+            <p class="card-detail-text"><strong>Problem Statement:</strong> {{ project.problemStatement | slice:0:100 }}...</p>
+
+            <div class="info-section">
+              <div class="info-item">
+                <span class="label"><i class="fas fa-cogs"></i> Technologies:</span>
+                <span>{{ project.technologies }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label"><i class="fas fa-tools"></i> Tools Used:</span>
+                <span>{{ project.toolsUsed }}</span>
+              </div>
+            </div>
           </div>
-          <p class="card-description">{{ project.description | slice:0:120 }}...</p>
-        </div>
-        <div class="card-footer">
-          <div class="actions-group">
-            <a [routerLink]="['/ProjectDetails', project.id]" class="btn btn-secondary">
-              <i class="fas fa-eye"></i> Details
-            </a>
-            <button (click)="deleteProject(project.id, $event)" class="btn btn-danger">
-              <i class="fas fa-trash-alt"></i> Delete
-            </button>
+          <div class="card-footer">
+            <div class="actions-group">
+              <a [routerLink]="['/EditProject', project.id]" (click)="$event.stopPropagation()" class="btn btn-secondary">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+              <button (click)="deleteProject(project.id, $event)" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Delete
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <ng-template #noProjects>
-      <div class="empty-message">
+      <!-- Display if no projects are found after successful loading -->
+      <div *ngIf="projects.length === 0" class="state-container empty-message">
         <h3>No projects found.</h3>
         <p>Let's create the first one!</p>
         <a routerLink="/AddProject" class="btn btn-primary">
           <i class="fas fa-plus"></i> Add New Project
         </a>
       </div>
-    </ng-template>
+    </ng-container>
   </ng-container>
-
-  <ng-template #loadingOrError>
-    <div class="loading-container">
-      <div class="loading-spinner"></div>
-      <p>Loading projects...</p>
-    </div>
-  </ng-template>
 </div>

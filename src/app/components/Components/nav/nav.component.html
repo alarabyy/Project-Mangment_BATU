@@ -13,8 +13,12 @@
       [attr.aria-expanded]="isMenuOpen"
     >
       <div class="hamburger"><span></span><span></span><span></span></div>
+
     </button>
+      <app-navigation-controls></app-navigation-controls>
+
   </div>
+
 
   <!-- Center Section: Logo -->
   <div class="navbar-section center">
@@ -67,7 +71,7 @@
     <ng-container *ngIf="authService.isLoggedIn()">
       <li class="menu-category"><span><i class="fas fa-compass"></i> General</span></li>
       <!-- ملاحظة: تأكد من وجود مسار '/projects' في ملف الـ routes -->
-      <li><a routerLink="/projects" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-folder-open"></i></span>My Projects</a></li>
+      <li><a routerLink="/my-projects" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-folder-open"></i></span>My Projects</a></li>
       <li><a routerLink="/Chat" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-comments"></i></span>Ask AI</a></li>
       <li><a routerLink="/MyProfile" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-id-card"></i></span>My Profile</a></li>
     </ng-container>
@@ -83,21 +87,22 @@
     </ng-container>
 
     <!-- 4. Student-Only Links -->
-    <ng-container *ngIf="authService.isLoggedIn() && userRole === 'student'">
+    <!-- <ng-container *ngIf="authService.isLoggedIn() && userRole === 'student'">
       <li class="menu-category"><span><i class="fas fa-user-graduate"></i> Student Zone</span></li>
       <li><a routerLink="/AddProject" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-plus-circle"></i></span>Add Project</a></li>
-    </ng-container>
+    </ng-container> -->
 
     <!-- 5. Doctor/Professor-Only Links -->
-    <ng-container *ngIf="authService.isLoggedIn() && (userRole === 'doctor' || userRole === 'professor')">
+    <!-- <ng-container *ngIf="authService.isLoggedIn() && (userRole === 'doctor' || userRole === 'professor')">
       <li class="menu-category"><span><i class="fas fa-chalkboard-teacher"></i> Professor Tools</span></li>
       <li><a routerLink="/AddProject" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-lightbulb"></i></span>Add Project Idea</a></li>
-    </ng-container>
+    </ng-container> -->
 
     <!-- Separator -->
     <li class="menu-separator"></li>
 
     <!-- 6. Public Links (Always Visible) -->
+    <li><a routerLink="/blogs" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-life-ring"></i></span>blogs</a></li>
     <li><a routerLink="/Privacy" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-life-ring"></i></span>Help & Support</a></li>
     <li><a routerLink="/documentaion" routerLinkActive="active-link"><span class="menu-icon"><i class="fas fa-book-open"></i></span>Documentation</a></li>
 

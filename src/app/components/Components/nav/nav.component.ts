@@ -5,6 +5,7 @@ import { Subscription, filter, Observable } from 'rxjs';
 import { AuthService } from '../../../Services/auth.service';
 import { NotificationService } from '../../../Services/notification-proxy.service';
 import { ThemeService } from '../../../Services/theme-service.service.spec';
+import { NavigationControlsComponent } from "../navigation-controls/navigation-controls.component";
 // ==========================================================
 // ==            THIS IS THE CORRECTED IMPORT              ==
 // ==========================================================
@@ -12,7 +13,7 @@ import { ThemeService } from '../../../Services/theme-service.service.spec';
 @Component({
   selector: 'app-nav',
   standalone: true,
-  imports: [CommonModule, RouterModule, TitleCasePipe],
+  imports: [CommonModule, RouterModule, TitleCasePipe, NavigationControlsComponent],
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css']
 })

@@ -1,0 +1,96 @@
+.detail-wrapper {
+  width: 100%;
+}
+
+.feedback-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+
+.blog-detail-container {
+  margin: 0 auto;
+}
+
+.detail-header {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-image-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.header-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.1) 100%);
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #ffffff;
+  max-width: 900px;
+  padding: 2rem;
+}
+
+.detail-title {
+  font-size: 4rem;
+  font-weight: var(--font-weight-black);
+  margin: 0.5rem 0 0 0;
+  text-shadow: 3px 3px 15px rgba(0,0,0,0.7);
+  line-height: 1.2;
+}
+
+.detail-meta {
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--primary-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.detail-content {
+  max-width: 800px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: var(--text-color);
+}
+
+.gallery-section, .detail-footer {
+  max-width: 950px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}
+
+.gallery-section h2 { font-size: 2rem; margin-bottom: 1.5rem; color: var(--text-color); }
+.image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+.gallery-item img { width: 100%; height: 150px; object-fit: cover; border-radius: var(--border-radius-base); }
+
+.detail-footer { text-align: center; }
+.back-button { color: var(--subtle-text-color); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: color var(--transition-speed-fast) ease; }
+.back-button:hover { color: var(--primary-accent); }

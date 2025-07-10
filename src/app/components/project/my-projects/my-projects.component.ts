@@ -1,94 +1,58 @@
-// import { Component, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { Router, RouterModule } from '@angular/router';
-// import { HttpErrorResponse } from '@angular/common/http';
-// import { ProjectService } from '../../../Services/project.service';
-// import { AuthService } from '../../../Services/auth.service';
-// import { Project } from '../../../models/project';
-// import { finalize } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { ProjectService } from '../../../Services/project.service';
 
-// @Component({
-//   selector: 'app-my-projects',
-//   standalone: true,
-//   imports: [CommonModule, RouterModule],
-//   templateUrl: './my-projects.component.html',
-//   styleUrls: ['./my-projects.component.css']
-// })
-// export class MyProjectsComponent implements OnInit {
-//   public projects: Project[] = [];
-//   public isLoading = true;
-//   public errorMessage: string | null = null;
-//   public deletingProjectIds = new Set<number>();
+// Define a minimal interface to match the ProjectMinimalDTO from the backend
+export interface ProjectMinimal {
+  id: number;
+  title: string;
+  description: string;
+  technologies: string;
+  toolsUsed: string;
+  problemStatement: string;
+}
 
-//   constructor(
-//     private projectService: ProjectService,
-//     private authService: AuthService,
-//     private router: Router
-//   ) {}
+@Component({
+  selector: 'app-my-projects',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './my-projects.component.html',
+  styleUrls: ['./my-projects.component.css']
+})
+export class MyProjectsComponent implements OnInit {
 
-//   ngOnInit(): void {
-//     this.loadMyProjects();
-//   }
+  public myProjects$!: Observable<ProjectMinimal[]>;
+  public error: string | null = null;
+  public isLoading = true;
 
-//   public loadMyProjects(): void {
-//     const userId = this.authService.getUserId();
-//     if (!userId) {
-//       this.errorMessage = "Could not identify the current user. Please log in again.";
-//       this.isLoading = false;
-//       return;
-//     }
+  constructor(private projectService: ProjectService) { }
 
-//     this.isLoading = true;
-//     this.errorMessage = null;
+  ngOnInit(): void {
+    this.loadProjects();
+  }
 
-//     // استدعاء الدالة الصحيحة من الخدمة
-//     this.projectService.getProjectsByUserId(userId).pipe(
-//       finalize(() => this.isLoading = false)
-//     ).subscribe({
-//       // تم تحديد نوع المتغير لحل الخطأ
-//       next: (userProjects: Project[]) => {
-//         this.projects = userProjects;
-//       },
-//       error: (err: HttpErrorResponse) => {
-//         console.error('API Error in MyProjectsComponent:', err);
-//         this.errorMessage = `Failed to load your projects. (Error: ${err.status})`;
-//       }
-//     });
-//   }
+  loadProjects(): void {
+    this.isLoading = true;
+    this.error = null;
+    // We assume getMyProjects() returns an array matching ProjectMinimal[]
+    this.myProjects$ = this.projectService.getMyProjects() as Observable<ProjectMinimal[]>;
 
-//   public deleteProject(projectId: number): void {
-//     if (this.deletingProjectIds.has(projectId)) return;
-//     const confirmation = confirm('Are you sure you want to permanently delete this project?');
-//     if (!confirmation) return;
-
-//     this.deletingProjectIds.add(projectId);
-//     this.errorMessage = null;
-
-//     // لا داعي لـ setTimeout هنا، إلا إذا كان لهدف جمالي
-//     this.projectService.deleteProject(projectId).pipe(
-//       finalize(() => this.deletingProjectIds.delete(projectId))
-//     ).subscribe({
-//       next: () => {
-//         // تم تصحيح Id إلى id
-//         this.projects = this.projects.filter(p => p.id !== projectId);
-//       },
-//       error: (err: HttpErrorResponse) => {
-//         console.error('Deletion Error:', err);
-//         this.errorMessage = `Failed to delete project #${projectId}.`;
-//       }
-//     });
-//   }
-
-//   public addProject(): void {
-//     this.router.navigate(['/projects/add']);
-//   }
-
-//   public editProject(projectId: number): void {
-//     this.router.navigate(['/projects/edit', projectId]);
-//   }
-
-//   // تم تصحيح Id إلى id
-//   public trackByProjectId(index: number, project: Project): number {
-//     return project.id;
-//   }
-// }
+    this.myProjects$.subscribe({
+      next: (projects) => {
+        console.log('My projects loaded successfully:', projects);
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load my projects:', err);
+        if (err.status === 401 || err.status === 403) {
+          this.error = 'Unauthorized. Please log in to view your projects.';
+        } else {
+          this.error = 'An error occurred while loading projects. Please try again later.';
+        }
+        this.isLoading = false;
+      }
+    });
+  }
+}

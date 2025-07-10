@@ -2,17 +2,17 @@
   *ngIf="showSuccessPopup"
   [title]="popupTitle"
   [message]="popupMessage"
-  [confirmButtonText]="'Go to List'"
+  [confirmButtonText]="'Go to Home'"
   [cancelButtonText]="'Close'"
   (close)="closePopup()"
-  [confirmNavigationPath]="'/ProjectList'"
-  [cancelNavigationPath]="'/ProjectList'"
+  [confirmNavigationPath]="'/Home'"
+  [cancelNavigationPath]="'/Home'"
 ></app-success-popup>
 
 <main class="container" [class.blurred]="showSuccessPopup">
   <header class="header">
     <div class="header-content"><i class="fas fa-plus-circle header-icon"></i><h1 class="header-title">Create New Project</h1></div>
-    <button (click)="onCancel()" class="btn btn-secondary" title="Back to Projects List"><i class="fas fa-arrow-alt-circle-left"></i><span>Back to List</span></button>
+    <!-- <button (click)="onCancel()" class="btn btn-secondary" title="Back to Projects List"><i class="fas fa-arrow-alt-circle-left"></i><span>Back to List</span></button> -->
   </header>
   <div class="form-container">
     <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>

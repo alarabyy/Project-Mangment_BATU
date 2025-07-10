@@ -1,5 +1,9 @@
 export const environment = {
   production: true,
   apiUrl: 'https://batuprojects.runasp.net/api', // هذا يبقى كما هو
-  geminiApiKey: process.env['AIzaSyA5uUncE_p0rXg9tsOFWR23O9g4chWccHw'] // هذا السطر سيقرأ المفتاح من Vercel بشكل آمن
+  geminiApiKey: process.env['AIzaSyA5uUncE_p0rXg9tsOFWR23O9g4chWccHw'], // هذا السطر سيقرأ المفتاح من Vercel بشكل آمن
+  imageBaseUrl: 'https://batuprojects.runasp.net/uploads/',
+  imagesBaseUrl: 'https://batuprojects.runasp.net/images/'
+
+
 };
