@@ -1,0 +1,63 @@
+/* src/app/components/staff/all-staff/all-staff.component.css */
+
+/* Reuse styles from global styles or define them here based on your structure */
+/* Ensure your global styles include:
+   .container, .header, .header-content, .header-icon, .header-title
+   .card, .card-image, .card-image-placeholder, .card-title, .card-subtitle, .card-text
+   .loading-indicator, .info-message, .form-error-box
+*/
+:host { display: block; background-color: var(--bg-color); min-height: 100vh; }
+
+.container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; } /* Wider container for grid */
+
+/* Reusing global header/card/message styles */
+
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+  gap: 2rem; /* Space between cards */
+}
+
+
+/* Responsive Adjustments (adjust breakpoints and values as needed) */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem; /* Adjust horizontal padding */
+  }
+  /* Header responsiveness (if not handled globally) */
+  .header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+  }
+  .header-title {
+      font-size: 1.5rem; /* Smaller title */
+  }
+  .staff-grid {
+      gap: 1.5rem; /* Smaller gap */
+  }
+  /* Card adjustments (if not handled globally) */
+  .card {
+      padding: 1rem; /* Smaller padding */
+  }
+   .card-title { font-size: 1.2rem; }
+   .card-subtitle { font-size: 0.9rem; }
+   .card-text { font-size: 0.95rem; }
+    .card-image, .card-image-placeholder {
+        height: 180px; /* Adjust image height */
+    }
+}
+
+@media (max-width: 480px) {
+    .staff-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically */
+        gap: 1rem; /* Smaller gap */
+    }
+     /* Further minor adjustments if needed */
+     .card-title { font-size: 1.1rem; }
+     .card-subtitle { font-size: 0.85rem; }
+     .card-text { font-size: 0.9rem; }
+     .header-icon { font-size: 1.75rem;}
+     .header-title { font-size: 1.4rem; }
+}

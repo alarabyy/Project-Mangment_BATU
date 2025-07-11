@@ -38,6 +38,9 @@ import { AllblogsComponent } from './components/blogs/allblogs/allblogs.componen
 import { EditBlogComponent } from './components/blogs/edit-blog/edit-blog.component';
 import { MyProjectsComponent } from './components/project/my-projects/my-projects.component';
 import { AllBlogsUserComponent } from './components/blogs/all-blogs-user/all-blogs-user.component';
+import { AllStaffComponent } from './components/staff/all-staff/all-staff.component';
+import { AllStaffAdminComponent } from './components/staff/all-staff-admin/all-staff-admin.component';
+import { AddStaffComponent } from './components/staff/add-staff/add-staff.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -92,6 +95,13 @@ export const routes: Routes = [
 
   { path: 'blog/:id', component: DetailsBlogComponent },
   { path: 'AllBlogsUser', component: AllBlogsUserComponent },
+
+
+  // staff  Management
+  { path: 'staff', component: AllStaffComponent },
+  { path: 'admin/staff', component: AllStaffAdminComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'admin/staff/add', component: AddStaffComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
+
   // --------------------- REDIRECTS & WILDCARD --------------------
   { path: '', redirectTo: 'Home', pathMatch: 'full' },
   { path: '**', redirectTo: '/Home' }

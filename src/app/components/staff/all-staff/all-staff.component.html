@@ -1,0 +1,39 @@
+<!-- src/app/components/staff/all-staff/all-staff.component.html -->
+
+<main class="container">
+  <header class="header">
+    <div class="header-content">
+      <i class="fas fa-users header-icon"></i>
+      <h1 class="header-title">All Staff Members</h1>
+    </div>
+  </header>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-indicator">
+    <i class="fas fa-spinner fa-spin"></i> Loading staff members...
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="form-error-box">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- No Data Message -->
+  <div *ngIf="!isLoading && staffMembers.length === 0 && !errorMessage" class="info-message">
+     No staff members found.
+  </div>
+
+  <!-- Staff Grid -->
+  <div class="staff-grid">
+    <div class="card" *ngFor="let staff of staffMembers">
+      <img *ngIf="getStaffImageUrl(staff.image) as imageUrl" [src]="imageUrl" [alt]="'Photo of ' + staff.name" class="card-image">
+       <div *ngIf="!getStaffImageUrl(staff.image)" class="card-image-placeholder">
+           <i class="fas fa-user-circle"></i>
+       </div>
+      <h3 class="card-title">{{ staff.name }}</h3>
+      <p class="card-subtitle">{{ staff.position }}</p>
+      <p class="card-text">{{ staff.about }}</p>
+    </div>
+  </div>
+</main>

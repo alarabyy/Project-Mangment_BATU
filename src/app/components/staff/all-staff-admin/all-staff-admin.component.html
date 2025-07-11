@@ -1,0 +1,132 @@
+<!-- src/app/components/staff/all-staff-admin/all-staff-admin.component.html -->
+
+<main class="container">
+  <header class="header">
+    <div class="header-content">
+      <i class="fas fa-users-cog header-icon"></i>
+      <h1 class="header-title">Manage Staff Members</h1>
+    </div>
+    <button [routerLink]="['/admin/staff/add']" class="btn btn-primary" title="Add New Staff Member" [disabled]="isAnyOperationInProgress()">
+      <i class="fas fa-user-plus"></i>
+      <span>Add Staff</span>
+    </button>
+  </header>
+
+  <!-- Global Loading Indicator (Initial Load) -->
+  <div *ngIf="isLoading" class="loading-indicator">
+    <i class="fas fa-spinner fa-spin"></i> Loading staff members...
+  </div>
+
+   <div *ngIf="isDeleting" class="loading-indicator deleting-indicator">
+    <i class="fas fa-spinner fa-spin"></i> Deleting staff member...
+  </div>
+
+  <!-- Global Error Message (e.g., for initial load or delete failure) -->
+  <div *ngIf="errorMessage && !isAnyOperationInProgress()" class="form-error-box">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+   <div *ngIf="!isLoading && staffMembers.length === 0 && !errorMessage" class="info-message">
+     No staff members found. Click "Add Staff" to create one.
+  </div>
+
+  <!-- Staff Admin Grid -->
+  <div class="staff-admin-grid">
+    <div class="card staff-card" *ngFor="let staff of staffMembers; trackBy: trackById">
+
+      <!-- Display section for viewing Staff details (shown when NOT editing) -->
+      <div *ngIf="!staff.isEditing">
+         <img *ngIf="getStaffImageUrl(staff.image) as imageUrl" [src]="imageUrl" [alt]="'Photo of ' + staff.name" class="card-image">
+          <div *ngIf="!getStaffImageUrl(staff.image)" class="card-image-placeholder">
+              <i class="fas fa-user-circle"></i>
+          </div>
+         <h3 class="card-title">{{ staff.name }}</h3>
+         <p class="card-subtitle">{{ staff.position }}</p>
+         <p class="card-text">{{ staff.about }}</p>
+         <div class="card-actions">
+           <button (click)="toggleEdit(staff)" class="btn btn-secondary" [disabled]="isAnyOperationInProgress()">
+             <i class="fas fa-edit"></i> Edit
+           </button>
+           <button (click)="confirmDelete(staff)" class="btn btn-danger" [disabled]="isAnyOperationInProgress()">
+             <i class="fas fa-trash-alt"></i> Delete
+           </button>
+         </div>
+      </div>
+
+      <!-- Display section for editing Staff details (inline form, shown when isEditing is true) -->
+      <div *ngIf="staff.isEditing" class="edit-form-section">
+          <h4>Edit Staff Member: {{ staff.name }}</h4>
+          <form #editStaffForm="ngForm" (ngSubmit)="saveEdit(staff, editStaffForm)">
+              <div class="form-group">
+                <label for="edit-name-{{staff.id}}">Name</label>
+                <input type="text" id="edit-name-{{staff.id}}" name="edit-name-{{staff.id}}" [(ngModel)]="staff.editModel!.name" required class="form-input" minlength="3">
+                 <div *ngIf="editStaffForm.controls['edit-name-' + staff.id]?.invalid && (editStaffForm.controls['edit-name-' + staff.id]?.dirty || editStaffForm.controls['edit-name-' + staff.id]?.touched)" class="error-text">
+                    <small *ngIf="editStaffForm.controls['edit-name-' + staff.id]?.errors?.['required']">Name is required.</small>
+                    <small *ngIf="editStaffForm.controls['edit-name-' + staff.id]?.errors?.['minlength']">Name must be at least 3 characters.</small>
+                 </div>
+              </div>
+
+               <div class="form-group">
+                <label for="edit-position-{{staff.id}}">Position</label>
+                <input type="text" id="edit-position-{{staff.id}}" name="edit-position-{{staff.id}}" [(ngModel)]="staff.editModel!.position" required class="form-input" minlength="3">
+                  <div *ngIf="editStaffForm.controls['edit-position-' + staff.id]?.invalid && (editStaffForm.controls['edit-position-' + staff.id]?.dirty || editStaffForm.controls['edit-position-' + staff.id]?.touched)" class="error-text">
+                    <small *ngIf="editStaffForm.controls['edit-position-' + staff.id]?.errors?.['required']">Position is required.</small>
+                    <small *ngIf="editStaffForm.controls['edit-position-' + staff.id]?.errors?.['minlength']">Position must be at least 3 characters.</small>
+                 </div>
+              </div>
+
+              <div class="form-group">
+                <label for="edit-about-{{staff.id}}">About</label>
+                <textarea id="edit-about-{{staff.id}}" name="edit-about-{{staff.id}}" [(ngModel)]="staff.editModel!.about" required class="form-input" rows="3" minlength="10"></textarea>
+                  <div *ngIf="editStaffForm.controls['edit-about-' + staff.id]?.invalid && (editStaffForm.controls['edit-about-' + staff.id]?.dirty || editStaffForm.controls['edit-about-' + staff.id]?.touched)" class="error-text">
+                    <small *ngIf="editStaffForm.controls['edit-about-' + staff.id]?.errors?.['required']">About is required.</small>
+                    <small *ngIf="editStaffForm.controls['edit-about-' + staff.id]?.errors?.['minlength']">About must be at least 10 characters.</small>
+                 </div>
+              </div>
+
+              <!-- Image Upload/Management for Edit -->
+               <div class="form-group">
+                   <label for="edit-image-{{staff.id}}">Image</label>
+                   <input type="file" id="edit-image-{{staff.id}}" name="edit-image-{{staff.id}}" (change)="onEditFileSelected($event, staff)" class="form-input-file">
+
+                   <ng-container *ngIf="getStaffImageUrl(staff.image) as currentImageUrl">
+                        <div *ngIf="!staff.selectedEditImageFile && staff.editModel?.removeImage !== true" class="current-image-preview">
+                             Current Image:
+                              <img [src]="currentImageUrl" [alt]="'Current photo of ' + staff.name" style="height: 50px; vertical-align: middle; margin-left: 10px; border-radius: var(--border-radius-sm);">
+                             <button type="button" class="btn-clear-file" (click)="markExistingImageForRemoval(staff)">Remove Image</button>
+                        </div>
+                   </ng-container>
+
+
+                    <div *ngIf="staff.selectedEditImageFile" class="selected-file-info">
+                        Selected new file: {{ staff.selectedEditImageFile.name }}
+                         <button type="button" class="btn-clear-file" (click)="clearSelectedEditImage(staff)">Clear Selected File</button>
+                    </div>
+
+                    <div *ngIf="staff.editModel?.removeImage === true" class="info-message-small">
+                         Current image will be removed on save.
+                          <button type="button" class="btn-clear-file" (click)="staff.editModel!.removeImage = false; staff.selectedEditImageFile = undefined;">Undo Remove</button>
+                    </div>
+               </div>
+
+
+               <!-- Error Message specific to the inline edit form -->
+               <div *ngIf="staff.editErrorMessage" class="form-error-box">
+                 <i class="fas fa-exclamation-triangle"></i>
+                 <span>{{ staff.editErrorMessage }}</span>
+               </div>
+
+               <!-- Actions for the inline edit form -->
+               <div class="form-actions">
+                   <button type="button" class="btn btn-secondary" (click)="cancelEdit(staff)" [disabled]="staff.isSavingEdit">Cancel</button>
+                   <button type="submit" class="btn btn-primary" [disabled]="staff.isSavingEdit || editStaffForm.invalid">
+                       <span *ngIf="!staff.isSavingEdit"><i class="fas fa-save"></i> Save Changes</span>
+                       <span *ngIf="staff.isSavingEdit"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+                   </button>
+               </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</main>

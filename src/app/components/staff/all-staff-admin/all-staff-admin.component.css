@@ -1,0 +1,217 @@
+/* src/app/components/staff/all-staff-admin/all-staff-admin.component.css */
+
+/* Reuse styles from global styles or define them here based on your structure */
+/* Ensure your global styles include:
+   .container, .header, .header-content, .header-icon, .header-title
+   .staff-grid (or staff-admin-grid base)
+   .card, .card-image, .card-image-placeholder, .card-title, .card-subtitle, .card-text
+   .card-actions, .card-actions .btn, .btn, .btn-primary, .btn-secondary
+   .btn-danger (if specific to admin section, otherwise make global)
+   .loading-indicator, .info-message, .form-error-box
+   .form-group, .form-input, .error-text
+   .form-input-file, .form-input-file::file-selector-button,
+   .selected-file-info, .btn-clear-file
+*/
+:host { display: block; background-color: var(--bg-color); min-height: 100vh; }
+
+.container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+
+/* Reusing global header/button/message styles */
+/* Adjust header layout for admin view if needed */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1rem; /* Add gap when wrapping */
+}
+
+.staff-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+  gap: 2rem; /* Space between cards */
+}
+
+/* Reuse .card styles from global */
+.staff-card {
+    display: flex; /* Ensure flex column for internal layout */
+    flex-direction: column;
+    justify-content: space-between; /* Push actions/edit form to bottom */
+}
+
+
+/* Reuse .card-actions, .card-actions .btn styles from global */
+
+
+/* Style for the danger button (Delete) - define globally or here */
+.btn-danger {
+    background-color: var(--error-color);
+    color: var(--bg-color); /* Text color should contrast with red */
+    border-color: var(--error-color);
+}
+.btn-danger:not(:disabled):hover {
+    background-color: darken(var(--error-color), 10%); /* Darken on hover */
+     transform: translateY(-2px); /* Subtle lift */
+}
+/* Ensure hover style also works in light theme if implemented */
+body.light-theme-active .btn-danger:not(:disabled):hover {
+     background-color: darken(var(--error-color), 10%);
+}
+
+
+.loading-indicator, .info-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--subtle-text-color);
+  margin-top: 2rem;
+}
+
+.deleting-indicator {
+    color: var(--error-color); /* Indicate deleting with error color */
+}
+
+.form-error-box {
+    display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: var(--border-radius-base);
+    font-weight: var(--font-weight-semibold); margin-top: 1rem; border: 1px solid;
+    background-color: rgba(248, 81, 73, 0.08); color: var(--error-color); border-color: var(--error-color);
+    max-width: 600px; /* Limit width for better readability */
+    margin-left: auto;
+    margin-right: auto;
+    word-break: break-word; /* Prevent long error messages from overflowing */
+}
+
+/* Styles specific to the inline edit form section */
+.edit-form-section {
+    /* Add some internal padding or margin if needed */
+    padding-top: 1rem; /* Space above the form */
+}
+
+.edit-form-section h4 {
+    font-size: 1.3rem;
+    color: var(--primary-accent); /* Use accent color for form title */
+    margin-bottom: 1rem; /* Space below title */
+    padding-bottom: 0.5rem; /* Padding below title */
+    border-bottom: 1px solid var(--border-color-translucent); /* Separator line */
+}
+
+.edit-form-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Space between form groups */
+}
+
+/* Reuse form-group, form-input, error-text, form-input-file, selected-file-info, btn-clear-file styles */
+
+.current-image-preview, .info-message-small {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--subtle-text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+.current-image-preview img {
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color-translucent);
+}
+.info-message-small {
+    color: var(--primary-accent); /* Highlight info message */
+}
+.info-message-small .btn-clear-file {
+     color: var(--secondary-accent); /* Use secondary accent for undo action */
+     text-decoration: none; /* Remove underline */
+     padding: 0.2rem 0.5rem;
+     border: 1px solid var(--secondary-accent);
+     border-radius: var(--border-radius-sm);
+     font-size: 0.8rem;
+     transition: all var(--transition-speed-fast) ease;
+     cursor: pointer;
+}
+.info-message-small .btn-clear-file:hover {
+     background-color: var(--secondary-accent-hover);
+     color: var(--bg-color);
+}
+
+
+/* Responsive Adjustments (adjust breakpoints and values as needed) */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+   /* Header responsiveness (if not handled globally) */
+  .header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+  }
+   .header-title {
+      font-size: 1.5rem;
+  }
+  .staff-admin-grid {
+      gap: 1.5rem;
+  }
+  /* Card adjustments (if not handled globally) */
+  .card {
+      padding: 1rem;
+  }
+   .card-title { font-size: 1.2rem; }
+   .card-subtitle { font-size: 0.9rem; }
+   .card-text { font-size: 0.95rem; }
+    /* Card actions layout (if not handled globally) */
+    .card-actions {
+        flex-direction: column; /* Stack action buttons */
+        gap: 0.5rem; /* Adjust gap */
+    }
+     .card-actions .btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+     }
+     /* Edit form adjustments */
+     .edit-form-section h4 {
+         font-size: 1.2rem;
+     }
+      /* Image preview/file info layout */
+      .current-image-preview, .selected-file-info, .info-message-small {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem; /* Adjust gap */
+      }
+       .current-image-preview img {
+         margin-left: 0;
+         margin-top: 0.5rem;
+       }
+}
+
+@media (max-width: 480px) {
+     .staff-admin-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically */
+        gap: 1rem;
+    }
+     /* Further minor adjustments if needed */
+     .card-image, .card-image-placeholder {
+        height: 180px; /* Adjust image height */
+    }
+     .card-title { font-size: 1.1rem; }
+     .card-subtitle { font-size: 0.85rem; }
+     .card-text { font-size: 0.9rem; }
+     .header-icon { font-size: 1.75rem;}
+     .header-title { font-size: 1.4rem; }
+     .edit-form-section h4 {
+         font-size: 1.1rem;
+     }
+     /* Adjust button font size (if not handled globally) */
+     .form-actions .btn {
+        font-size: 0.85rem;
+    }
+    /* Adjust clear button font size */
+     .info-message-small .btn-clear-file {
+         font-size: 0.75rem;
+         padding: 0.1rem 0.3rem;
+     }
+}
