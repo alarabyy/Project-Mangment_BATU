@@ -3,14 +3,10 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
-import { BlogDetails } from '../../../models/Blog';
+import { BlogDetails, BlogDetailsForEdit } from '../../../models/Blog';
 import { BlogService } from '../../../Services/blog.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-
-interface BlogDetailsForEdit extends BlogDetails {
-  images: string[];
-}
 
 @Component({
   selector: 'app-edit-blog',
@@ -165,35 +161,25 @@ export class EditBlogComponent implements OnInit {
       formData.append('headerImage', this.selectedHeaderImage, this.selectedHeaderImage.name);
     }
 
-    // 2. إرسال قائمة بمسارات الصور الموجودة التي *لم تُحذف*، لتصبح هي الصور النهائية للمعرض
-    // هذا هو أهم تعديل: يجب على الباك إند دمج هذه القائمة مع أي صور جديدة يرفعها بنفسه.
-    // وبما أن الـ Backend API لا يظهر حقل "existingImages", سأقوم بدمج الصور الموجودة مع الصور الجديدة
-    // (فقط أسمائها) في حقل addedImages، وهذا يعني أن الباك إند يجب أن يكون ذكيًا كفاية.
-    // أو الخيار الآخر هو أن الباك إند لا يحتاج هذه القائمة، بل يعتمد على `removedImages` فقط.
-    // بناءً على الـ API الذي قدمته (`addedImages` array<string>)، سنرسل أسماء الملفات.
-
+    // 2. تجميع أسماء الصور النهائية للمعرض في حقل 'addedImages' (وفقاً لـ Backend API الذي قدمته)
     const finalGalleryImageNames: string[] = [];
 
-    // إضافة أسماء الصور الموجودة (التي لم تُحذف بعد من الـ currentBlog.images)
+    // إضافة أسماء الصور الموجودة (التي لم تُحذف بعد من currentBlog.images)
     if (this.currentBlog && this.currentBlog.images.length > 0) {
       finalGalleryImageNames.push(...this.currentBlog.images);
     }
-    // إضافة أسماء الملفات الجديدة (هنا يجب أن يكون الـ Backend قد تلقاها في خطوة رفع منفصلة)
-    // IMPORTANT: هذا الجزء يتطلب أن يكون الـ Backend قد قام برفع هذه الملفات مسبقًا
-    // وإلا فإن هذا الحقل لن يفعل شيئًا سوى إرسال أسماء غير موجودة.
+    // إضافة أسماء الملفات الجديدة (هنا يجب أن يكون الـ Backend قد تلقاها في خطوة رفع منفصلة أو أنه يعالج الأسماء فقط)
     this.newGalleryFiles.forEach(file => {
       finalGalleryImageNames.push(file.name); // نرسل أسماء الملفات الجديدة
     });
 
-    // UPDATED: إرسال addedImages كـ Array<string>
-    // إذا كان الـ Backend يتوقع `List<string>` كحقل `addedImages`، فإننا نضيف كل اسم صورة كحقل منفصل باسم `addedImages`
+    // إرسال addedImages كـ Array<string> (كل اسم صورة كحقل منفصل باسم 'addedImages')
     finalGalleryImageNames.forEach(imageName => {
         formData.append('addedImages', imageName);
     });
 
     // 3. إرسال قائمة بمسارات الصور الموجودة التي تم تحديدها للحذف
-    // UPDATED: تغيير اسم الحقل إلى `removedImages` وضمها إلى string مفصول بفواصل.
-    // هذا يعتمد على أن الـ Backend يتوقع حقل واحد string لـ `removedImages`
+    // (وفقاً لـ Backend API الذي قدمته: حقل `removedImages` من نوع string مفصول بفواصل)
     if (this.deletedImageUrls.length > 0) {
       formData.append('removedImages', this.deletedImageUrls.join(','));
     }

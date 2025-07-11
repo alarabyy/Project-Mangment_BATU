@@ -62,7 +62,6 @@ export class AuthService {
       return throwError(() => new Error(errorMsg));
     }
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
-    // UPDATED: تمرير الهيدرز يدوياً هنا أيضاً لأننا لا نستخدم Interceptor
     return this.http.get<UserProfile>(profileUrl, { headers: this.getAuthHeaders() });
   }
 
@@ -76,7 +75,6 @@ export class AuthService {
   }
 
   public getToken(): string | null {
-    // هذه هي الدالة التي سيتم استدعاؤها للحصول على الـ token
     return localStorage.getItem(this.authTokenKey);
   }
 
@@ -86,7 +84,7 @@ export class AuthService {
     try {
       return jwtDecode(token);
     } catch (error) {
-      console.error("Error decoding token:", error); // إضافة سجل للخطأ
+      console.error("Error decoding token:", error);
       return null;
     }
   }
@@ -112,12 +110,11 @@ export class AuthService {
       }
       return decoded.exp < (Date.now() / 1000);
     } catch (error) {
-      console.error("Error checking token expiration:", error); // إضافة سجل للخطأ
+      console.error("Error checking token expiration:", error);
       return true;
     }
   }
 
-  // هذه الدالة موجودة بالفعل وسيتم استخدامها لبناء HttpHeaders
   public getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();

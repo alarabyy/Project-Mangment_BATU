@@ -182,33 +182,6 @@
     </div>
   </section>
 
-  <!-- Meet The Team Section -->
-  <section id="team" class="team-section content-section alt-bg">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-users icon-before"></i>Meet Our Dedicated Team
-      </h2>
-      <div class="team-grid">
-        <div *ngFor="let member of teamMembers; let i = index"
-             class="team-member-card animate-on-scroll scale-up" #animatable
-             [style.animation-delay]="(i * 0.15) + 's'">
-          <div class="team-member-photo-wrapper">
-            <img [src]="member.imageUrl" [alt]="member.name" class="team-member-photo">
-          </div>
-          <div class="team-member-info">
-            <h3><i [class]="member.icon" class="icon-before-small"></i>{{ member.name }}</h3>
-            <p class="member-role">{{ member.role }}</p>
-            <p *ngIf="member.bio" class="member-bio">{{ member.bio }}</p>
-            <div *ngIf="member.socialLinks" class="member-socials">
-              <a *ngFor="let social of member.socialLinks" [href]="social.url" target="_blank" [title]="social.platformIcon" class="unstyled-link">
-                <i [class]="social.platformIcon"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Resources & Downloads Section -->
   <section id="resources" class="resources-section content-section">

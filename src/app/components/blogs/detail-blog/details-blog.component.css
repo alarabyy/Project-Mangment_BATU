@@ -65,7 +65,7 @@
 .blog-header {
   position: relative;
   width: 100%;
-  height: 300px; /* ارتفاع ثابت لصورة الهيدر */
+  height: 300px;
   overflow: hidden;
   border-radius: var(--border-radius-base);
   margin-bottom: 2rem;
@@ -75,7 +75,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.7); /* لجعل النص فوقها أكثر وضوحاً */
+  filter: brightness(0.7);
 }
 
 .blog-header .header-overlay {
@@ -135,7 +135,7 @@
 
 .gallery-image {
   width: 100%;
-  height: 150px; /* ارتفاع ثابت لصور المعرض */
+  height: 150px;
   object-fit: cover;
   border-radius: var(--border-radius-base);
   border: 1px solid var(--border-color);

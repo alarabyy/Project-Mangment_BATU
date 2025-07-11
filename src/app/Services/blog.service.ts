@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http'; // استيراد HttpErrorResponse
-import { Observable, of, throwError, ObservableInput } from 'rxjs'; // استيراد ObservableInput, of, throwError
-import { map, catchError } from 'rxjs/operators'; // استيراد catchError
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError, ObservableInput } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { Blog, BlogDetails } from '../models/Blog';
 import { AuthService } from './auth.service';
@@ -18,8 +18,7 @@ export class BlogService {
     return this.authService.getAuthHeaders();
   }
 
-  // دالة لمعالجة الأخطاء
-  private handleError(error: HttpErrorResponse): ObservableInput<any> { // يجب أن تعيد ObservableInput
+  private handleError(error: HttpErrorResponse): ObservableInput<any> {
     console.error('Blog Service Error:', error);
 
     let errorMessage = 'An unknown error occurred!';
@@ -65,7 +64,7 @@ export class BlogService {
 
   getAllBlogs(): Observable<Blog[]> {
     return this.http.get<Blog[]>(`${this.apiUrl}/get/all`).pipe(
-      catchError(this.handleError) // إضافة معالجة الأخطاء
+      catchError(this.handleError)
     );
   }
 
@@ -80,21 +79,21 @@ export class BlogService {
         }
         return blog;
       }),
-      catchError(this.handleError) // إضافة معالجة الأخطاء
+      catchError(this.handleError)
     );
   }
 
   createBlog(formData: FormData): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.post<any>(`${this.apiUrl}/create`, formData, { headers }).pipe(
-      catchError(this.handleError) // إضافة معالجة الأخطاء
+      catchError(this.handleError)
     );
   }
 
   updateBlog(formData: FormData): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.put<any>(`${this.apiUrl}/update`, formData, { headers }).pipe(
-      catchError(this.handleError) // إضافة معالجة الأخطاء
+      catchError(this.handleError)
     );
   }
 
@@ -103,7 +102,7 @@ export class BlogService {
     const params = new HttpParams().set('id', id.toString());
 
     return this.http.delete<any>(`${this.apiUrl}/delete`, { headers, params }).pipe(
-      catchError(this.handleError) // إضافة معالجة الأخطاء
+      catchError(this.handleError)
     );
   }
 }

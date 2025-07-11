@@ -20,14 +20,12 @@
   <section *ngIf="blogDetails.images && blogDetails.images.length > 0" class="blog-gallery">
     <h2>Gallery</h2>
     <div class="gallery-grid">
-      <!-- UPDATED: لا يوجد تغيير هنا، فقط التأكد من أن blogDetails.images هو مصفوفة -->
       <img *ngFor="let imageUrl of blogDetails.images" [src]="imagesBaseUrl + imageUrl" alt="Blog Gallery Image" class="gallery-image">
     </div>
   </section>
 
   <div class="blog-actions">
     <a [routerLink]="['/blogs']" class="btn btn-secondary">Back to Blogs</a>
-    <!-- زر التعديل إذا كان المستخدم لديه صلاحية -->
     <a [routerLink]="['/admin/blogs/edit', blogDetails.id]" class="btn btn-primary">Edit Post</a>
   </div>
 </div>
