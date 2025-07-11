@@ -1,45 +1,38 @@
-<div class="page-container">
-  <div *ngIf="isLoading" class="feedback-state">
-    <div class="spinner"></div>
-    <p>Loading Blog Post...</p>
+<!-- src/app/components/blogs/detail-blog/details-blog.component.html -->
+<div *ngIf="isLoading" class="feedback-container">
+  <div class="spinner"></div>
+  <p>Loading blog post...</p>
+</div>
+
+<div *ngIf="!isLoading && blogDetails" class="blog-detail-container">
+  <header class="blog-header">
+    <img *ngIf="blogDetails.headerImage" [src]="imagesBaseUrl + blogDetails.headerImage" alt="{{ blogDetails.title }}" class="header-image">
+    <div class="header-overlay">
+      <h1>{{ blogDetails.title }}</h1>
+      <p class="published-date">Published: {{ blogDetails.publishedAt | date:'mediumDate' }}</p>
+    </div>
+  </header>
+
+  <section class="blog-content">
+    <p>{{ blogDetails.content }}</p>
+  </section>
+
+  <section *ngIf="blogDetails.images && blogDetails.images.length > 0" class="blog-gallery">
+    <h2>Gallery</h2>
+    <div class="gallery-grid">
+      <!-- UPDATED: لا يوجد تغيير هنا، فقط التأكد من أن blogDetails.images هو مصفوفة -->
+      <img *ngFor="let imageUrl of blogDetails.images" [src]="imagesBaseUrl + imageUrl" alt="Blog Gallery Image" class="gallery-image">
+    </div>
+  </section>
+
+  <div class="blog-actions">
+    <a [routerLink]="['/blogs']" class="btn btn-secondary">Back to Blogs</a>
+    <!-- زر التعديل إذا كان المستخدم لديه صلاحية -->
+    <a [routerLink]="['/admin/blogs/edit', blogDetails.id]" class="btn btn-primary">Edit Post</a>
   </div>
-  <div *ngIf="error" class="feedback-state error-state">
-    <i class="fa-solid fa-triangle-exclamation"></i>
-    <p>{{ error }}</p>
-    <a routerLink="/blogs" class="retry-button">Go to All Posts</a>
-  </div>
+</div>
 
-  <div *ngIf="blog" class="blog-detail-wrapper">
-    <header class="detail-hero">
-      <div class="hero-image-container">
-        <img [src]="imagesBaseUrl + blog.headerImage" [alt]="blog.title" class="hero-image">
-        <div class="hero-overlay"></div>
-      </div>
-      <div class="hero-content">
-        <p class="detail-meta">
-          <i class="fa-regular fa-calendar"></i> Published on {{ blog.publishedAt | date:'fullDate' }}
-        </p>
-        <h1 class="detail-title">{{ blog.title }}</h1>
-      </div>
-    </header>
-
-    <main class="detail-main-content">
-      <section class="detail-article-content" [innerHTML]="blog.content"></section>
-
-      <section *ngIf="blog.images && blog.images.length > 0" class="gallery-section">
-        <h2>More Images</h2>
-        <div class="image-gallery">
-          <div *ngFor="let imageUrl of blog.images" class="gallery-item">
-            <img [src]="imagesBaseUrl + imageUrl" [alt]="'Gallery image for ' + blog.title">
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="detail-footer">
-      <!-- <a routerLink="/blogs" class="back-button">
-        <i class="fa-solid fa-arrow-left"></i> Back to All Posts
-      </a> -->
-    </footer>
-  </div>
+<div *ngIf="!isLoading && !blogDetails" class="feedback-container">
+  <p>Blog post not found.</p>
+  <a [routerLink]="['/blogs']" class="btn btn-secondary">Back to Blogs</a>
 </div>

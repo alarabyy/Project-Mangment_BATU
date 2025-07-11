@@ -7,6 +7,11 @@ export interface Blog {
 
 export interface BlogDetails extends Blog {
   content: string;
-  // يمكن أن تأتي كـ string[] (إذا كانت مصفوفة) أو string (إذا كانت مفصولة بفواصل)
-  images: string[] | string;
+  images: string[] | string; // يبقى كما هو
+}
+
+// UPDATED: تعريف واجهة موسعة للاستخدام في المكونات
+export interface BlogDetailsDisplay extends Blog {
+  content: string;
+  images: string[]; // هنا نضمن أنها مصفوفة دائمًا للعرض في القالب
 }
