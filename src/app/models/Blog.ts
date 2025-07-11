@@ -7,5 +7,6 @@ export interface Blog {
 
 export interface BlogDetails extends Blog {
   content: string;
-  images: string[];
+  // يمكن أن تأتي كـ string[] (إذا كانت مصفوفة) أو string (إذا كانت مفصولة بفواصل)
+  images: string[] | string;
 }

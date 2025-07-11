@@ -24,6 +24,8 @@
   --transition-speed-fast: 0.15s;
   --easing-curve-elegant: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-curve-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+
+  --primary-accent-translucent: rgba(110, 231, 183, 0.2);
 }
 
 .form-page-container, .feedback-container {
@@ -36,6 +38,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  min-height: 50vh;
 }
 
 .form-wrapper {
@@ -60,6 +63,7 @@
 .form-header h1 {
   font-size: 2rem;
   font-weight: var(--font-weight-bold);
+  color: var(--text-color);
 }
 
 .close-button {
@@ -80,6 +84,7 @@
   display: block;
   font-weight: var(--font-weight-semibold);
   margin-bottom: 0.75rem;
+  color: var(--text-color);
 }
 
 .form-control {
@@ -90,7 +95,7 @@
   padding: 14px;
   color: var(--text-color);
   font-size: 1rem;
-  transition: all var(--transition-speed-fast) ease-in-out;
+  transition: all var(--transition-speed-fast) var(--easing-curve-elegant);
 }
 
 .form-control:focus {
@@ -101,10 +106,10 @@
 
 .file-input {
   width: 100%;
-  padding: 8px 0; /* تحسين مظهر ملف الإدخال */
+  padding: 8px 0;
+  color: var(--text-color);
 }
 
-/* إخفاء input file الأصلي لزر إضافة الصور في المعرض */
 .file-input-hidden {
   display: none;
 }
@@ -117,16 +122,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 150px; /* ارتفاع ثابت لمعاينة الصورة الرئيسية */
-  margin-bottom: 1rem; /* مسافة بعد المعاينة */
+  min-height: 180px;
+  margin-bottom: 1rem;
+  background-color: var(--bg-color);
+}
+
+.image-preview-container .placeholder-text {
+  color: var(--subtle-text-color);
+  font-style: italic;
 }
 
 .img-preview {
   max-width: 100%;
-  max-height: 200px; /* التحكم في حجم المعاينة */
+  max-height: 180px;
   height: auto;
   border-radius: var(--border-radius-base);
-  object-fit: contain; /* للتأكد من أن الصورة لا يتم اقتصاصها */
+  object-fit: contain;
 }
 
 .form-text {
@@ -136,7 +147,6 @@
   color: var(--subtle-text-color);
 }
 
-/* تنسيقات جديدة لأزرار إضافة وإزالة الصور */
 .add-gallery-button {
   display: inline-flex;
   align-items: center;
@@ -152,7 +162,7 @@
   transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
   width: 100%;
   justify-content: center;
-  margin-top: 1rem; /* مسافة بعد عنوان الصور الحالية */
+  margin-top: 1rem;
 }
 
 .add-gallery-button:hover {
@@ -165,14 +175,18 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 1rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  background-color: var(--bg-color);
 }
 
-.gallery-preview-grid.current-gallery h3,
-.gallery-preview-grid.new-gallery h3 {
-  grid-column: 1 / -1; /* لجعل العنوان يمتد عبر جميع الأعمدة */
+.gallery-preview-grid h3 {
+  grid-column: 1 / -1;
   color: var(--subtle-text-color);
   font-size: 1rem;
   margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
 }
 
 .gallery-preview-item {
@@ -183,20 +197,21 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 120px; /* ارتفاع ثابت لعناصر المعرض */
+  height: 120px;
+  background-color: var(--surface-color);
 }
 
 .gallery-preview-item .img-preview {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* لتغطية المساحة بالكامل */
+  object-fit: cover;
 }
 
 .remove-image-button {
   position: absolute;
   top: 5px;
   right: 5px;
-  background-color: rgba(248, 81, 73, 0.8); /* لون أحمر شبه شفاف */
+  background-color: rgba(248, 81, 73, 0.8);
   color: #fff;
   border: none;
   border-radius: 50%;
@@ -208,6 +223,7 @@
   cursor: pointer;
   font-size: 0.8rem;
   transition: background-color var(--transition-speed-fast) ease;
+  z-index: 10;
 }
 
 .remove-image-button:hover {
@@ -231,6 +247,7 @@
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
+  margin-top: 2rem;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -249,6 +266,12 @@
   margin-top: 0.5rem;
 }
 
-/* Spinner for loading states */
+.info-message-small {
+  color: var(--subtle-text-color);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
 .spinner { width: 50px; height: 50px; border: 5px solid var(--border-color); border-top-color: var(--primary-accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem auto; }
 @keyframes spin { 100% { transform: rotate(360deg); } }

@@ -5,6 +5,12 @@ import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { BlogDetails } from '../../../models/Blog';
 import { BlogService } from '../../../Services/blog.service';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+
+interface BlogDetailsForEdit extends BlogDetails {
+  images: string[];
+}
 
 @Component({
   selector: 'app-edit-blog',
@@ -18,16 +24,16 @@ export class EditBlogComponent implements OnInit {
   isSubmitting = false;
   isLoading = true;
   blogId: number | null = null;
-  currentBlog: BlogDetails | null = null;
-  imagesBaseUrl = environment.apiUploadUrl;
+  currentBlog: BlogDetailsForEdit | null = null;
+  imagesBaseUrl = environment.imageBaseUrl;
 
   selectedHeaderImage: File | null = null;
   selectedHeaderImagePreview: string | ArrayBuffer | null = null;
 
-  newGalleryFiles: File[] = []; // ملفات الصور الجديدة التي يختارها المستخدم للإضافة
-  newGalleryPreviews: { file: File, url: string | ArrayBuffer | null }[] = []; // معاينات للصور الجديدة
+  newGalleryFiles: File[] = [];
+  newGalleryPreviews: { file: File, url: string | ArrayBuffer | null }[] = [];
 
-  deletedImageUrls: string[] = []; // مسارات URL للصور الموجودة التي تم تحديدها للحذف
+  deletedImageUrls: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -49,19 +55,38 @@ export class EditBlogComponent implements OnInit {
       this.loadBlogData();
     } else {
       console.error('Blog ID not found in URL');
-      alert('Error: Blog ID is missing.');
+      alert('Error: Blog ID is missing. Redirecting to blogs list.');
       this.isLoading = false;
       this.router.navigate(['/blogs']);
     }
   }
 
   loadBlogData(): void {
-    if (!this.blogId) return;
+    if (!this.blogId) {
+        this.isLoading = false;
+        return;
+    }
 
     this.isLoading = true;
-    this.blogService.getBlogDetails(this.blogId).subscribe({
+    this.blogService.getBlogDetails(this.blogId).pipe(
+      finalize(() => this.isLoading = false),
+      catchError(err => {
+        console.error('Error loading blog data in component:', err);
+        alert(`Failed to load blog data: ${err.message || 'The post may not exist or an error occurred.'}`);
+        this.router.navigate(['/blogs']);
+        return of(null);
+      })
+    ).subscribe({
       next: (data) => {
-        this.currentBlog = data;
+        if (!data) return;
+
+        const blogImages = Array.isArray(data.images)
+                           ? data.images
+                           : (typeof data.images === 'string'
+                               ? data.images.split(',').filter(s => s.trim() !== '')
+                               : []);
+
+        this.currentBlog = { ...data, images: blogImages } as BlogDetailsForEdit;
         this.blogForm.patchValue({
           title: data.title,
           content: data.content
@@ -69,13 +94,6 @@ export class EditBlogComponent implements OnInit {
         if (data.headerImage) {
           this.selectedHeaderImagePreview = this.imagesBaseUrl + data.headerImage;
         }
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading blog data:', err);
-        alert('Failed to load blog data. The post may not exist.');
-        this.isLoading = false;
-        this.router.navigate(['/blogs']);
       }
     });
   }
@@ -91,7 +109,6 @@ export class EditBlogComponent implements OnInit {
       reader.readAsDataURL(file);
     } else {
       this.selectedHeaderImage = null;
-      // إذا لم يتم اختيار ملف جديد، نعيد معاينة الصورة الحالية
       this.selectedHeaderImagePreview = this.currentBlog?.headerImage ? this.imagesBaseUrl + this.currentBlog.headerImage : null;
     }
   }
@@ -103,32 +120,32 @@ export class EditBlogComponent implements OnInit {
         const reader = new FileReader();
         reader.onload = () => {
           this.newGalleryPreviews.push({ file: file, url: reader.result });
-          this.newGalleryFiles.push(file); // إضافة الملف الفعلي للرفع
+          this.newGalleryFiles.push(file);
         };
         reader.readAsDataURL(file);
       });
-      event.target.value = ''; // مسح قيمة input file للسماح باختيار نفس الملفات مرة أخرى
+      event.target.value = '';
     }
   }
 
   removeCurrentGalleryImage(imageUrl: string): void {
-    if (this.currentBlog && this.currentBlog.images) {
-      // إزالة الصورة من قائمة الصور المعروضة حاليا
+    if (this.currentBlog) {
       this.currentBlog.images = this.currentBlog.images.filter(img => img !== imageUrl);
-      // إضافة الصورة إلى قائمة الصور التي سيتم حذفها من الباك إند
       this.deletedImageUrls.push(imageUrl);
+      console.log('Deleted Image URLs:', this.deletedImageUrls);
     }
   }
 
   removeNewGalleryImage(index: number): void {
-    // إزالة الصورة من قائمة الصور الجديدة التي لم يتم رفعها بعد
     this.newGalleryFiles.splice(index, 1);
     this.newGalleryPreviews.splice(index, 1);
+    console.log('New Gallery Files after removal:', this.newGalleryFiles.map(f => f.name));
   }
 
   onSubmit(): void {
     if (this.blogForm.invalid) {
       this.blogForm.markAllAsTouched();
+      alert('Please fill in all required fields correctly.');
       return;
     }
 
@@ -148,47 +165,52 @@ export class EditBlogComponent implements OnInit {
       formData.append('headerImage', this.selectedHeaderImage, this.selectedHeaderImage.name);
     }
 
-    // 2. تجميع كل الصور التي يجب أن تكون في المعرض بعد التحديث
-    // هذا يشمل الصور الموجودة التي لم تُحذف + الصور الجديدة التي أضافها المستخدم
-    const finalGalleryImageFiles: File[] = [];
+    // 2. إرسال قائمة بمسارات الصور الموجودة التي *لم تُحذف*، لتصبح هي الصور النهائية للمعرض
+    // هذا هو أهم تعديل: يجب على الباك إند دمج هذه القائمة مع أي صور جديدة يرفعها بنفسه.
+    // وبما أن الـ Backend API لا يظهر حقل "existingImages", سأقوم بدمج الصور الموجودة مع الصور الجديدة
+    // (فقط أسمائها) في حقل addedImages، وهذا يعني أن الباك إند يجب أن يكون ذكيًا كفاية.
+    // أو الخيار الآخر هو أن الباك إند لا يحتاج هذه القائمة، بل يعتمد على `removedImages` فقط.
+    // بناءً على الـ API الذي قدمته (`addedImages` array<string>)، سنرسل أسماء الملفات.
+
     const finalGalleryImageNames: string[] = [];
 
-    // إضافة أسماء الصور الموجودة التي لم يتم حذفها (للباك إند لمعالجتها)
-    if (this.currentBlog?.images && this.currentBlog.images.length > 0) {
+    // إضافة أسماء الصور الموجودة (التي لم تُحذف بعد من الـ currentBlog.images)
+    if (this.currentBlog && this.currentBlog.images.length > 0) {
       finalGalleryImageNames.push(...this.currentBlog.images);
     }
+    // إضافة أسماء الملفات الجديدة (هنا يجب أن يكون الـ Backend قد تلقاها في خطوة رفع منفصلة)
+    // IMPORTANT: هذا الجزء يتطلب أن يكون الـ Backend قد قام برفع هذه الملفات مسبقًا
+    // وإلا فإن هذا الحقل لن يفعل شيئًا سوى إرسال أسماء غير موجودة.
+    this.newGalleryFiles.forEach(file => {
+      finalGalleryImageNames.push(file.name); // نرسل أسماء الملفات الجديدة
+    });
 
-    // إضافة ملفات الصور الجديدة التي تم اختيارها
-    if (this.newGalleryFiles.length > 0) {
-      this.newGalleryFiles.forEach(file => {
-        // نرسل ملفات الصور الجديدة بشكل فردي بحقل 'images' (كما في Add)
-        formData.append('images', file, file.name);
-      });
-    }
+    // UPDATED: إرسال addedImages كـ Array<string>
+    // إذا كان الـ Backend يتوقع `List<string>` كحقل `addedImages`، فإننا نضيف كل اسم صورة كحقل منفصل باسم `addedImages`
+    finalGalleryImageNames.forEach(imageName => {
+        formData.append('addedImages', imageName);
+    });
 
-    // 3. إرسال قائمة بمسارات الصور الموجودة التي تم حذفها
+    // 3. إرسال قائمة بمسارات الصور الموجودة التي تم تحديدها للحذف
+    // UPDATED: تغيير اسم الحقل إلى `removedImages` وضمها إلى string مفصول بفواصل.
+    // هذا يعتمد على أن الـ Backend يتوقع حقل واحد string لـ `removedImages`
     if (this.deletedImageUrls.length > 0) {
-      formData.append('deletedImages', this.deletedImageUrls.join(','));
-    } else {
-      formData.append('deletedImages', ''); // إرسال فارغ إذا لم يتم حذف أي صور
+      formData.append('removedImages', this.deletedImageUrls.join(','));
     }
 
-    // ملاحظة: لا نرسل existingImages كحقل منفصل بمساراتها كـ string،
-    // لأننا نعتمد على الباك إند لدمجها مع الصور الجديدة التي يتم رفعها كملفات.
-    // يجب على الباك إند:
-    // أ- حذف الصور المذكورة في 'deletedImages'.
-    // ب- حفظ الصور التي تصل في 'images' (NewGalleryFiles).
-    // ج- دمج الصور الجديدة التي تم حفظها مع الصور الموجودة سابقاً (من قاعدة البيانات) التي لم تُحذف، وتحديث حقل Images في قاعدة البيانات.
-
-    this.blogService.updateBlog(formData).subscribe({
-      next: () => {
-        alert('Blog post updated successfully!');
-        this.router.navigate(['/blogs']);
-      },
-      error: (err) => {
-        console.error('Error updating blog:', err);
-        alert('An error occurred while updating the post. You might need to be logged in.');
-        this.isSubmitting = false;
+    this.blogService.updateBlog(formData).pipe(
+      finalize(() => this.isSubmitting = false),
+      catchError(err => {
+        console.error('Error updating blog in component:', err);
+        alert(`An error occurred while updating the post: ${err.message || 'Please check console for details.'}`);
+        return of(null);
+      })
+    ).subscribe({
+      next: (response) => {
+        if (response) {
+          alert('Blog post updated successfully!');
+          this.router.navigate(['/blogs', this.blogId]);
+        }
       }
     });
   }

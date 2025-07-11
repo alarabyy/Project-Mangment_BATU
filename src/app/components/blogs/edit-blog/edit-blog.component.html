@@ -15,7 +15,7 @@
     <form [formGroup]="blogForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="title">Post Title</label>
-        <input type="text" id="title" formControlName="title" class="form-control">
+        <input type="text" id="title" formControlName="title" class="form-control" placeholder="Enter blog post title">
         <div *ngIf="title?.invalid && (title?.dirty || title?.touched)" class="error-message">
           <small *ngIf="title?.errors?.['required']">Title is required.</small>
         </div>
@@ -23,7 +23,7 @@
 
       <div class="form-group">
         <label for="content">Content</label>
-        <textarea id="content" formControlName="content" class="form-control" rows="10"></textarea>
+        <textarea id="content" formControlName="content" class="form-control" rows="10" placeholder="Write your blog post content here..."></textarea>
         <div *ngIf="content?.invalid && (content?.dirty || content?.touched)" class="error-message">
           <small *ngIf="content?.errors?.['required']">Content is required.</small>
           <small *ngIf="content?.errors?.['minlength']">Content must be at least 10 characters.</small>
@@ -33,11 +33,13 @@
       <!-- قسم تعديل الصورة الرئيسية -->
       <div class="form-group">
         <label>Header Image</label>
-        <div *ngIf="selectedHeaderImagePreview" class="image-preview-container">
-          <img [src]="selectedHeaderImagePreview" alt="Header Image Preview" class="img-preview">
+        <div class="image-preview-container">
+          <img *ngIf="selectedHeaderImagePreview" [src]="selectedHeaderImagePreview" alt="Header Image Preview" class="img-preview">
+          <span *ngIf="!selectedHeaderImagePreview" class="placeholder-text">No header image selected</span>
         </div>
         <input type="file" id="headerImage" class="file-input" (change)="onHeaderImageChange($event)" accept="image/*">
         <small class="form-text">Upload a new image to replace the current header image.</small>
+        <!-- يمكنك إضافة زر لمسح صورة الهيدر الحالية إذا أردت إزالتها بدون استبدال -->
       </div>
 
       <!-- قسم تعديل صور المعرض -->
@@ -49,11 +51,15 @@
           <h3>Current Images:</h3>
           <div *ngFor="let imageUrl of currentBlog.images" class="gallery-preview-item">
             <img [src]="imagesBaseUrl + imageUrl" alt="Current Gallery Image" class="img-preview">
-            <button type="button" class="remove-image-button" (click)="removeCurrentGalleryImage(imageUrl)">
+            <button type="button" class="remove-image-button" (click)="removeCurrentGalleryImage(imageUrl)" title="Remove this image from gallery">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
         </div>
+        <div *ngIf="!currentBlog.images || currentBlog.images.length === 0" class="info-message-small">
+          No current gallery images.
+        </div>
+
 
         <!-- إضافة صور معرض جديدة -->
         <div class="gallery-upload-area">
@@ -66,14 +72,14 @@
           <h3>New Images to Add:</h3>
           <div *ngFor="let preview of newGalleryPreviews; let i = index" class="gallery-preview-item">
             <img [src]="preview.url" alt="New Gallery Image Preview {{i}}" class="img-preview">
-            <button type="button" class="remove-image-button" (click)="removeNewGalleryImage(i)">
+            <button type="button" class="remove-image-button" (click)="removeNewGalleryImage(i)" title="Remove this new image from selection">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <button type="submit" class="submit-button" [disabled]="isSubmitting">
+      <button type="submit" class="submit-button" [disabled]="isSubmitting || blogForm.invalid">
         <i class="fa-solid fa-save"></i>
         {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
       </button>
