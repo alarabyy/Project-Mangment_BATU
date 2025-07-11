@@ -1,3 +1,31 @@
+/* edit-blog.component.css */
+/* Variables (تأكد من تعريف هذه المتغيرات في ملف styles.css العام أو في مكان يمكن الوصول إليه) */
+:root {
+  --text-color: #e0e0e0;
+  --subtle-text-color: #a0a0a0;
+  --surface-color: #2a2a2a;
+  --bg-color: #1a1a1a;
+  --border-color: #3a3a3a;
+  --border-color-translucent: rgba(58, 58, 58, 0.5);
+  --primary-accent: #6ee7b7;
+  --primary-accent-hover: #34d399;
+  --error-color: #ef4444;
+  --shadow-color-ambient: rgba(0, 0, 0, 0.3);
+  --shadow-color-light: rgba(0, 0, 0, 0.15);
+  --box-shadow-md: 0 4px 10px var(--shadow-color-ambient);
+  --box-shadow-lg: 0 8px 20px var(--shadow-color-ambient);
+  --border-radius-base: 8px;
+  --border-radius-large: 12px;
+  --border-radius-pill: 9999px;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-medium: 500;
+  --transition-speed-normal: 0.3s;
+  --transition-speed-fast: 0.15s;
+  --easing-curve-elegant: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-curve-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
 .form-page-container, .feedback-container {
   display: flex;
   justify-content: center;
@@ -73,14 +101,32 @@
 
 .file-input {
   width: 100%;
+  padding: 8px 0; /* تحسين مظهر ملف الإدخال */
 }
 
-.current-image-preview {
-  max-width: 200px;
-  max-height: 200px;
+/* إخفاء input file الأصلي لزر إضافة الصور في المعرض */
+.file-input-hidden {
+  display: none;
+}
+
+.image-preview-container {
+  margin-top: 1rem;
+  border: 1px dashed var(--border-color);
   border-radius: var(--border-radius-base);
-  border: 1px solid var(--border-color);
-  object-fit: cover;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 150px; /* ارتفاع ثابت لمعاينة الصورة الرئيسية */
+  margin-bottom: 1rem; /* مسافة بعد المعاينة */
+}
+
+.img-preview {
+  max-width: 100%;
+  max-height: 200px; /* التحكم في حجم المعاينة */
+  height: auto;
+  border-radius: var(--border-radius-base);
+  object-fit: contain; /* للتأكد من أن الصورة لا يتم اقتصاصها */
 }
 
 .form-text {
@@ -89,6 +135,85 @@
   font-size: 0.875rem;
   color: var(--subtle-text-color);
 }
+
+/* تنسيقات جديدة لأزرار إضافة وإزالة الصور */
+.add-gallery-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--surface-color);
+  color: var(--primary-accent);
+  border: 1px dashed var(--primary-accent);
+  padding: 10px 20px;
+  border-radius: var(--border-radius-base);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
+  width: 100%;
+  justify-content: center;
+  margin-top: 1rem; /* مسافة بعد عنوان الصور الحالية */
+}
+
+.add-gallery-button:hover {
+  background-color: var(--primary-accent-translucent);
+  color: var(--text-color);
+}
+
+.gallery-preview-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.gallery-preview-grid.current-gallery h3,
+.gallery-preview-grid.new-gallery h3 {
+  grid-column: 1 / -1; /* لجعل العنوان يمتد عبر جميع الأعمدة */
+  color: var(--subtle-text-color);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.gallery-preview-item {
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px; /* ارتفاع ثابت لعناصر المعرض */
+}
+
+.gallery-preview-item .img-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* لتغطية المساحة بالكامل */
+}
+
+.remove-image-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(248, 81, 73, 0.8); /* لون أحمر شبه شفاف */
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color var(--transition-speed-fast) ease;
+}
+
+.remove-image-button:hover {
+  background-color: var(--error-color);
+}
+
 
 .submit-button {
   width: 100%;
@@ -118,5 +243,12 @@
   cursor: not-allowed;
 }
 
+.error-message {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Spinner for loading states */
 .spinner { width: 50px; height: 50px; border: 5px solid var(--border-color); border-top-color: var(--primary-accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem auto; }
 @keyframes spin { 100% { transform: rotate(360deg); } }

@@ -1,19 +1,19 @@
-// allblogs.component.ts
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
-import { environment } from '../../../environments/environment';
 import { Blog } from '../../../models/Blog';
 import { BlogService } from '../../../Services/blog.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-All-blogs',
+  selector: 'app-all-blogs-user',
   standalone: true,
   imports: [CommonModule, RouterLink, DatePipe],
-  templateUrl: './allblogs.component.html',
-  styleUrls: ['./allblogs.component.css']
+  templateUrl: './all-blogs-user.component.html',
+  styleUrl: './all-blogs-user.component.css'
 })
-export class AllblogsComponent implements OnInit {
+export class AllBlogsUserComponent implements OnInit  {
+
   blogs: Blog[] = [];
   isLoading = true;
   error: string | null = null;
@@ -37,23 +37,5 @@ export class AllblogsComponent implements OnInit {
         this.isLoading = false;
       }
     });
-  }
-
-  onDelete(event: MouseEvent, id: number): void {
-    event.stopPropagation();
-    event.preventDefault();
-
-    if (confirm('Are you sure you want to delete this blog post? This action cannot be undone.')) {
-      this.blogService.deleteBlog(id).subscribe({
-        next: () => {
-          alert('Blog post deleted successfully!');
-          this.loadBlogs();
-        },
-        error: (err) => {
-          console.error(`Error deleting blog with id ${id}:`, err);
-          alert('An error occurred while deleting the post. You might need to be logged in.');
-        }
-      });
-    }
   }
 }

@@ -69,7 +69,7 @@ export class DepartmentListComponent implements OnInit {
 
   public addDepartment(): void {
     // تم تغيير المسار ليتوافق مع ملف التوجيه الخاص بك
-    this.router.navigate(['/Departments']);
+    this.router.navigate(['/Departments']); // Assuming '/Departments' routes to DepartmentCreateComponent
   }
 
   public editDepartment(departmentId: number): void {

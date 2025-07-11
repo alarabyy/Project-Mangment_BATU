@@ -1,6 +1,7 @@
+/* Add responsive adjustments */
 :host { display: block; background-color: var(--bg-color); }
 .container { max-width: 900px; margin: 2rem auto; padding: 2rem; font-family: var(--font-family-base); }
-.header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2.5rem; }
+.header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2.5rem; flex-wrap: wrap; /* Allow wrapping */ }
 .header-content { display: flex; align-items: center; gap: 1rem; }
 .header-icon { font-size: 2rem; color: var(--primary-accent); }
 .header-title { font-size: 1.75rem; font-weight: var(--font-weight-bold); margin: 0; }
@@ -14,14 +15,80 @@
 .department-form { display: flex; flex-direction: column; gap: 1.5rem; }
 .form-group { display: flex; flex-direction: column; }
 .form-row { display: flex; gap: 1.5rem; }
-.form-row .form-group { flex: 1; }
+.form-row .form-group { flex: 1; } /* Allows form groups in a row to take equal space */
 .form-group label { font-size: 0.95rem; color: var(--subtle-text-color); margin-bottom: 0.5rem; font-weight: var(--font-weight-medium); }
-.form-input { width: 100%; padding: 0.75rem 1rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-base); color: var(--text-color); font-size: 1rem; transition: all var(--transition-speed-fast) ease; }
+.form-input { width: 100%; padding: 0.75rem 1rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-base); color: var(--text-color); font-size: 1rem; transition: all var(--transition-speed-fast) ease; box-sizing: border-box; /* Include padding in width */ }
 .form-input:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 3px var(--primary-accent-translucent); }
 .form-input.ng-invalid.ng-touched { border-color: var(--error-color); }
-.error-text { color: var(--error-color); font-size: 0.85rem; margin-top: 0.5rem; height: 1em; }
-.success-message, .form-error-box { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: var(--border-radius-base); font-weight: var(--font-weight-semibold); margin-top: 1rem; border: 1px solid; }
+.error-text { color: var(--error-color); font-size: 0.85rem; margin-top: 0.5rem; height: 1em; } /* Maintain space even if no error */
+.success-message, .form-error-box { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: var(--border-radius-base); font-weight: var(--font-weight-semibold); margin-top: 1rem; border: 1px solid; word-break: break-word; /* Prevent overflow on small screens */ }
 .success-message { background-color: var(--primary-accent-translucent); color: var(--primary-accent); border-color: var(--primary-accent); }
 .form-error-box { background-color: rgba(248, 81, 73, 0.08); color: var(--error-color); border-color: var(--error-color); }
-.form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+.form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); flex-wrap: wrap; /* Allow buttons to wrap */ }
+.form-actions .btn { flex-grow: 1; /* Allow buttons to grow on small screens */ }
+
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem; /* Reduce padding on smaller screens */
+    margin: 1rem auto; /* Adjust margin */
+  }
+
+  .form-container {
+    padding: 1.5rem; /* Reduce padding */
+  }
+
+  .header {
+    flex-direction: column; /* Stack header items */
+    align-items: flex-start; /* Align items to the start */
+    gap: 1rem; /* Add space between stacked items */
+  }
+
+  .header-title {
+      font-size: 1.5rem; /* Reduce title size */
+  }
+
+  .form-row {
+    flex-direction: column; /* Stack form groups in a row */
+    gap: 1rem; /* Reduce gap */
+  }
+
+  .form-row .form-group {
+    flex: unset; /* Remove flex-grow when stacked */
+    width: 100%; /* Ensure stacked groups take full width */
+  }
+
+  .form-actions {
+    flex-direction: column; /* Stack action buttons */
+    gap: 1rem; /* Reduce gap */
+  }
+
+   .form-actions .btn {
+     width: 100%; /* Make buttons take full width when stacked */
+     text-align: center; /* Center button text */
+     justify-content: center; /* Center button content */
+   }
+
+}
+
+/* Optional: Further adjustments for very small screens */
+@media (max-width: 480px) {
+    .form-container {
+        padding: 1rem;
+    }
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    .header-icon {
+        font-size: 1.75rem;
+    }
+    .header-title {
+        font-size: 1.4rem;
+    }
+}
+
+

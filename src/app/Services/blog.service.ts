@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { Blog, BlogDetails } from '../models/Blog';
+import { AuthService } from './auth.service'; // <--- تم إضافة هذا الاستيراد
 
 @Injectable({
   providedIn: 'root'
@@ -10,31 +12,32 @@ import { Blog, BlogDetails } from '../models/Blog';
 export class BlogService {
   private apiUrl = `${environment.apiUrl}/blogs`;
 
-  constructor(private http: HttpClient) { }
+  // <--- تم حقن AuthService هنا
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
+  // <--- تم تعديل هذه الدالة لاستخدام AuthService لجلب الهيدرات
   private getAuthHeaders(): HttpHeaders {
-    // افترض أنك تحفظ التوكن في localStorage بعد تسجيل الدخول
-    const token = localStorage.getItem('auth_token');
-
-    // إذا لم يكن هناك توكن، أرجع هيدر فارغ
-    if (!token) {
-      return new HttpHeaders();
-    }
-
-    // إذا كان هناك توكن، أرجع الهيدر مع التوكن
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.authService.getAuthHeaders();
   }
 
-  // --- دوال لا تحتاج تسجيل دخول ---
   getAllBlogs(): Observable<Blog[]> {
     return this.http.get<Blog[]>(`${this.apiUrl}/get/all`);
   }
 
   getBlogDetails(id: number): Observable<BlogDetails> {
-    return this.http.get<BlogDetails>(`${this.apiUrl}/get/${id}`);
+    return this.http.get<BlogDetails>(`${this.apiUrl}/get/${id}`).pipe(
+      map(blog => {
+        if (typeof blog.images === 'string') {
+          return {
+            ...blog,
+            images: (blog.images as string).split(',').filter(s => s.trim() !== '')
+          };
+        }
+        return blog;
+      })
+    );
   }
 
-  // --- دوال تحتاج تسجيل دخول (تم تعديلها لتشمل الهيدر) ---
   createBlog(formData: FormData): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.post<any>(`${this.apiUrl}/create`, formData, { headers });

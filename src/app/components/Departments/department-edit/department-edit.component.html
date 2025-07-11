@@ -19,7 +19,7 @@
   </div>
 
   <div
-    *ngIf="errorMessage && !isLoading"
+    *ngIf="errorMessage && !isLoading && !saveSuccess"
     class="state-container error-message fade-in"
   >
     <i class="fas fa-exclamation-triangle"></i>
@@ -70,13 +70,29 @@
         </div>
       </div>
 
-      <input type="hidden" name="facultyId" [(ngModel)]="department.facultyId" />
-      <input type="hidden" name="headId" [(ngModel)]="department.headId" />
+      <!-- Hidden inputs for facultyId and headId to ensure they are sent with the update payload -->
+      <!-- These values will be loaded from the 'department' object, which now has them flattened -->
+      <div class="form-group" [class.hidden]="true"> <!-- Optional: Hide these fields visually -->
+        <label for="facultyId">Faculty ID</label>
+        <input type="number" id="facultyId" name="facultyId" [(ngModel)]="department.facultyId" required class="form-input" #facultyId="ngModel">
+        <div *ngIf="facultyId.invalid && (facultyId.dirty || facultyId.touched)" class="error-text">
+          <small>Faculty ID is required and must be a number.</small>
+        </div>
+      </div>
+      <div class="form-group" [class.hidden]="true"> <!-- Optional: Hide these fields visually -->
+        <label for="headId">Head ID</label>
+        <input type="number" id="headId" name="headId" [(ngModel)]="department.headId" required class="form-input" #headId="ngModel">
+        <div *ngIf="headId.invalid && (headId.dirty || headId.touched)" class="error-text">
+          <small>Head ID is required and must be a number.</small>
+        </div>
+      </div>
+
       <div *ngIf="saveSuccess" class="success-message">
         <i class="fas fa-check-circle"></i>
         Department updated successfully! Redirecting...
       </div>
 
+      <!-- Display general form error messages (e.g., from API calls) -->
       <div *ngIf="errorMessage && !saveSuccess" class="form-error-box">
         <i class="fas fa-exclamation-triangle"></i>
         <span>{{ errorMessage }}</span>
@@ -86,7 +102,7 @@
         <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">
           Cancel
         </button>
-        <button type="submit" class="btn btn-primary" [disabled]="isSaving || editForm.invalid">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving || editForm.invalid || facultyId.invalid || headId.invalid">
           <span *ngIf="!isSaving"><i class="fas fa-save"></i> Save Changes</span>
           <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
         </button>

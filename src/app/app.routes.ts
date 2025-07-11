@@ -37,6 +37,7 @@ import { DetailsBlogComponent } from './components/blogs/detail-blog/details-blo
 import { AllblogsComponent } from './components/blogs/allblogs/allblogs.component';
 import { EditBlogComponent } from './components/blogs/edit-blog/edit-blog.component';
 import { MyProjectsComponent } from './components/project/my-projects/my-projects.component';
+import { AllBlogsUserComponent } from './components/blogs/all-blogs-user/all-blogs-user.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -85,10 +86,12 @@ export const routes: Routes = [
 
 
   // blogs  Management
-  { path: 'blogs', component: AllblogsComponent },
+  { path: 'blogs', component: AllblogsComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'add-blog', component: AddblogsComponent , canActivate: [RoleGuard], data: { roles: ['admin'] }},
+  { path: 'edit-blog/:id', component: EditBlogComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
+
   { path: 'blog/:id', component: DetailsBlogComponent },
-  { path: 'add-blog', component: AddblogsComponent },
-  { path: 'edit-blog/:id', component: EditBlogComponent },
+  { path: 'AllBlogsUser', component: AllBlogsUserComponent },
   // --------------------- REDIRECTS & WILDCARD --------------------
   { path: '', redirectTo: 'Home', pathMatch: 'full' },
   { path: '**', redirectTo: '/Home' }

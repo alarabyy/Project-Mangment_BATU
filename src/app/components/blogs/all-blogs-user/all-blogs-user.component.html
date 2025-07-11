@@ -1,29 +1,18 @@
-<!-- تأكد من تضمين Font Awesome في مشروعك (في index.html مثلاً) -->
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
-
 <div class="page-container">
   <header class="page-header">
     <h1>The Tech Chronicle</h1>
-    <!-- زر "New Post" في الهيدر -->
-    <a routerLink="/add-blog" class="add-button">
-      <i class="fa-solid fa-plus"></i> New Post
-    </a>
   </header>
 
-  <!-- Loading State -->
   <div *ngIf="isLoading" class="feedback-state">
     <div class="spinner"></div>
     <p>Loading Posts...</p>
   </div>
-
-  <!-- Error State -->
   <div *ngIf="error" class="feedback-state error-state">
     <i class="fa-solid fa-cloud-slash"></i>
     <p>{{ error }}</p>
     <button (click)="loadBlogs()" class="retry-button">Try Again</button>
   </div>
 
-  <!-- Main Content (Blog List) -->
   <main *ngIf="!isLoading && !error" class="blogs-list">
     <a *ngFor="let blog of blogs" [routerLink]="['/blog', blog.id]" class="blog-card-link">
       <article class="blog-card">
@@ -32,25 +21,14 @@
         </div>
         <div class="card-content-wrapper">
           <h2 class="card-title">{{ blog.title }}</h2>
-          <!-- معلومات الميتا (التاريخ) بعد العنوان مباشرة -->
           <div class="card-meta">
             <i class="fa-regular fa-calendar"></i>
             <span>Published on {{ blog.publishedAt | date:'longDate' }}</span>
-          </div>
-          <!-- الأزرار في الأسفل -->
-          <div class="card-actions">
-            <a [routerLink]="['/edit-blog', blog.id]" (click)="$event.stopPropagation()" class="action-button edit">
-              <i class="fa-solid fa-pen-to-square"></i> Edit
-            </a>
-            <button (click)="onDelete($event, blog.id)" class="action-button delete">
-              <i class="fa-solid fa-trash-can"></i> Delete
-            </button>
           </div>
         </div>
       </article>
     </a>
 
-    <!-- Empty State -->
     <div *ngIf="blogs.length === 0 && !isLoading" class="feedback-state">
       <p>No blog posts found. Be the first to create one!</p>
     </div>

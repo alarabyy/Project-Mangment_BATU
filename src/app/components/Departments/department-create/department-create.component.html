@@ -2,58 +2,60 @@
   <header class="header">
     <div class="header-content">
       <i class="fas fa-plus-circle header-icon"></i>
-      <h1 class="header-title">Add New Department</h1>
+      <h1 class="header-title">Add New Department</h1> <!-- English Title -->
     </div>
-    <button (click)="cancel()" class="btn btn-secondary" title="Back to Departments List">
+    <button (click)="cancel()" class="btn btn-secondary" title="Back to Departments List"> <!-- English Title attribute -->
       <i class="fas fa-arrow-alt-circle-left"></i>
-      <span>Back to List</span>
+      <span>Back to List</span> <!-- English Button Text -->
     </button>
   </header>
 
   <div class="form-container fade-in">
+    <!-- Pass the form to the ngSubmit handler -->
     <form (ngSubmit)="createDepartment()" #departmentForm="ngForm" class="department-form">
       <div class="form-group">
-        <label for="name">Department Name</label>
+        <label for="name">Department Name</label> <!-- English Label -->
         <input type="text" id="name" name="name" [(ngModel)]="departmentModel.name" required class="form-input"
-               placeholder="e.g., Computer Science" minlength="3" maxlength="100" #name="ngModel">
+               placeholder="e.g., Computer Science" minlength="3" maxlength="100" #name="ngModel"> <!-- English Placeholder -->
         <div *ngIf="name.invalid && (name.dirty || name.touched)" class="error-text">
-          <small *ngIf="name.errors?.['required']">Department name is required.</small>
-          <small *ngIf="name.errors?.['minlength']">Name must be at least 3 characters.</small>
+          <small *ngIf="name.errors?.['required']">Department name is required.</small> <!-- English Error Message -->
+          <small *ngIf="name.errors?.['minlength']">Name must be at least 3 characters.</small> <!-- English Error Message -->
         </div>
       </div>
 
       <div class="form-group">
-        <label for="description">Description</label>
+        <label for="description">Description</label> <!-- English Label -->
         <textarea id="description" name="description" [(ngModel)]="departmentModel.description" required class="form-input"
-                  placeholder="Provide a brief description of the department." rows="4" minlength="10" #description="ngModel"></textarea>
+                  placeholder="Provide a brief description of the department." rows="4" minlength="10" #description="ngModel"></textarea> <!-- English Placeholder -->
         <div *ngIf="description.invalid && (description.dirty || description.touched)" class="error-text">
-          <small *ngIf="description.errors?.['required']">Description is required.</small>
-          <small *ngIf="description.errors?.['minlength']">Description must be at least 10 characters.</small>
+          <small *ngIf="description.errors?.['required']">Description is required.</small> <!-- English Error Message -->
+          <small *ngIf="description.errors?.['minlength']">Description must be at least 10 characters.</small> <!-- English Error Message -->
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="facultyId">Faculty ID</label>
+          <label for="facultyId">Faculty ID</label> <!-- English Label -->
           <input type="number" id="facultyId" name="facultyId" [(ngModel)]="departmentModel.facultyId" required class="form-input"
-                 placeholder="Enter numeric Faculty ID" min="1" #facultyId="ngModel">
+                 placeholder="Enter numeric Faculty ID" min="1" #facultyId="ngModel"> <!-- English Placeholder -->
           <div *ngIf="facultyId.invalid && (facultyId.dirty || facultyId.touched)" class="error-text">
-            <small>Valid Faculty ID is required.</small>
+            <small>Valid Faculty ID is required.</small> <!-- English Error Message -->
           </div>
         </div>
         <div class="form-group">
-          <label for="headId">Head ID</label>
+          <label for="headId">Head ID</label> <!-- English Label -->
           <input type="number" id="headId" name="headId" [(ngModel)]="departmentModel.headId" required class="form-input"
-                 placeholder="Enter numeric Head ID" min="1" #headId="ngModel">
+                 placeholder="Enter numeric Head ID" min="1" #headId="ngModel"> <!-- English Placeholder -->
           <div *ngIf="headId.invalid && (headId.dirty || headId.touched)" class="error-text">
-            <small>Valid Head ID is required.</small>
+            <small>Valid Head ID is required.</small> <!-- English Error Message -->
           </div>
         </div>
       </div>
 
+      <!-- Success message in English -->
       <div *ngIf="saveSuccess" class="success-message">
         <i class="fas fa-check-circle"></i>
-        Department created successfully! Redirecting...
+        Done! Redirecting... <!-- English Success Message -->
       </div>
 
       <div *ngIf="errorMessage && !saveSuccess" class="form-error-box">
@@ -62,10 +64,10 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">Cancel</button>
+        <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">Cancel</button> <!-- English Button Text -->
         <button type="submit" class="btn btn-primary" [disabled]="isSaving || departmentForm.invalid">
-          <span *ngIf="!isSaving"><i class="fas fa-plus"></i> Add Department</span>
-          <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Adding...</span>
+          <span *ngIf="!isSaving"><i class="fas fa-plus"></i> Add Department</span> <!-- English Button Text -->
+          <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Adding...</span> <!-- English Button Text -->
         </button>
       </div>
     </form>

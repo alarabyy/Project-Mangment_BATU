@@ -1,39 +1,45 @@
-<div *ngIf="isLoading || error" class="feedback-container">
-  <div *ngIf="isLoading" class="spinner"></div>
-  <p *ngIf="error">{{ error }}</p>
-  <a *ngIf="error" routerLink="/blogs" class="back-button">Go to All Posts</a>
-</div>
+<div class="page-container">
+  <div *ngIf="isLoading" class="feedback-state">
+    <div class="spinner"></div>
+    <p>Loading Blog Post...</p>
+  </div>
+  <div *ngIf="error" class="feedback-state error-state">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <p>{{ error }}</p>
+    <a routerLink="/blogs" class="retry-button">Go to All Posts</a>
+  </div>
 
-<div *ngIf="blog" class="detail-wrapper">
-  <article class="blog-detail-container">
-    <header class="detail-header">
-      <div class="header-image-container">
-        <img [src]="imagesBaseUrl + blog.headerImage" [alt]="blog.title" class="header-image">
-        <div class="image-overlay"></div>
+  <div *ngIf="blog" class="blog-detail-wrapper">
+    <header class="detail-hero">
+      <div class="hero-image-container">
+        <img [src]="imagesBaseUrl + blog.headerImage" [alt]="blog.title" class="hero-image">
+        <div class="hero-overlay"></div>
       </div>
-      <div class="header-content">
+      <div class="hero-content">
         <p class="detail-meta">
-          Published on {{ blog.publishedAt | date:'fullDate' }}
+          <i class="fa-regular fa-calendar"></i> Published on {{ blog.publishedAt | date:'fullDate' }}
         </p>
         <h1 class="detail-title">{{ blog.title }}</h1>
       </div>
     </header>
 
-    <section class="detail-content" [innerHTML]="blog.content"></section>
+    <main class="detail-main-content">
+      <section class="detail-article-content" [innerHTML]="blog.content"></section>
 
-    <section *ngIf="blog.images && blog.images.length > 0" class="gallery-section">
-      <h2>Gallery</h2>
-      <div class="image-gallery">
-        <div *ngFor="let imageUrl of blog.images" class="gallery-item">
-          <img [src]="imagesBaseUrl + imageUrl" alt="Gallery image">
+      <section *ngIf="blog.images && blog.images.length > 0" class="gallery-section">
+        <h2>More Images</h2>
+        <div class="image-gallery">
+          <div *ngFor="let imageUrl of blog.images" class="gallery-item">
+            <img [src]="imagesBaseUrl + imageUrl" [alt]="'Gallery image for ' + blog.title">
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
     <footer class="detail-footer">
-      <a routerLink="/blogs" class="back-button">
+      <!-- <a routerLink="/blogs" class="back-button">
         <i class="fa-solid fa-arrow-left"></i> Back to All Posts
-      </a>
+      </a> -->
     </footer>
-  </article>
+  </div>
 </div>

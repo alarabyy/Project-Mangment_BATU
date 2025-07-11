@@ -16,7 +16,7 @@ export class DetailsBlogComponent implements OnInit {
   blog: BlogDetails | null = null;
   isLoading = true;
   error: string | null = null;
-  imagesBaseUrl = environment.imagesBaseUrl;
+  imagesBaseUrl = environment.apiUploadUrl;
 
   constructor(
     private route: ActivatedRoute,
@@ -28,7 +28,7 @@ export class DetailsBlogComponent implements OnInit {
     if (id) {
       this.loadBlogDetails(+id);
     } else {
-      this.error = 'Blog post not found in URL.';
+      this.error = 'Blog post ID not found in URL.';
       this.isLoading = false;
     }
   }

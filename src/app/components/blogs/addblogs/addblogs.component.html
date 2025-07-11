@@ -28,17 +28,35 @@
       <div class="form-group">
         <label for="headerImage">Header Image (Required)</label>
         <input type="file" id="headerImage" class="file-input" (change)="onHeaderImageChange($event)" accept="image/*">
-        <div *ngIf="headerImage?.invalid && (headerImage?.dirty || headerImage?.touched)" class="error-message">
-          <small *ngIf="headerImage?.errors?.['required']">A header image is required.</small>
+        <!-- معاينة الصورة الرئيسية -->
+        <div *ngIf="selectedHeaderImagePreview" class="image-preview-container">
+          <img [src]="selectedHeaderImagePreview" alt="Header Image Preview" class="img-preview">
+        </div>
+        <div *ngIf="headerImageError" class="error-message">
+          <small>A header image is required.</small>
         </div>
       </div>
 
-       <div class="form-group">
-        <label for="images">Additional Images (Optional)</label>
-        <input type="file" id="images" class="file-input" (change)="onImagesChange($event)" accept="image/*" multiple>
+       <!-- قسم إضافة صور المعرض -->
+      <div class="form-group">
+        <label>Gallery Images (Optional)</label>
+        <div class="gallery-upload-area">
+          <input type="file" id="galleryImages" class="file-input-hidden" (change)="onAddGalleryImages($event)" accept="image/*" multiple #galleryInput>
+          <button type="button" class="add-gallery-button" (click)="galleryInput.click()">
+            <i class="fa-solid fa-plus"></i> Add Images
+          </button>
+        </div>
+        <div *ngIf="galleryPreviews.length > 0" class="gallery-preview-grid">
+          <div *ngFor="let preview of galleryPreviews; let i = index" class="gallery-preview-item">
+            <img [src]="preview.url" alt="Gallery Image Preview {{i}}" class="img-preview">
+            <button type="button" class="remove-image-button" (click)="removeGalleryImage(i)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <button type="submit" class="submit-button" [disabled]="blogForm.invalid || isSubmitting">
+      <button type="submit" class="submit-button" [disabled]="blogForm.invalid || headerImageError || isSubmitting">
         <i class="fa-solid fa-paper-plane"></i>
         {{ isSubmitting ? 'Publishing...' : 'Publish Post' }}
       </button>

@@ -1,30 +1,115 @@
+/* ========================================= */
+/* Global Variables & Base Styles          */
+/* ========================================= */
+:root {
+  /* Colors - Green Focused Palette for Dark Theme */
+  --primary-accent: #69F0AE; /* Bright Green A200 - For primary actions (Edit, Add) */
+  --primary-accent-hover: #00E676; /* Green A700 - Darker hover for green accents */
+  --primary-accent-translucent: rgba(105, 240, 174, 0.2); /* Translucent green */
+
+  /* Specific colors for Delete button (Red as requested) */
+  --error-color: #F44336; /* Red 500 - Standard red for destructive actions */
+  --error-color-hover: #D32F2F; /* Red 700 - Darker red for hover */
+  --delete-button-bg-base: rgba(244, 67, 54, 0.15); /* Translucent red for delete button */
+  --delete-button-text-color: #F44336; /* Red text for delete button base state */
+
+  /* Text Colors (Green Shades) */
+  --main-title-color: #F8F8F8; /* White/very light for the main page title as in image */
+  --text-color: #B9F6CA; /* Light Green A100 - For primary content text (titles, main descriptions) */
+  --subtle-text-color: #80CBC4; /* Teal A200 - Muted green for meta info and subtle text */
+  --dark-text-on-light-green: #1B5E20; /* Dark Green 800 - For text on bright green backgrounds (e.g., Add button) */
+  --white-text: #FFFFFF; /* White for text on solid dark backgrounds (e.g., delete button hover) */
+
+
+  /* Backgrounds & Surfaces (Dark Theme) */
+  --background-color: #1A1A1A; /* Very dark grey/almost black - Matches image background */
+  --surface-color: #2C2C2C; /* Dark grey for cards - Matches image card background */
+  --border-color: #424242; /* Dark grey for borders - Subtle on dark theme */
+  --border-color-translucent: rgba(105, 240, 174, 0.4); /* Vibrant green tint for hovered border */
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 2.5rem;
+  --spacing-xxl: 3rem;
+
+  /* Border Radius - Slightly larger for a distinctive look */
+  --border-radius-base: 10px;
+  --border-radius-large: 16px; /* More pronounced rounded corners for cards */
+  --border-radius-pill: 50px;
+
+  /* Shadows - Enhanced for depth and "wow" factor */
+  --box-shadow-sm: 0 2px 5px rgba(0,0,0,0.3);
+  --box-shadow-md: 0 8px 20px rgba(0,0,0,0.4); /* Stronger shadow */
+  --box-shadow-lg: 0 16px 40px rgba(0,0,0,0.6); /* Even stronger on hover */
+  --shadow-color-accent: rgba(105, 240, 174, 0.4); /* Greenish shadow for accent elements */
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Transitions - Smooth and elegant */
+  --transition-speed-fast: 0.2s;
+  --transition-speed-normal: 0.4s; /* Slightly longer for more noticeable animation */
+  --easing-curve-elegant: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* ease-out-quad */
+  --easing-curve-sharp: cubic-bezier(0.4, 0, 0.2, 1); /* standard material design */
+}
+
+/* Base body styles */
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--background-color); /* Dark background */
+  color: var(--text-color); /* Default text color (light green) */
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure all elements inherit box-sizing */
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* ========================================= */
+/* Layout & Container Styles               */
+/* ========================================= */
 .page-container {
   max-width: 950px;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: var(--spacing-xxl) var(--spacing-md);
+  background-color: var(--background-color); /* Ensure full container has dark background */
 }
 
 .page-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center horizontally */
+  margin-bottom: var(--spacing-xxl);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color); /* Subtle border matching image */
 }
 
 .page-header h1 {
   font-weight: var(--font-weight-bold);
   font-size: 2.75rem;
-  color: var(--text-color);
+  color: var(--main-title-color); /* White/very light for main title as in image */
+  margin: 0 0 var(--spacing-md) 0; /* Space below title before the button */
 }
 
+/* ========================================= */
+/* Buttons                                 */
+/* ========================================= */
 .add-button {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-xs);
   background-color: var(--primary-accent);
-  color: #000000;
+  color: var(--dark-text-on-light-green); /* Dark green text for contrast */
   padding: 14px 28px;
   text-decoration: none;
   border-radius: var(--border-radius-pill);
@@ -32,6 +117,8 @@
   font-weight: var(--font-weight-semibold);
   transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
   box-shadow: 0 4px 15px var(--shadow-color-accent);
+  border: none;
+  cursor: pointer;
 }
 
 .add-button:hover {
@@ -40,77 +127,9 @@
   box-shadow: 0 8px 25px var(--shadow-color-accent);
 }
 
-.blogs-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-}
-
-.blog-card-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-}
-
-.blog-card {
-  display: flex;
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-large);
-  box-shadow: var(--box-shadow-md);
-  overflow: hidden;
-  transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
-}
-
-.blog-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--box-shadow-lg);
-  border-color: var(--border-color-translucent);
-}
-
-.card-image-wrapper {
-  flex: 0 0 300px;
-}
-
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.card-content-wrapper {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.card-title {
-  font-size: 1.75rem;
-  font-weight: var(--font-weight-semibold);
-  margin: 0 0 0.75rem 0;
-  color: var(--text-color);
-}
-
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--subtle-text-color);
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-}
-
-.card-actions {
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  gap: 1rem;
-}
-
+/* Action buttons within cards */
 .action-button {
-  flex: 1;
+  flex: 1; /* Make buttons take equal width */
   padding: 10px;
   border-radius: var(--border-radius-base);
   border: 1px solid transparent;
@@ -121,33 +140,202 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--spacing-xs);
   text-decoration: none;
 }
 
 .action-button.edit {
   background-color: var(--primary-accent-translucent);
-  color: var(--primary-accent);
+  color: var(--primary-accent); /* Green text for edit button */
 }
 
 .action-button.edit:hover {
   background-color: var(--primary-accent);
-  color: #000;
+  color: var(--dark-text-on-light-green); /* Dark green text on hover */
   border-color: var(--primary-accent-hover);
 }
 
 .action-button.delete {
-  background-color: rgba(248, 81, 73, 0.1);
-  color: var(--error-color);
+  background-color: var(--delete-button-bg-base);
+  color: var(--delete-button-text-color); /* Red text for delete button */
 }
 
 .action-button.delete:hover {
-  background-color: var(--error-color);
-  color: #fff;
+  background-color: var(--error-color); /* Solid red background on hover */
+  color: var(--white-text); /* White text on red hover for clarity */
 }
 
-.feedback-state { text-align: center; color: var(--subtle-text-color); padding: 4rem 1rem; }
-.spinner { width: 50px; height: 50px; border: 5px solid var(--border-color); border-top-color: var(--primary-accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem auto; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-.error-state { color: var(--error-color); }
-.retry-button { background: var(--secondary-accent); color: white; border: none; padding: 10px 20px; border-radius: var(--border-radius-base); cursor: pointer; }
+/* ========================================= */
+/* Blog List & Card Styles                 */
+/* ========================================= */
+.blogs-list {
+  display: grid; /* Use grid for two-column layout */
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Two columns, responsive */
+  gap: var(--spacing-xl); /* Space between cards, ensures good separation */
+  justify-content: center; /* Center cards if there's only one or odd number */
+}
+
+.blog-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.blog-card {
+  display: flex;
+  flex-direction: column; /* Image on top, then content */
+  background-color: var(--surface-color); /* Dark card background */
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-large); /* More pronounced rounded corners */
+  box-shadow: var(--box-shadow-md);
+  overflow: hidden; /* Ensures content stays within rounded corners */
+  transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
+}
+
+.blog-card:hover {
+  transform: translateY(-8px); /* More pronounced lift on hover */
+  box-shadow: var(--box-shadow-lg); /* Larger, deeper shadow on hover */
+  border-color: var(--border-color-translucent); /* Greenish border highlight on hover */
+  filter: brightness(1.1); /* Subtle brightness increase for a glowing effect */
+}
+
+.card-image-wrapper {
+  width: 100%;
+  height: 200px; /* Fixed height for consistent image size in cards */
+  overflow: hidden;
+  /* Apply border-radius to top corners of image wrapper */
+  border-top-left-radius: var(--border-radius-large);
+  border-top-right-radius: var(--border-radius-large);
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image covers the area without distortion */
+  display: block;
+}
+
+.card-content-wrapper {
+  padding: var(--spacing-lg); /* Generous padding around content */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows content to push meta/actions down if needed */
+  color: var(--text-color); /* Default text in card content is light green */
+}
+
+.card-title {
+  font-size: 1.5rem; /* Adjusted for image's smaller card titles */
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--spacing-xs) 0; /* Small space below title */
+  color: var(--text-color); /* Title text is light green */
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--subtle-text-color); /* Meta text is muted light green */
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-md); /* Space before the actions section */
+}
+
+.card-actions {
+  margin-top: auto; /* Pushes action buttons to the very bottom of the card content */
+  padding-top: var(--spacing-sm); /* Padding above actions */
+  border-top: 1px solid var(--border-color); /* Separator line above actions */
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap; /* Allow buttons to wrap if screen is too small */
+}
+
+
+/* ========================================= */
+/* Feedback States (Loading, Error, Empty) */
+/* ========================================= */
+.feedback-state {
+  text-align: center;
+  color: var(--subtle-text-color); /* Feedback text is muted green */
+  padding: 4rem var(--spacing-sm);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--border-color);
+  border-top-color: var(--primary-accent); /* Green accent for spinner */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem auto;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error-state {
+  color: var(--error-color); /* Error state text color is red */
+}
+
+.error-state .fa-cloud-slash {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.retry-button {
+  background: var(--primary-accent); /* Green button */
+  color: var(--dark-text-on-light-green); /* Dark green text */
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  transition: background-color var(--transition-speed-fast) ease;
+}
+
+.retry-button:hover {
+  background-color: var(--primary-accent-hover);
+}
+
+/* ========================================= */
+/* Basic Responsiveness                    */
+/* ========================================= */
+@media (max-width: 768px) {
+  .blogs-list {
+    grid-template-columns: 1fr; /* Single column on smaller screens */
+  }
+
+  .card-image-wrapper {
+    height: 180px; /* Adjust image height for smaller screens */
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-xl); /* More space below header on small screens */
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .add-button {
+    width: 100%; /* Full width button on small screens */
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+
+  .action-button {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+}
