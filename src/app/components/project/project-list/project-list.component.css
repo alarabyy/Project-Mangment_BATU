@@ -193,3 +193,18 @@
 }
 .error-container i { color: var(--error-color); }
 .empty-message i { color: var(--subtle-text-color); } /* For folder-x icon if used */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem; /* Ensures gap between title and action group on wrap */
+}
+
+/* Add this new style for the button group */
+.list-header .header-actions {
+  display: flex;
+  gap: 0.75rem; /* Spacing between the Add and Analysis buttons */
+  flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+}

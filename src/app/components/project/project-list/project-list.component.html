@@ -1,9 +1,15 @@
 <div class="list-container">
   <header class="list-header">
     <h1>Project Dashboard</h1>
-    <a routerLink="/AddProject" class="btn btn-primary">
-      <i class="fas fa-plus"></i> Add New Project
-    </a>
+    <div class="header-actions"> <!-- NEW: Added a wrapper div for actions -->
+      <a routerLink="/AddProject" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Project
+      </a>
+      <!-- NEW BUTTON FOR ANALYSIS -->
+      <a routerLink="/ProjectAnalysis" class="btn btn-secondary">
+        <i class="fas fa-chart-bar"></i> Project Analysis
+      </a>
+    </div>
   </header>
 
   <!-- Conditional Rendering for Loading State -->

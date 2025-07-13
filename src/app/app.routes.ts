@@ -45,6 +45,7 @@ import { AllStaffAdminComponent } from './components/staff/all-staff-admin/all-s
 import { AddStaffComponent } from './components/staff/add-staff/add-staff.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
+import { ProjectAnalysisComponent } from './components/project/project-analysis/project-analysis.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -77,7 +78,7 @@ export const routes: Routes = [
   { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor' ] } },
   { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'my-projects', component: MyProjectsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
-
+  { path: 'ProjectAnalysis', component: ProjectAnalysisComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   // ------------------------ ADMIN-ONLY ROUTES ----------------------
   // General Admin
   { path: 'notifications', component: NotificationsPageComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },

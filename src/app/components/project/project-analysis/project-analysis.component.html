@@ -1,0 +1,184 @@
+<ng-container *ngIf="state$ | async as state">
+  <main class="analytics-container">
+    <header class="page-header">
+      <div class="header-content">
+        <h1>Project Analysis Dashboard</h1>
+        <p>In-depth insights into project statuses, categories, and technologies.</p>
+      </div>
+      <div class="header-filters">
+        <div class="filter-group">
+          <label for="category-filter">Category</label>
+          <select id="category-filter" (change)="onCategoryFilterChange($event)">
+            <option value="all">All Categories</option>
+            <option *ngFor="let category of uniqueCategories" [value]="category.toLowerCase()">{{ category }}</option>
+            <option value="uncategorized">Uncategorized</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="status-filter">Status</label>
+          <select id="status-filter" (change)="onStatusFilterChange($event)">
+            <option value="all">All Statuses</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="submitted">Submitted</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <ng-container *ngIf="state.isLoading">
+      <div class="analytics-grid skeleton-grid">
+        <div class="kpi-card-skeleton" *ngFor="let i of [1,2,3,4]"></div>
+        <div class="chart-card-skeleton large"></div>
+        <div class="chart-card-skeleton large"></div>
+        <div class="chart-card-skeleton large"></div>
+        <div class="chart-card-skeleton large"></div>
+        <div class="chart-card-skeleton full-width"></div>
+        <div class="chart-card-skeleton full-width"></div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="state.error && !state.isLoading" class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Loading Failed</h3>
+      <p>{{ state.error }}</p>
+      <button class="btn btn-primary" (click)="ngOnInit()">Retry</button>
+    </div>
+
+    <ng-container *ngIf="!state.isLoading && !state.error">
+      <div *ngIf="filteredProjects$ | async as projects">
+        <ng-container *ngIf="kpiData$ | async as kpiData">
+          <div class="analytics-grid">
+
+            <!-- KPI Cards -->
+            <div class="kpi-card">
+              <i class="fas fa-project-diagram kpi-icon"></i>
+              <div class="kpi-content">
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.total">0</span>
+                <span class="kpi-title">Total Projects</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <i class="fas fa-spinner kpi-icon ongoing-icon"></i>
+              <div class="kpi-content">
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.ongoing">0</span>
+                <span class="kpi-title">Ongoing Projects</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <i class="fas fa-check-circle kpi-icon submitted-icon"></i>
+              <div class="kpi-content">
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.submitted">0</span>
+                <span class="kpi-title">Submitted Projects</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <i class="fas fa-calendar-plus kpi-icon"></i>
+              <div class="kpi-content">
+                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.newLastMonth">0</span>
+                <span class="kpi-title">New Last 30 Days</span>
+              </div>
+            </div>
+
+            <!-- Project Status Distribution Chart (Doughnut) -->
+            <div class="chart-card large">
+              <h3 class="chart-title">Project Status Distribution</h3>
+              <div *ngIf="projectStatusDistributionOptions$ | async as options" class="chart-wrapper">
+                <apx-chart
+                  [series]="options.series!"
+                  [chart]="options.chart!"
+                  [labels]="options.labels!"
+                  [colors]="options.colors!"
+                  [legend]="options.legend!"
+                  [dataLabels]="options.dataLabels!"
+                  [plotOptions]="options.plotOptions!"
+                  [tooltip]="options.tooltip!">
+                </apx-chart>
+              </div>
+            </div>
+
+            <!-- New Projects Over Time Chart (Area) -->
+            <div class="chart-card large">
+                <h3 class="chart-title">New Projects (Last 30 Days)</h3>
+                <div *ngIf="newProjectsOverTimeOptions$ | async as options" class="chart-wrapper">
+                  <apx-chart
+                    [series]="options.series!"
+                    [chart]="options.chart!"
+                    [xaxis]="options.xaxis!"
+                    [yaxis]="options.yaxis!"
+                    [stroke]="options.stroke!"
+                    [tooltip]="options.tooltip!"
+                    [dataLabels]="options.dataLabels!"
+                    [grid]="options.grid!"
+                    [fill]="options.fill!"
+                    [colors]="options.colors!">
+                  </apx-chart>
+                </div>
+            </div>
+
+            <!-- Projects by Category Chart (Bar) -->
+            <div class="chart-card large">
+                <h3 class="chart-title">Projects by Category</h3>
+                <div *ngIf="projectsByCategoryOptions$ | async as options" class="chart-wrapper">
+                  <apx-chart
+                    [series]="options.series!"
+                    [chart]="options.chart!"
+                    [xaxis]="options.xaxis!"
+                    [yaxis]="options.yaxis!"
+                    [stroke]="options.stroke!"
+                    [tooltip]="options.tooltip!"
+                    [dataLabels]="options.dataLabels!"
+                    [grid]="options.grid!"
+                    [fill]="options.fill!"
+                    [colors]="options.colors!"
+                    [plotOptions]="options.plotOptions!"
+                    [legend]="options.legend!">
+                  </apx-chart>
+                </div>
+            </div>
+
+            <!-- Projects by Department Chart (Bar) -->
+            <div class="chart-card large">
+                <h3 class="chart-title">Projects by Department</h3>
+                <div *ngIf="projectsByDepartmentOptions$ | async as options" class="chart-wrapper">
+                  <apx-chart
+                    [series]="options.series!"
+                    [chart]="options.chart!"
+                    [xaxis]="options.xaxis!"
+                    [yaxis]="options.yaxis!"
+                    [stroke]="options.stroke!"
+                    [tooltip]="options.tooltip!"
+                    [dataLabels]="options.dataLabels!"
+                    [grid]="options.grid!"
+                    [fill]="options.fill!"
+                    [colors]="options.colors!"
+                    [plotOptions]="options.plotOptions!"
+                    [legend]="options.legend!">
+                  </apx-chart>
+                </div>
+            </div>
+
+            <!-- Top Technologies Chart (Horizontal Bar) -->
+            <div class="chart-card full-width">
+              <h3 class="chart-title">Top Technologies Used</h3>
+               <div *ngIf="topTechnologiesOptions$ | async as options" class="chart-wrapper">
+                <apx-chart
+                  [series]="options.series!"
+                  [chart]="options.chart!"
+                  [plotOptions]="options.plotOptions!"
+                  [xaxis]="options.xaxis!"
+                  [yaxis]="options.yaxis!"
+                  [grid]="options.grid!"
+                  [tooltip]="options.tooltip!"
+                  [legend]="options.legend!"
+                  [colors]="options.colors!"
+                  [dataLabels]="options.dataLabels!">
+                </apx-chart>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </main>
+</ng-container>
