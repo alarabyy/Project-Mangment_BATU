@@ -1,17 +1,22 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { RoleGuard } from './guards/role.guard';
 
 // --- General Public Components ---
 import { HomeComponent } from './components/home/home.component';
-import { LoginComponent } from './components/login/login.component';
-import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { PrivacyPolicyComponent } from './components/Components/privacy/privacy.component';
 import { documentaionComponent } from './components/Components/documentaion/documentaion.component';
 import { UnauthorizedComponent } from './components/Components/unauthorized/unauthorized.component';
 
+// --- New Auth Components ---
+import { ForgotPasswordComponent } from './components/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
+
+
 // --- User-Specific Protected Components ---
 import { MyProfileComponent } from './components/my-profile/my-profile.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { UserProfileComponent } from './components/User/user-profile/user-profile.component';
 
 // --- Project Management Components ---
 import { ProjectListComponent } from './components/project/project-list/project-list.component';
@@ -41,6 +46,8 @@ import { AllBlogsUserComponent } from './components/blogs/all-blogs-user/all-blo
 import { AllStaffComponent } from './components/staff/all-staff/all-staff.component';
 import { AllStaffAdminComponent } from './components/staff/all-staff-admin/all-staff-admin.component';
 import { AddStaffComponent } from './components/staff/add-staff/add-staff.component';
+import { LoginComponent } from './components/auth/login/login.component';
+import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -51,13 +58,23 @@ export const routes: Routes = [
   { path: 'Home', component: HomeComponent },
   { path: 'documentaion', component: documentaionComponent },
   { path: 'Privacy', component: PrivacyPolicyComponent },
-  { path: 'SignUp', component: SignUpComponent },
   { path: 'Login', component: LoginComponent },
   { path: 'unauthorized', component: UnauthorizedComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'blog/:id', component: DetailsBlogComponent },
+  { path: 'AllBlogsUser', component: AllBlogsUserComponent },
+  { path: 'staff', component: AllStaffComponent },
+
+  // --- SignUp is now an Admin-only route ---
+  { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+
 
   // ---------------------- PROTECTED USER ROUTES --------------------
   { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
   { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
+  { path: 'user/profile/:id', component: UserProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
+
 
   // -------------------- PROJECT MANAGEMENT ROUTES ------------------
   { path: 'ProjectDetails/:id', component: ProjectDetailsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
@@ -93,12 +110,7 @@ export const routes: Routes = [
   { path: 'add-blog', component: AddblogsComponent , canActivate: [RoleGuard], data: { roles: ['admin'] }},
   { path: 'edit-blog/:id', component: EditBlogComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
-  { path: 'blog/:id', component: DetailsBlogComponent },
-  { path: 'AllBlogsUser', component: AllBlogsUserComponent },
-
-
   // staff  Management
-  { path: 'staff', component: AllStaffComponent },
   { path: 'admin/staff', component: AllStaffAdminComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
   { path: 'admin/staff/add', component: AddStaffComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
 

@@ -1,3 +1,4 @@
+// src/app/app.component.ts
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from './components/Components/nav/nav.component';
@@ -13,7 +14,18 @@ import { NavigationControlsComponent } from "./components/Components/navigation-
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, RouterOutlet, NavComponent, CommonModule, FooterComponent, FloatingControlsComponent, LoaderComponent, GeneralPopupComponent],
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    FormsModule,
+    RouterOutlet,
+    NavComponent,
+    FooterComponent,
+    FloatingControlsComponent,
+    LoaderComponent,
+    GeneralPopupComponent,
+    NavigationControlsComponent
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

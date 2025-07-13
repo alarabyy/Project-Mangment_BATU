@@ -1,0 +1,52 @@
+<!-- src/app/components/User/user-profile/user-profile.component.html -->
+<div class="user-profile-container">
+  <ng-container *ngIf="userProfile$ | async as user; else loadingOrError">
+    <div class="profile-card">
+      <div class="profile-header">
+        <img *ngIf="user.imageUrl" [src]="user.imageUrl" alt="User Avatar" class="profile-avatar">
+        <div class="user-details">
+          <h1>{{ user.firstName }} {{ user.lastName }}</h1>
+          <p class="role-text">{{ user.role }}</p>
+        </div>
+      </div>
+
+      <div class="profile-info">
+        <div class="info-item">
+          <i class="fas fa-envelope"></i>
+          <span>Email:</span>
+          <p>{{ user.email }}</p>
+        </div>
+        <div class="info-item" *ngIf="user.id">
+          <i class="fas fa-id-badge"></i>
+          <span>User ID:</span>
+          <p>{{ user.id }}</p>
+        </div>
+        <div class="info-item" *ngIf="user.gender !== null && user.gender !== undefined">
+          <i class="fas fa-venus-mars"></i>
+          <span>Gender:</span>
+          <p>{{ user.gender === 1 ? 'Male' : (user.gender === 0 ? 'Female' : 'Not Specified') }}</p>
+        </div>
+      </div>
+
+      <!-- أزرار الإجراءات إذا كنت تريد تعديل هذا الملف الشخصي مباشرة -->
+      <!-- <div class="profile-actions">
+        <button class="edit-profile-btn">Edit Profile</button>
+      </div> -->
+    </div>
+  </ng-container>
+
+  <ng-template #loadingOrError>
+    <div *ngIf="loadingError; else loadingState" class="error-panel">
+      <i class="fas fa-exclamation-circle"></i>
+      <h2>Error Loading Profile</h2>
+      <p>{{ loadingError }}</p>
+      <button class="back-btn" (click)="router.navigate(['/users'])">Back to User List</button>
+    </div>
+    <ng-template #loadingState>
+      <div class="loading-panel">
+        <div class="spinner"></div>
+        <p>Loading user profile...</p>
+      </div>
+    </ng-template>
+  </ng-template>
+</div>

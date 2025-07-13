@@ -1,9 +1,9 @@
 <div class="auth-page-container">
-  <!-- الخلفيات المتحركة -->
+  <!-- Background animations -->
   <div class="aurora-background"></div>
   <div class="animated-grid-background"></div>
 
-  <!-- حاوية الفورم -->
+  <!-- Form container -->
   <div class="auth-form-container">
     <div class="form-header">
       <div class="header-icon-wrapper">
@@ -15,7 +15,7 @@
 
     <form [formGroup]="signupForm" (ngSubmit)="submitSignup()" class="auth-form" novalidate>
 
-      <!-- صف الأسماء -->
+      <!-- Name row -->
       <div class="form-row three-columns">
         <div class="input-field-wrapper">
           <input id="firstName" type="text" class="form-control" placeholder=" " formControlName="firstName" [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched"/>
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <!-- صف البريد الإلكتروني وكلمة المرور -->
+      <!-- Email and Password row -->
       <div class="input-field-wrapper">
         <input id="email" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="f['email'].invalid && f['email'].touched"/>
         <label for="email">University Email</label>
@@ -45,7 +45,7 @@
         </p>
       </div>
 
-
+      <!-- Single "Show Password" toggle -->
       <div class="options-wrapper">
         <label class="toggle-switch">
           <input type="checkbox" (click)="togglePassword()">
@@ -54,8 +54,7 @@
         <span>Show Password</span>
       </div>
 
-      
-      <!-- صف الجنس والدور -->
+      <!-- Gender and Role row -->
       <div class="form-row two-columns">
         <div class="radio-group-wrapper">
           <label class="radio-group-label">Gender</label>
@@ -69,7 +68,6 @@
           </div>
         </div>
 
-        <!-- FIX: تمت إضافة خيار Admin هنا -->
         <div class="radio-group-wrapper">
           <label class="radio-group-label">I am a</label>
           <div class="radio-group role-group">
@@ -84,14 +82,6 @@
             </label>
           </div>
         </div>
-      </div>
-
-      <div class="options-wrapper">
-        <label class="toggle-switch">
-          <input type="checkbox" (click)="togglePassword()">
-          <span class="slider"></span>
-        </label>
-        <span>Show Password</span>
       </div>
 
       <button type="submit" class="btn-submit-glow" [disabled]="signupForm.invalid || isSubmitting">

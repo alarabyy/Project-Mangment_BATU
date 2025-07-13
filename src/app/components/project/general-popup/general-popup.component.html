@@ -1,4 +1,4 @@
-<!-- نستخدم كلاسات الأنيميشن هنا -->
+<!-- src/app/components/project/general-popup/general-popup.component.html -->
 <div class="popup-overlay"
      *ngIf="state.isOpen"
      [class.fade-out]="isClosing"
@@ -9,7 +9,6 @@
        [class.slide-out-down]="isClosing"
        (click)="$event.stopPropagation()">
 
-    <!-- الأيقونة التي تطفو فوق الصندوق -->
     <div class="popup-icon-wrapper">
       <div class="popup-icon">
         <i class="fas" [ngClass]="{
@@ -20,18 +19,14 @@
       </div>
     </div>
 
-    <!-- المحتوى -->
     <h2 class="popup-title">{{ state.title }}</h2>
     <p class="popup-message" [innerHTML]="state.message"></p>
 
-    <!-- الأزرار -->
     <div class="popup-actions">
-      <!-- FIX: تم ربط زر الإلغاء بـ onCancelClick() -->
       <button *ngIf="state.type === 'confirm'" class="btn btn-secondary" (click)="onCancelClick()">
         {{ state.cancelButtonText }}
       </button>
 
-      <!-- FIX: تم ربط الزر الرئيسي بـ onConfirmClick() -->
       <button class="btn btn-primary" (click)="onConfirmClick()">
         {{ state.confirmButtonText }}
       </button>

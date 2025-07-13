@@ -1,8 +1,9 @@
+// src/app/pages/login/login.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../Services/auth.service';
+import { AuthService } from '../../../Services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -65,12 +66,10 @@ export class LoginComponent implements OnInit {
       case 'admin':
         this.router.navigate(['/Home']);
         break;
-      // ================= 🔽 تم التعديل هنا 🔽 =================
       case 'doctor':
-      case 'professor': // تعامل مع professor بنفس طريقة doctor
+      case 'professor':
         this.router.navigate(['/Home']);
         break;
-      // ========================================================
       case 'student':
         this.router.navigate(['/Home']);
         break;

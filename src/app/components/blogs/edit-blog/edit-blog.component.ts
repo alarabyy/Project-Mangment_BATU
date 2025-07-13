@@ -161,25 +161,13 @@ export class EditBlogComponent implements OnInit {
       formData.append('headerImage', this.selectedHeaderImage, this.selectedHeaderImage.name);
     }
 
-    // 2. تجميع أسماء الصور النهائية للمعرض في حقل 'addedImages' (وفقاً لـ Backend API الذي قدمته)
-    const finalGalleryImageNames: string[] = [];
-
-    // إضافة أسماء الصور الموجودة (التي لم تُحذف بعد من currentBlog.images)
-    if (this.currentBlog && this.currentBlog.images.length > 0) {
-      finalGalleryImageNames.push(...this.currentBlog.images);
-    }
-    // إضافة أسماء الملفات الجديدة (هنا يجب أن يكون الـ Backend قد تلقاها في خطوة رفع منفصلة أو أنه يعالج الأسماء فقط)
+    // 2. تجميع ملفات الصور الجديدة للمعرض وإضافتها كـ File objects
+    // هذا هو السطر الحيوي الذي يرسل الملفات كـ binary data كما يتوقعها الباك إند
     this.newGalleryFiles.forEach(file => {
-      finalGalleryImageNames.push(file.name); // نرسل أسماء الملفات الجديدة
+      formData.append('addedImages', file, file.name);
     });
 
-    // إرسال addedImages كـ Array<string> (كل اسم صورة كحقل منفصل باسم 'addedImages')
-    finalGalleryImageNames.forEach(imageName => {
-        formData.append('addedImages', imageName);
-    });
-
-    // 3. إرسال قائمة بمسارات الصور الموجودة التي تم تحديدها للحذف
-    // (وفقاً لـ Backend API الذي قدمته: حقل `removedImages` من نوع string مفصول بفواصل)
+    // 3. إرسال قائمة بمسارات الصور الموجودة التي تم تحديدها للحذف (كسلسلة نصية مفصولة بفواصل)
     if (this.deletedImageUrls.length > 0) {
       formData.append('removedImages', this.deletedImageUrls.join(','));
     }
@@ -195,6 +183,7 @@ export class EditBlogComponent implements OnInit {
       next: (response) => {
         if (response) {
           alert('Blog post updated successfully!');
+          // بعد النجاح، يتم إعادة التوجيه لصفحة التفاصيل لتحميل البيانات المحدثة
           this.router.navigate(['/blogs', this.blogId]);
         }
       }

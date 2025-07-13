@@ -23,6 +23,8 @@ export class ChatService {
       return of('API Key is not configured. Please contact the administrator.');
     }
 
+    // هنا ChatService لا يضيف Authorization Header، وهذا صحيح.
+    // الـ Interceptor هو من كان يضيفها بشكل خاطئ.
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const body = { contents: [{ parts: [{ text: prompt }] }] };
 

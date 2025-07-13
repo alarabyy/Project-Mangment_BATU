@@ -150,3 +150,169 @@
 .error-container .icon-wrapper { width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; background-color: rgba(248, 81, 73, 0.1); border-radius: 50%; margin-bottom: 1.5rem; }
 .error-container svg { width: 40px; height: 40px; stroke: var(--error-color); }
 .error-container h2 { color: var(--text-color); margin-bottom: 0.5rem; }
+
+/* NEW: Styles for forms */
+.form-card {
+  margin-top: 2rem;
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 5px 20px var(--shadow-color-light);
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: border-color var(--transition-speed-fast) ease, box-shadow var(--transition-speed-fast) ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+}
+
+.form-control.is-invalid {
+  border-color: var(--error-color, #dc3545);
+}
+
+.invalid-feedback {
+  color: var(--error-color, #dc3545);
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.submit-btn, .cancel-btn {
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-speed-fast) ease;
+  flex-grow: 1; /* Make buttons expand */
+  text-align: center;
+}
+
+.submit-btn {
+  background-color: var(--primary-accent);
+  color: white;
+  border: 1px solid var(--primary-accent);
+}
+
+.submit-btn:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.submit-btn:disabled {
+  background-color: var(--disabled-color);
+  border-color: var(--disabled-color);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.cancel-btn:hover {
+  background-color: var(--bg-color);
+  color: var(--primary-accent);
+  border-color: var(--primary-accent);
+}
+
+/* NEW: Success Message styles */
+.success-container {
+  /* Inherits existing status-container styles */
+  background-color: var(--surface-color); /* Matches info cards */
+  border: 1px solid var(--success-color-light); /* Light border */
+  color: var(--success-color-dark); /* Darker text for contrast */
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 5px 20px rgba(0, 128, 0, 0.1); /* Subtle green shadow */
+}
+
+.success-container .icon-wrapper {
+  background-color: rgba(var(--success-rgb), 0.1); /* Light green background */
+}
+
+.success-container svg {
+  stroke: var(--success-color); /* Green icon */
+}
+
+.success-container h2 {
+  color: var(--success-color-darker); /* Even darker green for heading */
+}
+
+/* NEW: Retry button for error state */
+.retry-btn {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-accent);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  transition: background-color 0.2s ease;
+}
+
+.retry-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Adjust existing error container styles for consistency */
+.error-container {
+  background-color: var(--surface-color);
+  border: 1px solid var(--error-color-light);
+  color: var(--error-color-dark);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 5px 20px rgba(255, 0, 0, 0.1);
+}
+
+.error-container .icon-wrapper {
+  background-color: rgba(var(--error-rgb), 0.1);
+}
+
+.error-container svg {
+  stroke: var(--error-color);
+}
+
+.error-container h2 {
+  color: var(--error-color-darker);
+}
+
+/* Ensure the layout adapts to forms */
+@media (min-width: 992px) {
+  .profile-main-content {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Maintain gap between sections */
+  }
+}

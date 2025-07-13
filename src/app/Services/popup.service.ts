@@ -1,3 +1,4 @@
+// src/app/Services/popup.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -31,14 +32,14 @@ export class PopupService {
     });
   }
 
-  showError(title: string, message: string) {
+  showError(title: string, message: string, onConfirm?: () => void) {
     this.popupState.next({
       isOpen: true,
       type: 'error',
       title,
       message,
       confirmButtonText: 'Close',
-      onConfirm: () => this.close(),
+      onConfirm: onConfirm || (() => this.close()),
     });
   }
 

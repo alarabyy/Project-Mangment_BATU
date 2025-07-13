@@ -1,8 +1,11 @@
+<!-- src/app/pages/user-management/user-management.component.html -->
 <ng-container *ngIf="state$ | async as state">
   <main class="user-management-container">
     <header class="page-header">
       <div class="header-content">
+        <!-- زر جديد بتصميم محسن للانتقال إلى تحليلات المستخدمين -->
         <button class="custom-nav-btn">
+          <!-- Use routerLink for Angular navigation -->
           <a routerLink="/user-analytics" routerLinkActive="active-link">
             <span class="menu-icon"><i class="fas fa-chart-line"></i></span>
             <span class="menu-text">User Analytics</span>
@@ -13,53 +16,125 @@
       </div>
       <div class="header-actions">
         <div class="search-box">
-          <i class="fas fa-search search-icon"></i>
-          <input type="text" placeholder="Search by ID, name, or email..." (input)="onSearch($event)" aria-label="Search users">
+          <i class="fas fa-search search-icon"></i> <!-- Uncommented search icon -->
+          <input
+            type="text"
+            placeholder="Search by ID, name, or email..."
+            (input)="onSearch($event)"
+            aria-label="Search users"
+          />
         </div>
       </div>
     </header>
 
-    <div class="user-list">
+    <div class="user-cards-wrapper">
+      <!-- حالة التحميل (هيكل البطاقات الهيكلي) -->
       <ng-container *ngIf="state.isLoading">
-        <div class="user-row-skeleton" *ngFor="let i of [1,2,3,4,5]">
-          <div class="info-skeleton">
-            <div class="line long"></div>
-            <div class="line short"></div>
+        <div class="card-grid">
+          <div class="user-card-skeleton" *ngFor="let i of [1, 2, 3, 4, 5]">
+            <div class="skeleton-header">
+              <div class="line long"></div>
+              <div class="line short"></div>
+            </div>
+            <div class="skeleton-details">
+              <div class="line xs"></div>
+              <div class="line sm"></div>
+            </div>
+            <div class="skeleton-actions">
+              <div class="line action-btn-skeleton"></div>
+              <div class="line action-btn-skeleton"></div>
+            </div>
           </div>
         </div>
       </ng-container>
 
-      <div *ngIf="state.error && !state.isLoading" class="error-message">
+      <!-- حالة الخطأ -->
+      <div *ngIf="state.error && !state.isLoading" class="state-message error-message">
         <i class="fas fa-exclamation-triangle"></i>
         <h2>An Error Occurred</h2>
         <p>{{ state.error }}</p>
       </div>
 
+      <!-- المحتوى الرئيسي (بطاقات المستخدمين) -->
       <ng-container *ngIf="!state.isLoading && !state.error">
         <div *ngIf="filteredUsers$ | async as users">
-          <div *ngIf="users.length > 0; else emptyState" class="feed">
-            <!-- [تم التصحيح] كل الخصائص هنا تستخدم camelCase/lowercase -->
-            <a *ngFor="let user of users; trackBy: trackById; let i = index" [routerLink]="['/user/profile', user.id]" class="user-row" [style.--animation-delay]="i * 50 + 'ms'" title="View {{ user.firstName }}'s Profile">
-              <div class="user-info">
-                <h3 class="user-name">{{ user.firstName }} {{ user.lastname }}</h3>
-                <p class="user-email">{{ user.email }}</p>
+          <div *ngIf="users.length > 0; else emptyState" class="card-grid">
+            <div class="user-card" *ngFor="let user of users; trackBy: trackById; let i = index"
+                 [style.--animation-delay]="i * 70 + 'ms'"> <!-- تأثير حركي متتالي -->
+
+              <!-- رأس البطاقة / معلومات المستخدم -->
+              <div class="card-header">
+                <!-- وضع التعديل للمستخدم -->
+                <ng-container *ngIf="editingUserId === user.id && editedUser">
+                  <div class="user-edit-form">
+                    <div class="form-group">
+                      <label for="firstName-{{ user.id }}">First Name</label>
+                      <input id="firstName-{{ user.id }}" type="text" [(ngModel)]="editedUser.firstName" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="lastName-{{ user.id }}">Last Name</label>
+                      <input id="lastName-{{ user.id }}" type="text" [(ngModel)]="editedUser.lastname">
+                    </div>
+                    <div class="form-group">
+                      <label for="email-{{ user.id }}">Email</label>
+                      <input id="email-{{ user.id }}" type="email" [(ngModel)]="editedUser.email" required>
+                    </div>
+                  </div>
+                </ng-container>
+
+                <!-- وضع العرض للمستخدم -->
+                <ng-container *ngIf="editingUserId !== user.id">
+                  <a [routerLink]="['/user/profile', user.id]" class="user-profile-link" title="View {{ user.firstName }}'s Profile">
+                    <h3 class="user-name">{{ user.firstName }} {{ user.lastname }}</h3>
+                    <p class="user-email">{{ user.email }}</p>
+                  </a>
+                </ng-container>
               </div>
-              <div class="user-id-container">
-                <span class="user-id">ID: {{user.id}}</span>
+
+              <!-- جسم البطاقة / التفاصيل -->
+              <div class="card-body">
+                <div class="detail-item">
+                  <span class="detail-label">ID:</span>
+                  <span class="user-id-value">{{ user.id }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Role:</span>
+                  <span class="role-badge" [ngClass]="getRoleInfo(user.role).name.toLowerCase()">
+                    <i class="fas" [ngClass]="getRoleInfo(user.role).icon"></i>
+                    <span>{{ getRoleInfo(user.role).name }}</span>
+                  </span>
+                </div>
               </div>
-              <div class="user-role">
-                <span class="role-badge" [ngClass]="getRoleInfo(user.role).name.toLowerCase()">
-                  <i class="fas" [ngClass]="getRoleInfo(user.role).icon"></i>
-                  <span>{{ getRoleInfo(user.role).name }}</span>
-                </span>
+
+              <!-- تذييل البطاقة / الإجراءات -->
+              <div class="card-footer" *ngIf="isAdmin()">
+                <!-- أزرار وضع التعديل -->
+                <ng-container *ngIf="editingUserId === user.id">
+                  <button class="action-btn save-btn" (click)="saveEdit()" title="Save Changes">
+                    <i class="fas fa-check"></i> Save
+                  </button>
+                  <button class="action-btn cancel-btn" (click)="cancelEdit()" title="Cancel Editing">
+                    <i class="fas fa-times"></i> Cancel
+                  </button>
+                </ng-container>
+                <!-- أزرار وضع العرض -->
+                <ng-container *ngIf="editingUserId !== user.id">
+                  <button class="action-btn edit-btn" (click)="startEdit(user)" title="Edit User">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="action-btn delete-btn" (click)="deleteUser(user.id)" title="Delete User">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </ng-container>
               </div>
-            </a>
+            </div>
           </div>
         </div>
       </ng-container>
 
+      <!-- حالة لا توجد بيانات -->
       <ng-template #emptyState>
-        <div class="empty-state-container">
+        <div class="state-message empty-state-container">
           <i class="fas fa-users-slash empty-icon"></i>
           <h2>No Users Found</h2>
           <p>The list is empty or no users match your search criteria.</p>

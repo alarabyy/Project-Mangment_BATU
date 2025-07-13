@@ -1,3 +1,4 @@
+// src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -9,13 +10,26 @@ export interface UserProfile {
   id: string;
   email: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   imageUrl: string | null;
-  role: string | string[];
+  role: string | number;
+  gender?: number;
 }
 
 export interface LoginResponse {
   token: string;
+}
+
+// New interface for Forgot Password Request body
+export interface PasswordResetRequest {
+  token: string;
+  newPassword: string;
+}
+
+// NEW: Interface for Change Password Request body (for logged-in users)
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }
 
 @Injectable({
@@ -48,6 +62,22 @@ export class AuthService {
     );
   }
 
+  // New method for Forgot Password
+  public forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.authApiUrl}/forgot-password?email=${encodeURIComponent(email)}`, null);
+  }
+
+  // New method for Reset Password (for forgotten password flow)
+  public resetPassword(request: PasswordResetRequest): Observable<any> {
+    return this.http.post(`${this.authApiUrl}/reset-password`, request);
+  }
+
+  // NEW: Method to change password for a logged-in user
+  public changePassword(request: ChangePasswordRequest): Observable<any> {
+    // The endpoint is /api/auth/change-password
+    return this.http.post(`${this.authApiUrl}/change-password`, request);
+  }
+
   public logout(): void {
     localStorage.removeItem(this.authTokenKey);
     this._isAuthenticated.next(false);
@@ -59,10 +89,11 @@ export class AuthService {
     if (!userId) {
       const errorMsg = "[AuthService] Cannot fetch profile, User ID not found in token.";
       console.error(errorMsg);
+      this.logout();
       return throwError(() => new Error(errorMsg));
     }
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
-    return this.http.get<UserProfile>(profileUrl, { headers: this.getAuthHeaders() });
+    return this.http.get<UserProfile>(profileUrl);
   }
 
   private checkInitialAuthState(): void {
@@ -91,21 +122,27 @@ export class AuthService {
 
   public getUserId(): string | null {
     const decoded = this.getDecodedToken();
-    return decoded ? (decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || decoded.nameid || decoded.sub) : null;
+    return decoded ? (decoded.sub || decoded.nameid || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
   }
 
   public getUserRole(): string | null {
     const decoded = this.getDecodedToken();
     if (!decoded) return null;
     const role = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
-    return Array.isArray(role) ? role[0]?.toLowerCase() : role?.toLowerCase() || null;
+    if (role === undefined || role === null) return null;
+
+    if (Array.isArray(role)) {
+      return (role[0]?.toString() || '').toLowerCase();
+    } else {
+      return (role?.toString() || '').toLowerCase();
+    }
   }
 
   private isTokenExpired(token: string): boolean {
     try {
-      const decoded: { exp: number } = jwtDecode(token);
+      const decoded: { exp?: number } = jwtDecode(token);
       if (typeof decoded.exp !== 'number') {
-        console.warn("Token does not contain a numeric 'exp' claim.");
+        console.warn("Token does not contain a numeric 'exp' claim, or 'exp' is missing. Treating as expired.");
         return true;
       }
       return decoded.exp < (Date.now() / 1000);
@@ -117,6 +154,10 @@ export class AuthService {
 
   public getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
-    return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
+    if (token) {
+      return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    } else {
+      return new HttpHeaders();
+    }
   }
 }
