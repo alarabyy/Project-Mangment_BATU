@@ -23,7 +23,7 @@
     <ng-container *ngIf="(projects$ | async) as projects">
       <!-- Check if projects array has items -->
       <div *ngIf="projects.length > 0" class="projects-grid">
-        <div *ngFor="let project of projects" class="project-card">
+        <div *ngFor="let project of projects" class="project-card" (click)="goToProjectDetails(project.id)">
           <div class="card-header">
             <h2 class="card-title">{{ project.title }}</h2>
           </div>
@@ -44,6 +44,7 @@
           </div>
           <div class="card-footer">
             <div class="actions-group">
+              <!-- Prevent click propagation to card's routerLink when editing/deleting -->
               <a [routerLink]="['/EditProject', project.id]" (click)="$event.stopPropagation()" class="btn btn-secondary">
                 <i class="fas fa-edit"></i> Edit
               </a>

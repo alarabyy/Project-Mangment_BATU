@@ -30,7 +30,7 @@ export class SignUpComponent implements OnInit {
       middleName: [''],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       gender: ['0', Validators.required], // 0: Male, 1: Female
-      role: ['0', Validators.required], // 0: Student, 1: Doctor, 2: Admin
+      role: ['1', Validators.required], // 1: Student, 2: Admin, 3: Doctor (matching user-management roles)
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$')]]
     });
@@ -60,7 +60,7 @@ export class SignUpComponent implements OnInit {
         this.popupService.showSuccess(
           'Account Created!',
           'Your account has been created successfully. You can now log in.',
-          () => this.router.navigate(['/Login'])
+          () => this.router.navigate(['/home']) // هذا الـ callback سيتم تنفيذه الآن بشكل صحيح ثم ستُغلق النافذة
         );
       },
       error: (err) => {

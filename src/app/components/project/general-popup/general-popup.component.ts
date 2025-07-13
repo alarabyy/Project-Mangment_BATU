@@ -1,4 +1,3 @@
-// src/app/components/project/general-popup/general-popup.component.ts
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule }  from '@angular/common';
 import { Subscription } from 'rxjs';
@@ -31,8 +30,9 @@ export class GeneralPopupComponent implements OnInit, OnDestroy {
 
   onConfirmClick(): void {
     if (this.state.onConfirm) {
-      this.state.onConfirm();
+      this.state.onConfirm(); // تنفيذ الـ callback (مثل التوجيه لصفحة Home)
     }
+    this.popupService.close(); // <--- التعديل هنا: دائمًا أغلق النافذة بعد التأكيد
   }
 
   onCancelClick(): void {

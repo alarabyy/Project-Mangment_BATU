@@ -1,4 +1,3 @@
-// src/app/pages/user-management/user-management.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -113,7 +112,7 @@ export class UserManagementComponent implements OnInit {
       ).subscribe(response => {
         if (response !== null) {
           alert('User deleted successfully!');
-          this.refreshUsers$.next();
+          this.refreshUsers$.next(); // <--- هذا الكود يقوم بتحديث القائمة تلقائياً
         }
       });
     }
@@ -153,7 +152,7 @@ export class UserManagementComponent implements OnInit {
           alert('User updated successfully!');
           this.editingUserId = null;
           this.editedUser = null;
-          this.refreshUsers$.next();
+          this.refreshUsers$.next(); // <--- هذا الكود يقوم بتحديث القائمة تلقائياً
         }
       });
     }

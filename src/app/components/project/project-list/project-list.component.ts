@@ -41,7 +41,7 @@ export class ProjectListComponent implements OnInit {
   }
 
   deleteProject(id: number, event: MouseEvent): void {
-    event.stopPropagation(); // Prevent the card's routerLink from firing
+    event.stopPropagation(); // Prevent the card's navigation from firing when clicking delete button
     if (confirm('Are you sure you want to permanently delete this project? This action cannot be undone.')) {
       this.projectService.deleteProject(id).subscribe({
         next: () => {
@@ -54,5 +54,14 @@ export class ProjectListComponent implements OnInit {
         }
       });
     }
+  }
+
+  /**
+   * Navigates to the project details page for the given project ID.
+   * This method is called when a project card is clicked.
+   * @param projectId The ID of the project to view details for.
+   */
+  goToProjectDetails(projectId: number): void {
+    this.router.navigate(['/ProjectDetails', projectId]);
   }
 }
