@@ -1,4 +1,3 @@
-<!-- src/app/pages/login/login.component.html -->
 <div class="auth-page-container">
   <div class="aurora-background"></div>
   <div class="animated-grid-background"></div>
@@ -6,31 +5,46 @@
   <div class="auth-form-container">
     <div class="form-header">
       <div class="header-icon-wrapper">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="fingerprint-icon">
+        <!-- Icon for Login Mode -->
+        <svg *ngIf="currentMode === 'login'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="fingerprint-icon">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3.5-8.67c.33-.33.86-.33 1.19 0 .21.21.33.5.33.8V15c0 .55-.45 1-1 1s-1-.45-1-1v-2.87c0-.3.12-.59.33-.8zM12 11c.55 0 1 .45 1 1v5c0 .55-.45 1-1 1s-1-.45-1-1v-5c0-.55.45-1 1-1zm3.5-1.17c.33.33.33.86 0 1.19-.21.21-.5.33-.8.33H14c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1s1 .45 1 1v2.17c.3-.12.59-.21.8-.33z"></path>
           <path d="M15.5 11.17c-.3-.12-.59-.21-.8-.33V9c0-.55-.45-1-1-1s-1 .45-1 1v3c0 .55.45 1 1 1h.67c.3 0 .59-.12.8-.33.33-.33.33-.86 0-1.19zM11 12v3c0 .55.45 1 1 1s1-.45 1-1v-5c0-.55-.45-1-1-1s-1 .45-1 1v2zm-2.5-2.67c.21.21.33.5.33.8V15c0 .55-.45 1-1 1s-1-.45-1-1v-2.87c0-.3.12-.59.33-.8.33-.33.86-.33 1.19 0z" opacity=".3"></path>
         </svg>
+        <!-- Icon for Forgot Password Mode -->
+        <svg *ngIf="currentMode === 'forgotPassword'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="key-icon">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.5-9H8.5V6c0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5v2z"/>
+        </svg>
+        <!-- Icon for Reset Password Mode -->
+        <svg *ngIf="currentMode === 'resetPassword'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="lock-reset-icon">
+          <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 11c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm3.5-9H8.5V6c0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5v2z"/>
+        </svg>
       </div>
-      <h2>Secure Access</h2>
-      <p>Authenticate to manage your projects</p>
+      <h2 *ngIf="currentMode === 'login'">Secure Access</h2>
+      <h2 *ngIf="currentMode === 'forgotPassword'">Forgot Password</h2>
+      <h2 *ngIf="currentMode === 'resetPassword'">Reset Password</h2>
+
+      <p *ngIf="currentMode === 'login'">Authenticate to manage your projects</p>
+      <p *ngIf="currentMode === 'forgotPassword'">Enter your email to receive a password reset link.</p>
+      <p *ngIf="currentMode === 'resetPassword'">Set your new password.</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="auth-form">
+    <!-- --- Login Form Section --- -->
+    <form *ngIf="currentMode === 'login'" [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="auth-form">
       <div class="input-field-wrapper">
-        <input id="email" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="f['email'].invalid && f['email'].touched"/>
+        <input id="email" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="loginF['email'].invalid && loginF['email'].touched"/>
         <label for="email">University Email</label>
       </div>
-      <div class="error-message" *ngIf="f['email'].invalid && f['email'].touched">
-        <p *ngIf="f['email'].errors?.['required']">* Email is required.</p>
-        <p *ngIf="f['email'].errors?.['email']">* Please enter a valid email.</p>
+      <div class="error-message" *ngIf="loginF['email'].invalid && loginF['email'].touched">
+        <p *ngIf="loginF['email'].errors?.['required']">* Email is required.</p>
+        <p *ngIf="loginF['email'].errors?.['email']">* Please enter a valid email.</p>
       </div>
 
       <div class="input-field-wrapper">
-        <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="password" [class.is-invalid]="f['password'].invalid && f['password'].touched"/>
+        <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="password" [class.is-invalid]="loginF['password'].invalid && loginF['password'].touched"/>
         <label for="password">Password</label>
       </div>
-      <div class="error-message" *ngIf="f['password'].invalid && f['password'].touched">
-        <p *ngIf="f['password'].errors?.['required']">* Password is required.</p>
+      <div class="error-message" *ngIf="loginF['password'].invalid && loginF['password'].touched">
+        <p *ngIf="loginF['password'].errors?.['required']">* Password is required.</p>
       </div>
 
       <div class="options-wrapper">
@@ -38,8 +52,8 @@
         <span>Show Password</span>
       </div>
 
-      <div *ngIf="errorMessage" class="server-error-message">
-        {{ errorMessage }}
+      <div *ngIf="loginErrorMessage" class="server-error-message">
+        {{ loginErrorMessage }}
       </div>
 
       <button type="submit" class="btn-submit-glow" [disabled]="loginForm.invalid || isSubmitting">
@@ -47,8 +61,86 @@
       </button>
 
       <div class="form-footer">
-        <p>No account yet? <a routerLink="/SignUp">Create One</a></p>
-        <p><a routerLink="/forgot-password">Forgot Password?</a></p> <!-- Added Forgot Password Link -->
+        <!-- <p>No account yet? <a routerLink="/SignUp">Create One</a></p> -->
+        <p><a (click)="showForgotPasswordForm()">Forgot Password?</a></p> <!-- Changed to click handler -->
+      </div>
+    </form>
+
+    <!-- --- Forgot Password Form Section --- -->
+    <form *ngIf="currentMode === 'forgotPassword'" [formGroup]="forgotPasswordForm" (ngSubmit)="submitForgotPassword()" class="auth-form">
+      <div class="input-field-wrapper">
+        <input id="forgotEmail" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="forgotF['email'].invalid && forgotF['email'].touched"/>
+        <label for="forgotEmail">University Email</label>
+      </div>
+      <div class="error-message" *ngIf="forgotF['email'].invalid && forgotF['email'].touched">
+        <p *ngIf="forgotF['email'].errors?.['required']">* Email is required.</p>
+        <p *ngIf="forgotF['email'].errors?.['email']">* Please enter a valid email.</p>
+      </div>
+
+      <div *ngIf="forgotPasswordErrorMessage" class="server-error-message">
+        {{ forgotPasswordErrorMessage }}
+      </div>
+      <div *ngIf="forgotPasswordSuccessMessage" class="server-success-message">
+        {{ forgotPasswordSuccessMessage }}
+      </div>
+
+      <button type="submit" class="btn-submit-glow" [disabled]="forgotPasswordForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Sending...' : 'Send Reset Link' }}
+      </button>
+
+      <div class="form-footer">
+        <p><a (click)="showLoginForm()">Back to Login</a></p>
+      </div>
+    </form>
+
+        <!-- --- Reset Password Form Section --- -->
+    <form *ngIf="currentMode === 'resetPassword'" [formGroup]="resetPasswordForm" (ngSubmit)="submitResetPassword()" class="auth-form">
+      <div *ngIf="!resetToken && !resetPasswordErrorMessage" class="server-error-message">
+        Loading... please ensure you came from a valid reset link.
+      </div>
+      <div *ngIf="resetPasswordErrorMessage" class="server-error-message">
+        {{ resetPasswordErrorMessage }}
+      </div>
+
+      <!-- Only show form fields if a token is present and no critical error -->
+      <ng-container *ngIf="resetToken && !resetPasswordErrorMessage">
+        <div class="input-field-wrapper">
+          <!-- الخطأ الأول: تم حذف || resetPasswordForm.submitted -->
+          <input id="newPassword" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="newPassword" [class.is-invalid]="newPasswordControl?.invalid && newPasswordControl?.touched"/>
+          <label for="newPassword">New Password</label>
+        </div>
+        <div class="error-message" *ngIf="newPasswordControl?.invalid && newPasswordControl?.touched">
+          <p *ngIf="newPasswordControl?.errors?.['required']">* New password is required.</p>
+          <p *ngIf="newPasswordControl?.errors?.['minlength']">* New password must be at least 6 characters long.</p>
+        </div>
+
+        <div class="input-field-wrapper">
+          <!-- الخطأ الثاني: تم حذف || resetPasswordForm.submitted -->
+          <input id="confirmPassword" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="confirmPassword" [class.is-invalid]="confirmPasswordControl?.invalid && confirmPasswordControl?.touched"/>
+          <label for="confirmPassword">Confirm New Password</label>
+        </div>
+        <div class="error-message" *ngIf="confirmPasswordControl?.invalid && confirmPasswordControl?.touched">
+          <p *ngIf="confirmPasswordControl?.errors?.['required']">* Confirm password is required.</p>
+          <!-- هنا يمكن أن يبقى resetPasswordForm.errors?.['mismatch'] لأنه خطأ على مستوى النموذج وليس حقل واحد -->
+          <p *ngIf="resetPasswordForm.errors?.['mismatch'] && confirmPasswordControl?.dirty">* Passwords do not match.</p>
+        </div>
+
+        <div class="options-wrapper">
+          <label class="toggle-switch"><input type="checkbox" (click)="togglePassword()"><span class="slider"></span></label>
+          <span>Show Password</span>
+        </div>
+
+        <div *ngIf="resetPasswordSuccessMessage" class="server-success-message">
+          {{ resetPasswordSuccessMessage }}
+        </div>
+
+        <button type="submit" class="btn-submit-glow" [disabled]="resetPasswordForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Resetting...' : 'Reset Password' }}
+        </button>
+      </ng-container>
+
+      <div class="form-footer">
+        <p><a (click)="showLoginForm()">Back to Login</a></p>
       </div>
     </form>
   </div>

@@ -8,9 +8,6 @@ import { PrivacyPolicyComponent } from './components/Components/privacy/privacy.
 import { documentaionComponent } from './components/Components/documentaion/documentaion.component';
 import { UnauthorizedComponent } from './components/Components/unauthorized/unauthorized.component';
 
-// --- New Auth Components ---
-import { ForgotPasswordComponent } from './components/auth/forgot-password/forgot-password.component';
-import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
 
 
 // --- User-Specific Protected Components ---
@@ -60,8 +57,6 @@ export const routes: Routes = [
   { path: 'Privacy', component: PrivacyPolicyComponent },
   { path: 'Login', component: LoginComponent },
   { path: 'unauthorized', component: UnauthorizedComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'blog/:id', component: DetailsBlogComponent },
   { path: 'AllBlogsUser', component: AllBlogsUserComponent },
   { path: 'staff', component: AllStaffComponent },

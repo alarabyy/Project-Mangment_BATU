@@ -49,8 +49,12 @@
   color: var(--primary-accent); transition: transform 0.3s ease;
 }
 .header-icon-wrapper:hover { transform: rotate(15deg) scale(1.1); }
-.fingerprint-icon { width: 40px; height: 40px; transition: transform 0.3s ease; }
-.header-icon-wrapper:hover .fingerprint-icon { transform: scale(0.9); }
+
+/* NEW ICONS FOR DIFFERENT MODES */
+.fingerprint-icon, .key-icon, .lock-reset-icon { width: 40px; height: 40px; transition: transform 0.3s ease; }
+.header-icon-wrapper:hover .fingerprint-icon,
+.header-icon-wrapper:hover .key-icon,
+.header-icon-wrapper:hover .lock-reset-icon { transform: scale(0.9); }
 
 .form-header h2 { font-size: 1.75rem; color: var(--text-color); font-weight: var(--font-weight-bold); }
 .form-header p { color: var(--subtle-text-color); margin-top: 0.5rem; }
@@ -100,6 +104,13 @@
     padding: 1rem; border-radius: var(--border-radius-base); text-align: center;
     margin-top: 1rem; border: 1px solid rgba(248, 81, 73, 0.3); animation: bounce-in 0.5s var(--easing-curve-bounce);
 }
+/* NEW: Success message style */
+.server-success-message {
+    background-color: rgba(67, 160, 71, 0.1); /* Green tint */
+    color: #43a047; /* Darker green */
+    padding: 1rem; border-radius: var(--border-radius-base); text-align: center;
+    margin-top: 1rem; border: 1px solid rgba(67, 160, 71, 0.3); animation: bounce-in 0.5s var(--easing-curve-bounce);
+}
 
 .options-wrapper { display: flex; align-items: center; gap: 0.75rem; color: var(--subtle-text-color); margin-top: 1rem; }
 .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -124,7 +135,12 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .form-footer { text-align: center; margin-top: 2rem; font-size: 0.9rem; }
 .form-footer p { color: var(--subtle-text-color); }
-.form-footer a { color: var(--primary-accent); text-decoration: none; font-weight: var(--font-weight-semibold); }
+.form-footer a {
+  color: var(--primary-accent);
+  text-decoration: none;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer; /* Add pointer for anchor tags that trigger functions */
+}
 .form-footer a:hover { text-decoration: underline; color: var(--primary-accent-hover); }
 
 /* --- 5. KEYFRAME ANIMATIONS --- */
