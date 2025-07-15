@@ -1,97 +1,75 @@
-<div class="auth-page-container">
-  <!-- Background animations -->
-  <div class="aurora-background"></div>
-  <div class="animated-grid-background"></div>
+<form [formGroup]="signupForm" (ngSubmit)="submitSignup()" class="auth-form" novalidate>
 
-  <!-- Form container -->
-  <div class="auth-form-container">
-    <div class="form-header">
-      <div class="header-icon-wrapper">
-        <i class="fas fa-user-plus header-icon"></i>
-      </div>
-      <h2>Create a New Account</h2>
-      <p>Join us to start managing your projects efficiently.</p>
+  <!-- Name Fields -->
+  <div class="form-row three-columns">
+    <div class="input-field-wrapper">
+      <input id="firstName" type="text" class="form-control" placeholder=" " formControlName="firstName" />
+      <label for="firstName">First Name</label>
     </div>
-
-    <form [formGroup]="signupForm" (ngSubmit)="submitSignup()" class="auth-form" novalidate>
-
-      <!-- Name row -->
-      <div class="form-row three-columns">
-        <div class="input-field-wrapper">
-          <input id="firstName" type="text" class="form-control" placeholder=" " formControlName="firstName" [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched"/>
-          <label for="firstName">First Name</label>
-        </div>
-        <div class="input-field-wrapper">
-          <input id="middleName" type="text" class="form-control" placeholder=" " formControlName="middleName"/>
-          <label for="middleName">Middle Name <small>(Optional)</small></label>
-        </div>
-        <div class="input-field-wrapper">
-          <input id="lastName" type="text" class="form-control" placeholder=" " formControlName="lastName" [class.is-invalid]="f['lastName'].invalid && f['lastName'].touched"/>
-          <label for="lastName">Last Name</label>
-        </div>
-      </div>
-
-      <!-- Email and Password row -->
-      <div class="input-field-wrapper">
-        <input id="email" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="f['email'].invalid && f['email'].touched"/>
-        <label for="email">University Email</label>
-      </div>
-
-      <div class="input-field-wrapper">
-        <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="password" [class.is-invalid]="f['password'].invalid && f['password'].touched"/>
-        <label for="password">Password</label>
-        <p class="input-hint" *ngIf="f['password'].invalid && f['password'].touched && f['password'].errors?.['pattern']">
-          * At least 8 characters, with letters and numbers.
-        </p>
-      </div>
-
-      <!-- Single "Show Password" toggle -->
-      <div class="options-wrapper">
-        <label class="toggle-switch">
-          <input type="checkbox" (click)="togglePassword()">
-          <span class="slider"></span>
-        </label>
-        <span>Show Password</span>
-      </div>
-
-      <!-- Gender and Role row -->
-      <div class="form-row two-columns">
-        <div class="radio-group-wrapper">
-          <label class="radio-group-label">Gender</label>
-          <div class="radio-group">
-            <label class="radio-option">
-              <input type="radio" value="0" formControlName="gender"><span>Male</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" value="1" formControlName="gender"><span>Female</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="radio-group-wrapper">
-          <label class="radio-group-label">I am a</label>
-          <div class="radio-group role-group">
-            <label class="radio-option">
-              <input type="radio" value="1" formControlName="role"><span>Student</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" value="3" formControlName="role"><span>Doctor</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" value="2" formControlName="role"><span>Admin</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-submit-glow" [disabled]="signupForm.invalid || isSubmitting">
-        <span *ngIf="!isSubmitting">Create Account</span>
-        <span *ngIf="isSubmitting">Creating Account...</span>
-      </button>
-
-      <div class="form-footer">
-        <!-- <p>Already have an account? <a routerLink="/Login">Sign In</a></p> -->
-      </div>
-    </form>
+    <div class="input-field-wrapper">
+      <input id="middleName" type="text" class="form-control" placeholder=" " formControlName="middleName" />
+      <label for="middleName">Middle Name (Optional)</label>
+    </div>
+    <div class="input-field-wrapper">
+      <input id="lastName" type="text" class="form-control" placeholder=" " formControlName="lastName" />
+      <label for="lastName">Last Name</label>
+    </div>
   </div>
-</div>
+
+  <!-- Email -->
+  <div class="input-field-wrapper">
+    <input id="email" type="email" class="form-control" placeholder=" " formControlName="email" />
+    <label for="email">University Email</label>
+  </div>
+
+  <!-- Password -->
+  <div class="input-field-wrapper">
+    <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="password" />
+    <label for="password">Password</label>
+  </div>
+
+  <!-- Toggle Password Visibility -->
+  <div class="options-wrapper">
+    <label class="toggle-switch">
+      <input type="checkbox" (click)="togglePassword()">
+      <span class="slider"></span>
+    </label>
+    <span>Show Password</span>
+  </div>
+
+  <!-- Gender Selection -->
+  <div class="radio-group-wrapper">
+    <label class="radio-group-label">Gender</label>
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" [value]="0" formControlName="gender"><span>Male</span>
+      </label>
+      <label class="radio-option">
+        <input type="radio" [value]="1" formControlName="gender"><span>Female</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Role Selection (Fixed) -->
+  <div class="radio-group-wrapper">
+    <label class="radio-group-label">I am a</label>
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" [value]="0" formControlName="role"><span>Student</span>
+      </label>
+      <label class="radio-option">
+        <input type="radio" [value]="1" formControlName="role"><span>Doctor</span>
+      </label>
+      <label class="radio-option">
+        <input type="radio" [value]="2" formControlName="role"><span>Admin</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="btn-submit-glow" [disabled]="signupForm.invalid || isSubmitting">
+    <span *ngIf="!isSubmitting">Create Account</span>
+    <span *ngIf="isSubmitting">Creating Account...</span>
+  </button>
+
+</form>

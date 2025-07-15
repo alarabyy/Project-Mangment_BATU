@@ -1,6 +1,6 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { RoleGuard } from './guards/role.guard';
+import { RoleGuard } from './guards/role.guard'; // تأكد من المسار الصحيح للحارس
 
 // --- General Public Components ---
 import { HomeComponent } from './components/home/home.component';
@@ -26,7 +26,6 @@ import { NotificationsPageComponent } from './components/Components/notification
 import { UserManagementComponent } from './components/User/user-management/user-management.component';
 import { UserAnalyticsComponent } from './components/User/user-analytics/user-analytics.component';
 import { DepartmentCreateComponent } from './components/Departments/department-create/department-create.component';
-import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
 import { DepartmentEditComponent } from './components/Departments/department-edit/department-edit.component';
 import { FacultyListComponent } from './components/faculty/faculty-list/faculty-list.component';
 import { AddFacultyComponent } from './components/faculty/add-faculty/add-faculty.component';
@@ -46,6 +45,7 @@ import { AddStaffComponent } from './components/staff/add-staff/add-staff.compon
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
 import { ProjectAnalysisComponent } from './components/project/project-analysis/project-analysis.component';
+import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -67,17 +67,17 @@ export const routes: Routes = [
 
 
   // ---------------------- PROTECTED USER ROUTES --------------------
-  { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
-  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
-  { path: 'user/profile/:id', component: UserProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student', 'professor'] } },
+  { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
+  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'user/profile/:id', component: UserProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
 
 
   // -------------------- PROJECT MANAGEMENT ROUTES ------------------
-  { path: 'ProjectDetails/:id', component: ProjectDetailsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
-  { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
-  { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor' ] } },
+  { path: 'ProjectDetails/:id', component: ProjectDetailsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor' ] } },
   { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'my-projects', component: MyProjectsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor', 'professor'] } },
+  { path: 'my-projects', component: MyProjectsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
   { path: 'ProjectAnalysis', component: ProjectAnalysisComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
   // ------------------------ ADMIN-ONLY ROUTES ----------------------
   // General Admin

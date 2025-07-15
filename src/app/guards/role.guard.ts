@@ -14,13 +14,8 @@ export class RoleGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     // الخطوة 1: التحقق مما إذا كان المستخدم مسجلاً دخوله أساسًا
     if (!this.authService.isLoggedIn()) {
-      console.log('[RoleGuard] DENIED: User is not logged in. Redirecting to /unauthorized...');
-
-      // =============================================================
-      // ==                هذا هو التعديل المطلوب                     ==
-      // == الآن سيوجه المستخدم غير المسجل إلى صفحة عدم الصلاحية     ==
-      // =============================================================
-      this.router.navigate(['/unauthorized']);
+      console.log('[RoleGuard] DENIED: User is not logged in. Redirecting to /Login...');
+      this.router.navigate(['/Login']); // التوجيه لصفحة تسجيل الدخول
       return false;
     }
 
@@ -39,14 +34,14 @@ export class RoleGuard implements CanActivate {
     // طباعة معلومات التشخيص للمساعدة في تتبع المشاكل
     console.log(`[RoleGuard] Checking access for: ${state.url}`);
     console.log(`[RoleGuard] Required Roles: [${requiredRoles.join(', ')}]`);
-    console.log(`[RoleGuard] User's Role: '${userRole}'`);
+    console.log(`[RoleGuard] User's Role (from AuthService): '${userRole}'`); // طباعة الدور المستخرج
 
     // الخطوة 4: التحقق مما إذا كانت صلاحية المستخدم ضمن الصلاحيات المطلوبة
     if (userRole && requiredRoles.includes(userRole)) {
       console.log('[RoleGuard] GRANTED: User has the required role.');
       return true;
     } else {
-      // إذا كان مسجلاً ولكن دوره خطأ، سيتم توجيهه هنا أيضًا
+      // إذا كان مسجلاً ولكن دوره خطأ أو غير كافٍ، سيتم توجيهه هنا
       console.log('[RoleGuard] DENIED: User role is not sufficient. Redirecting to /unauthorized...');
       this.router.navigate(['/unauthorized']);
       return false;

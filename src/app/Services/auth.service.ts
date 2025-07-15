@@ -20,13 +20,11 @@ export interface LoginResponse {
   token: string;
 }
 
-// New interface for Forgot Password Request body
 export interface PasswordResetRequest {
   token: string;
   newPassword: string;
 }
 
-// NEW: Interface for Change Password Request body (for logged-in users)
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
@@ -62,19 +60,15 @@ export class AuthService {
     );
   }
 
-  // New method for Forgot Password
   public forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.authApiUrl}/forgot-password?email=${encodeURIComponent(email)}`, null);
   }
 
-  // New method for Reset Password (for forgotten password flow)
   public resetPassword(request: PasswordResetRequest): Observable<any> {
     return this.http.post(`${this.authApiUrl}/reset-password`, request);
   }
 
-  // NEW: Method to change password for a logged-in user
   public changePassword(request: ChangePasswordRequest): Observable<any> {
-    // The endpoint is /api/auth/change-password
     return this.http.post(`${this.authApiUrl}/change-password`, request);
   }
 
@@ -116,6 +110,8 @@ export class AuthService {
       return jwtDecode(token);
     } catch (error) {
       console.error("Error decoding token:", error);
+      // If token is invalid, clear it and logout
+      this.logout();
       return null;
     }
   }
@@ -125,18 +121,50 @@ export class AuthService {
     return decoded ? (decoded.sub || decoded.nameid || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
   }
 
+  // === هذا الكود صحيح ويتعامل مع القيم الرقمية 0, 1, 2 بشكل سليم ===
   public getUserRole(): string | null {
     const decoded = this.getDecodedToken();
     if (!decoded) return null;
-    const role = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
-    if (role === undefined || role === null) return null;
 
-    if (Array.isArray(role)) {
-      return (role[0]?.toString() || '').toLowerCase();
+    let roleValue = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
+
+    if (roleValue === undefined || roleValue === null) {
+      return null;
+    }
+
+    if (Array.isArray(roleValue)) {
+      roleValue = roleValue[0]; // خذ العنصر الأول إذا كان مصفوفة
+    }
+
+    const numericRole = Number(roleValue);
+
+    if (!isNaN(numericRole)) {
+      // التعامل مع الأدوار الرقمية بناءً على الـ Enum في الـ Backend
+      switch (numericRole) {
+        case 0: // Student في الـ Backend Enum هو 0
+          return 'student';
+        case 1: // Doctor في الـ Backend Enum هو 1
+          return 'doctor';
+        case 2: // Admin في الـ Backend Enum هو 2
+          return 'admin';
+        default:
+          return null; // لأي رقم دور غير معروف
+      }
     } else {
-      return (role?.toString() || '').toLowerCase();
+      // التعامل مع الأدوار النصية (كـ Fallback إذا كان الـ Backend يرسل نصًا)
+      const lowerCaseRole = (roleValue?.toString() || '').toLowerCase();
+
+      if (lowerCaseRole === 'student') {
+        return 'student';
+      } else if (lowerCaseRole === 'doctor') {
+        return 'doctor';
+      } else if (lowerCaseRole === 'admin') {
+        return 'admin';
+      }
+      return null; // إذا لم يطابق أي من الأدوار الثلاثة المعروفة، أعد null
     }
   }
+  // === نهاية الكود الصحيح ===
 
   private isTokenExpired(token: string): boolean {
     try {
@@ -158,6 +186,25 @@ export class AuthService {
       return new HttpHeaders().set('Authorization', `Bearer ${token}`);
     } else {
       return new HttpHeaders();
+    }
+  }
+
+  // تعديل في دالة redirectToDashboard() لاستخدام getUserRole()
+  private redirectToDashboard(): void {
+    const role = this.getUserRole();
+    switch (role) {
+      case 'admin':
+        this.router.navigate(['/Home']);
+        break;
+      case 'doctor':
+        this.router.navigate(['/Home']);
+        break;
+      case 'student':
+        this.router.navigate(['/Home']);
+        break;
+      default:
+        this.router.navigate(['/Home']);
+        break;
     }
   }
 }

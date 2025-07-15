@@ -1,3 +1,4 @@
+// src/app/core/components/nav/nav.component.ts
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';

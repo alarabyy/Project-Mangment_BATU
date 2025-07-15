@@ -29,16 +29,23 @@ export class SignUpComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       middleName: [''],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      gender: ['0', Validators.required], // 0: Male, 1: Female
-      role: ['1', Validators.required], // 1: Student, 2: Admin, 3: Doctor (matching user-management roles)
+      gender: ['0', Validators.required], // 0 = Male, 1 = Female
+      role: ['0', Validators.required],   // ✅ default role = Student (0)
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$')]]
+      password: ['', [
+        Validators.required,
+        Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$') // Letters + numbers
+      ]]
     });
   }
 
-  get f() { return this.signupForm.controls; }
+  get f() {
+    return this.signupForm.controls;
+  }
 
-  togglePassword(): void { this.showPassword = !this.showPassword; }
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   submitSignup(): void {
     if (this.signupForm.invalid) {
@@ -46,13 +53,15 @@ export class SignUpComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
-
     const payload = {
       ...this.signupForm.value,
-      gender: +this.signupForm.value.gender,
-      role: +this.signupForm.value.role
+      gender: Number(this.signupForm.value.gender),
+      role: Number(this.signupForm.value.role) // ✅ تأكد أن الرقم يتبعت
     };
+
+    console.log("📤 Payload to Register:", payload); // Debug
+
+    this.isSubmitting = true;
 
     this.authService.register(payload).subscribe({
       next: () => {
@@ -60,12 +69,12 @@ export class SignUpComponent implements OnInit {
         this.popupService.showSuccess(
           'Account Created!',
           'Your account has been created successfully. You can now log in.',
-          () => this.router.navigate(['/home']) // هذا الـ callback سيتم تنفيذه الآن بشكل صحيح ثم ستُغلق النافذة
+          () => this.router.navigate(['/home'])
         );
       },
       error: (err) => {
         this.isSubmitting = false;
-        const errorMessage = err.error?.message || err.error?.title || 'Registration failed. Please check your details and try again.';
+        const errorMessage = err.error?.message || err.error?.title || 'Registration failed.';
         this.popupService.showError('Registration Failed', errorMessage);
       }
     });

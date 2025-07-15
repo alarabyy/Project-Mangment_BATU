@@ -151,6 +151,7 @@
   justify-content: center;
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  position: relative; /* Add this if not present, for badge positioning */
 }
 .navbar-icon-btn:hover {
   background-color: var(--bg-light-hover);

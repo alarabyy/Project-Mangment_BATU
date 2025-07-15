@@ -1,3 +1,4 @@
+// src/app/authentication/login/login.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -201,7 +202,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/Home']);
         break;
       case 'doctor':
-      case 'professor':
+      case 'professor': // هنا يمكن إزالة 'professor' إذا كنت متأكدًا أنه لن يظهر كدور نصي
         this.router.navigate(['/Home']);
         break;
       case 'student':
