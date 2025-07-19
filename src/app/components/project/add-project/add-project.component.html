@@ -89,14 +89,18 @@
       </div>
 
       <div class="form-row">
-        <div class="form-group"><label for="grade">Grade (Optional)</label><input type="number" id="grade" formControlName="grade" class="form-control" [class.is-invalid]="f['grade'].invalid && f['grade'].touched">
+        <div class="form-group">
+          <label for="grade">Grade (Optional)</label>
+          <input type="number" id="grade" formControlName="grade" class="form-control" [class.is-invalid]="f['grade'].invalid && f['grade'].touched">
           <div *ngIf="f['grade'].touched && f['grade'].errors" class="error-message">
             <small *ngIf="f['grade'].errors?.['min'] || f['grade'].errors?.['max']">Grade must be between 0 and 100.</small>
           </div>
         </div>
         <div class="form-group">
-          <label for="teamLeaderId">Leader ID <span class="required-indicator">*</span></label><input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control" [class.is-invalid]="f['teamLeaderId'].invalid && f['teamLeaderId'].touched">
-          <div *ngIf="f['teamLeaderId'].touched && f['teamLeaderId'].errors" class="error-message"><small *ngIf="f['teamLeaderId'].errors?.['required']">Leader ID is required.</small>
+          <label for="teamLeaderId">Leader ID <span class="required-indicator">*</span></label>
+          <input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control" [class.is-invalid]="f['teamLeaderId'].invalid && f['teamLeaderId'].touched">
+          <div *ngIf="f['teamLeaderId'].touched && f['teamLeaderId'].errors" class="error-message">
+            <small *ngIf="f['teamLeaderId'].errors?.['required']">Leader ID is required.</small>
             <small *ngIf="f['teamLeaderId'].errors?.['pattern']">Leader ID must be a number.</small>
           </div>
         </div>

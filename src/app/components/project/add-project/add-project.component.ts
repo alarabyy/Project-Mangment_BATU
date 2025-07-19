@@ -11,7 +11,7 @@ import { Category } from '../../../models/category';
 import { Department } from '../../../models/department';
 import { Faculty } from '../../../models/faculty'; // لا يزال مستخدماً للنوع فقط
 import { SuccessPopupComponent } from '../success-popup/success-popup.component';
-import { Member } from '../../../models/project';
+import { Member } from '../../../models/project'; // Make sure Project model defines Member interface correctly
 
 @Component({
   selector: 'app-add-project',
@@ -198,10 +198,13 @@ export class AddProjectComponent implements OnInit {
       finalize(() => this.isSubmitting = false)
     ).subscribe({
       next: (response) => {
+        // Handle response from the backend. Assuming backend returns a string message or success object
         if (typeof response === 'string' && response.trim() !== '') {
+            // If it's a string message, display it as an alert
             alert(response);
-            this.router.navigate(['/Home']);
+            this.router.navigate(['/Home']); // Navigate after displaying alert
         } else {
+            // Otherwise, assume successful object response, show popup
             this.popupTitle = 'Project Created!';
             this.popupMessage = 'Your project has been successfully created. Find it in the project list to edit it and upload images.';
             this.showSuccessPopup = true;
@@ -209,7 +212,7 @@ export class AddProjectComponent implements OnInit {
       },
       error: (err) => {
         console.error('An error occurred during project creation:', err);
-        const errorMessage = err.error || 'Failed to create the project.';
+        const errorMessage = err.error?.message || err.message || 'Failed to create the project. Please try again.';
         alert(errorMessage);
       }
     });

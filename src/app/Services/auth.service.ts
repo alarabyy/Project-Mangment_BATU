@@ -10,7 +10,8 @@ export interface UserProfile {
   id: string;
   email: string;
   firstName: string;
-  lastName: string | null;
+  lastname: string | null; // **تم التعديل: lastName -> lastname**
+  middleName?: string;     // هذا الحقل سيظل موجودًا ولكن قد لا يتم إرساله من الـ API
   imageUrl: string | null;
   role: string | number;
   gender?: number;
@@ -69,7 +70,8 @@ export class AuthService {
   }
 
   public changePassword(request: ChangePasswordRequest): Observable<any> {
-    return this.http.post(`${this.authApiUrl}/change-password`, request);
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.authApiUrl}/change-password`, request, { headers });
   }
 
   public logout(): void {
@@ -87,7 +89,8 @@ export class AuthService {
       return throwError(() => new Error(errorMsg));
     }
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
-    return this.http.get<UserProfile>(profileUrl);
+    const headers = this.getAuthHeaders();
+    return this.http.get<UserProfile>(profileUrl, { headers });
   }
 
   private checkInitialAuthState(): void {
@@ -110,7 +113,6 @@ export class AuthService {
       return jwtDecode(token);
     } catch (error) {
       console.error("Error decoding token:", error);
-      // If token is invalid, clear it and logout
       this.logout();
       return null;
     }
@@ -121,7 +123,6 @@ export class AuthService {
     return decoded ? (decoded.sub || decoded.nameid || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
   }
 
-  // === هذا الكود صحيح ويتعامل مع القيم الرقمية 0, 1, 2 بشكل سليم ===
   public getUserRole(): string | null {
     const decoded = this.getDecodedToken();
     if (!decoded) return null;
@@ -133,25 +134,23 @@ export class AuthService {
     }
 
     if (Array.isArray(roleValue)) {
-      roleValue = roleValue[0]; // خذ العنصر الأول إذا كان مصفوفة
+      roleValue = roleValue[0];
     }
 
     const numericRole = Number(roleValue);
 
     if (!isNaN(numericRole)) {
-      // التعامل مع الأدوار الرقمية بناءً على الـ Enum في الـ Backend
       switch (numericRole) {
-        case 0: // Student في الـ Backend Enum هو 0
+        case 0:
           return 'student';
-        case 1: // Doctor في الـ Backend Enum هو 1
+        case 1:
           return 'doctor';
-        case 2: // Admin في الـ Backend Enum هو 2
+        case 2:
           return 'admin';
         default:
-          return null; // لأي رقم دور غير معروف
+          return null;
       }
     } else {
-      // التعامل مع الأدوار النصية (كـ Fallback إذا كان الـ Backend يرسل نصًا)
       const lowerCaseRole = (roleValue?.toString() || '').toLowerCase();
 
       if (lowerCaseRole === 'student') {
@@ -161,10 +160,9 @@ export class AuthService {
       } else if (lowerCaseRole === 'admin') {
         return 'admin';
       }
-      return null; // إذا لم يطابق أي من الأدوار الثلاثة المعروفة، أعد null
+      return null;
     }
   }
-  // === نهاية الكود الصحيح ===
 
   private isTokenExpired(token: string): boolean {
     try {
@@ -189,7 +187,6 @@ export class AuthService {
     }
   }
 
-  // تعديل في دالة redirectToDashboard() لاستخدام getUserRole()
   private redirectToDashboard(): void {
     const role = this.getUserRole();
     switch (role) {

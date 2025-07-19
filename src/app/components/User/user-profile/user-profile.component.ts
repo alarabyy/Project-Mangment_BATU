@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { UserProfile } from '../../../Services/auth.service';
+import { UserProfile } from '../../../Services/auth.service'; // Ensure UserProfile is correctly defined here
 import { UserService } from '../../../Services/user.service';
 
 @Component({

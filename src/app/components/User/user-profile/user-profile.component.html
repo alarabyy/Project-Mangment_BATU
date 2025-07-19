@@ -5,7 +5,8 @@
       <div class="profile-header">
         <img *ngIf="user.imageUrl" [src]="user.imageUrl" alt="User Avatar" class="profile-avatar">
         <div class="user-details">
-          <h1>{{ user.firstName }} {{ user.lastName }}</h1>
+          <!-- CHANGE: user.lastName to user.lastname -->
+          <h1>{{ user.firstName }} {{ user.lastname }}</h1>
           <p class="role-text">{{ user.role }}</p>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import { Component, OnInit, ElementRef, QueryList, ViewChildren, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Import all specific ApexCharts types you're using in ChartOptions
 import { ApexChart, ApexDataLabels, ApexFill, ApexGrid, ApexLegend, ApexPlotOptions, ApexResponsive, ApexStroke, ApexTitleSubtitle, ApexTooltip, ApexXAxis, ApexYAxis, NgApexchartsModule } from 'ng-apexcharts';
 import { Observable, of, BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { map, catchError, startWith, shareReplay } from 'rxjs/operators';
@@ -10,7 +9,6 @@ import { Department } from '../../../models/department';
 import { subDays, format, eachDayOfInterval, startOfDay } from 'date-fns';
 import { ProjectService } from '../../../Services/project.service';
 
-// ApexCharts type definitions
 type ChartOptions = Partial<{
   series: any[];
   chart: ApexChart;
@@ -35,7 +33,7 @@ interface AnalyticsState { projects: Project[]; isLoading: boolean; error: strin
 @Component({
   selector: 'app-project-analysis',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule], // هذا هو المكان الصحيح الوحيد لـ imports
+  imports: [CommonModule, NgApexchartsModule],
   templateUrl: './project-analysis.component.html',
   styleUrls: ['./project-analysis.component.css']
 })
@@ -48,10 +46,11 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
   private categoryFilter$ = new BehaviorSubject<string>('all');
   private statusFilter$ = new BehaviorSubject<string>('all');
+  public clickedTechnology$ = new BehaviorSubject<string | null>(null);
 
   public kpiData$!: Observable<any>;
+  public selectedTechProjects$!: Observable<Project[]>;
 
-  // Initialize chart options observables with an empty object
   public projectStatusDistributionOptions$: Observable<Partial<ChartOptions>> = of({});
   public projectsByCategoryOptions$: Observable<Partial<ChartOptions>> = of({});
   public projectsByDepartmentOptions$: Observable<Partial<ChartOptions>> = of({});
@@ -60,6 +59,9 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
   public uniqueCategories: string[] = [];
   public uniqueDepartments: string[] = [];
+  public uniqueStatuses: string[] = ['Ongoing', 'Submitted'];
+
+  private _lastProjectsReference: Project[] = [];
 
   constructor(private projectService: ProjectService) {}
 
@@ -79,8 +81,9 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
       this.statusFilter$
     ]).pipe(
       map(([projects, category, status]) => {
-        if (!this.uniqueCategories.length || !this.uniqueDepartments.length) {
+        if (projects !== this._lastProjectsReference) {
           this.populateFilterOptions(projects);
+          this._lastProjectsReference = projects;
         }
         return this.applyFilters(projects, category, status);
       })
@@ -88,19 +91,29 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
     this.kpiData$ = this.filteredProjects$.pipe(map(projects => this.calculateKpiData(projects)));
 
-    // Assign chart options observables after data is processed
-    this.projectStatusDistributionOptions$ = this.filteredProjects$.pipe(map(projects => this.createProjectStatusDistributionChart(projects)));
-    this.projectsByCategoryOptions$ = this.filteredProjects$.pipe(map(projects => this.createProjectsByCategoryChart(projects)));
-    this.projectsByDepartmentOptions$ = this.filteredProjects$.pipe(map(projects => this.createProjectsByDepartmentChart(projects)));
-    this.topTechnologiesOptions$ = this.filteredProjects$.pipe(map(projects => this.createTopTechnologiesChart(projects)));
-    this.newProjectsOverTimeOptions$ = this.filteredProjects$.pipe(map(projects => this.createNewProjectsOverTimeChart(projects)));
+    this.selectedTechProjects$ = combineLatest([
+        this.filteredProjects$,
+        this.clickedTechnology$
+    ]).pipe(
+        map(([projects, tech]) => {
+            if (!tech || tech === 'Other') return [];
+            return projects.filter(p =>
+                p.technologies?.split(',').map(t => t.trim().toLowerCase()).includes(tech.toLowerCase())
+            );
+        }),
+        shareReplay(1)
+    );
+
+    this.projectStatusDistributionOptions$ = this.filteredProjects$.pipe(map(projects => this.createProjectStatusDistributionChart(projects)), shareReplay(1));
+    this.projectsByCategoryOptions$ = this.filteredProjects$.pipe(map(projects => this.createProjectsByCategoryChart(projects)), shareReplay(1));
+    this.projectsByDepartmentOptions$ = this.filteredProjects$.pipe(map(projects => this.createProjectsByDepartmentChart(projects)), shareReplay(1));
+    this.topTechnologiesOptions$ = this.filteredProjects$.pipe(map(projects => this.createTopTechnologiesChart(projects)), shareReplay(1));
+    this.newProjectsOverTimeOptions$ = this.filteredProjects$.pipe(map(projects => this.createNewProjectsOverTimeChart(projects)), shareReplay(1));
   }
 
   ngAfterViewInit(): void {
     this.kpiSubscription = this.kpiData$.subscribe(data => {
-      if (data && this.kpiValueElements && this.kpiValueElements.length > 0) {
-        setTimeout(() => this.animateCounters(), 0);
-      }
+      setTimeout(() => this.animateCounters(), 100);
     });
   }
 
@@ -108,6 +121,9 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
     if (this.kpiSubscription) {
       this.kpiSubscription.unsubscribe();
     }
+    this.categoryFilter$.complete();
+    this.statusFilter$.complete();
+    this.clickedTechnology$.complete();
   }
 
   private populateFilterOptions(projects: Project[]): void {
@@ -123,7 +139,7 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
   applyFilters(projects: Project[], category: string, status: string): Project[] {
     return projects.filter(project => {
-      const isCategoryMatch = category === 'all' || (project.category?.name && project.category.name.toLowerCase() === category.toLowerCase());
+      const isCategoryMatch = category === 'all' || (project.category?.name && project.category.name.toLowerCase() === category.toLowerCase()) || (category === 'uncategorized' && !project.category?.name);
       const isStatusMatch = status === 'all' || this.getProjectStatus(project).toLowerCase() === status.toLowerCase();
       return isCategoryMatch && isStatusMatch;
     });
@@ -132,7 +148,7 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
   onCategoryFilterChange(event: Event): void { this.categoryFilter$.next((event.target as HTMLSelectElement).value); }
   onStatusFilterChange(event: Event): void { this.statusFilter$.next((event.target as HTMLSelectElement).value); }
 
-  private getProjectStatus(project: Project): string {
+  public getProjectStatus(project: Project): string {
     if (project.submissionDate && !isNaN(new Date(project.submissionDate).getTime()) && new Date(project.submissionDate) <= new Date()) {
       return 'Submitted';
     }
@@ -171,13 +187,48 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
       return {
           series: [{ name: 'New Projects', data: seriesData }],
-          chart: { type: 'area', height: 350, background: 'transparent', toolbar: { show: false }, zoom: { enabled: false } },
-          dataLabels: { enabled: false }, stroke: { curve: 'smooth', width: 3 }, colors: ['var(--primary-accent)'],
-          fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.1, stops: [0, 90, 100] } },
-          xaxis: { categories, labels: { style: { colors: 'var(--subtle-text-color)' } }, axisBorder: { show: false }, axisTicks: { show: false } },
-          yaxis: { labels: { style: { colors: 'var(--subtle-text-color)' } } },
-          grid: { borderColor: 'var(--border-color-translucent)', strokeDashArray: 4 },
-          tooltip: { theme: 'dark', x: { format: 'dd MMM yyyy' } },
+          chart: {
+            type: 'area',
+            height: 350,
+            background: 'transparent',
+            toolbar: { show: false },
+            zoom: { enabled: false },
+            fontFamily: 'var(--font-family-base)'
+          },
+          dataLabels: { enabled: false },
+          stroke: { curve: 'smooth', width: 3 },
+          colors: ['var(--primary-accent)'],
+          fill: {
+            type: 'gradient',
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.7,
+              opacityTo: 0.1,
+              stops: [0, 90, 100],
+              colorStops: [{ offset: 0, color: 'var(--primary-accent)', opacity: 0.7 }, { offset: 100, color: 'var(--primary-accent)', opacity: 0.1 }]
+            }
+          },
+          xaxis: {
+            categories,
+            labels: { style: { colors: 'var(--subtle-text-color)' } },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            tooltip: { enabled: false }
+          },
+          yaxis: {
+            labels: { style: { colors: 'var(--subtle-text-color)' } },
+            forceNiceScale: true,
+            min: 0
+          },
+          grid: {
+            borderColor: 'var(--border-color-translucent)',
+            strokeDashArray: 4
+          },
+          tooltip: {
+            theme: 'dark',
+            x: { format: 'dd MMM yyyy' },
+            y: { formatter: (val: number) => `${val} Project(s)` }
+          },
       };
   }
 
@@ -191,18 +242,31 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
     const labels = Object.keys(statusCounts);
     const series = Object.values(statusCounts);
 
-    const donutColors = ['#4CAF50', '#FFC107']; // Green for Submitted, Amber for Ongoing
+    const donutColors = ['var(--success-color)', 'var(--warning-color)'];
 
     return {
       series: series,
-      chart: { type: 'donut', height: 350, background: 'transparent' },
+      chart: {
+        type: 'donut',
+        height: 350,
+        background: 'transparent',
+        fontFamily: 'var(--font-family-base)'
+      },
       labels: labels,
       colors: donutColors.slice(0, labels.length),
-      legend: { position: 'bottom', horizontalAlign: 'center', floating: false, labels: { colors: 'var(--subtle-text-color)' } },
+      legend: {
+        position: 'bottom',
+        horizontalAlign: 'center',
+        floating: false,
+        labels: { colors: 'var(--subtle-text-color)' },
+        markers: { },
+        itemMargin: { horizontal: 10, vertical: 0 }
+      },
       dataLabels: {
         enabled: true,
         formatter: (val: any, opts: any) => {
           const total = opts.w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
+          if (total === 0) return '0%';
           const percentage = (opts.w.globals.series[opts.seriesIndex] / total * 100).toFixed(1);
           return `${percentage}%`;
         },
@@ -216,7 +280,7 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
         },
         style: {
             fontSize: '12px',
-            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontFamily: 'var(--font-family-base)',
             fontWeight: 'bold',
             colors: ['#fff']
         }
@@ -224,13 +288,24 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
       plotOptions: {
         pie: {
           donut: {
+            size: '70%',
             labels: {
               show: true,
               total: {
                 show: true,
                 label: 'Total Projects',
                 color: 'var(--subtle-text-color)',
+                fontSize: '16px',
+                fontWeight: 'bold',
                 formatter: (w: any) => w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0).toLocaleString()
+              },
+              value: {
+                show: true,
+                color: 'var(--text-color)',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                offsetY: 4,
+                formatter: (val: string) => parseInt(val).toLocaleString()
               }
             }
           }
@@ -258,14 +333,50 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
     return {
       series: [{ name: 'Project Count', data: seriesData }],
-      chart: { type: 'bar', height: 350, background: 'transparent', toolbar: { show: false } },
+      chart: {
+        type: 'bar',
+        height: 350,
+        background: 'transparent',
+        toolbar: { show: false },
+        fontFamily: 'var(--font-family-base)'
+      },
       colors: barColors,
-      plotOptions: { bar: { borderRadius: 4, horizontal: false, distributed: true, columnWidth: '70%' } },
-      dataLabels: { enabled: true, style: { colors: ['var(--text-color)'] } },
-      xaxis: { categories: categories, labels: { style: { colors: 'var(--subtle-text-color)' } } },
-      yaxis: { labels: { show: true, style: { colors: 'var(--subtle-text-color)', fontSize: '14px' } } },
-      grid: { borderColor: 'var(--border-color-translucent)', xaxis: { lines: { show: false } }, yaxis: { lines: { show: true } } },
-      tooltip: { theme: 'dark', y: { formatter: (val: number) => `${val} Projects` } }, legend: { show: false }
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          horizontal: false,
+          distributed: true,
+          columnWidth: '70%'
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        style: { colors: ['var(--text-color)'] },
+        formatter: (val: any) => val.toLocaleString(),
+        background: { enabled: true, foreColor: 'var(--text-color)', padding: 4, borderRadius: 2, borderWidth: 1, borderColor: 'var(--border-color)', opacity: 0.9, dropShadow: { enabled: false } },
+        textAnchor: 'middle',
+      },
+      xaxis: {
+        categories: categories,
+        labels: { style: { colors: 'var(--subtle-text-color)' } },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      yaxis: {
+        labels: { show: true, style: { colors: 'var(--subtle-text-color)', fontSize: '14px' } },
+        forceNiceScale: true,
+        min: 0,
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      grid: {
+        borderColor: 'var(--border-color-translucent)',
+        xaxis: { lines: { show: false } },
+        yaxis: { lines: { show: true } },
+        strokeDashArray: 4
+      },
+      tooltip: { theme: 'dark', y: { formatter: (val: number) => `${val} Projects` } },
+      legend: { show: false }
     };
   }
 
@@ -287,14 +398,50 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
     return {
       series: [{ name: 'Project Count', data: seriesData }],
-      chart: { type: 'bar', height: 350, background: 'transparent', toolbar: { show: false } },
+      chart: {
+        type: 'bar',
+        height: 350,
+        background: 'transparent',
+        toolbar: { show: false },
+        fontFamily: 'var(--font-family-base)'
+      },
       colors: barColors,
-      plotOptions: { bar: { borderRadius: 4, horizontal: false, distributed: true, columnWidth: '70%' } },
-      dataLabels: { enabled: true, style: { colors: ['var(--text-color)'] } },
-      xaxis: { categories: departments, labels: { style: { colors: 'var(--subtle-text-color)' } } },
-      yaxis: { labels: { show: true, style: { colors: 'var(--subtle-text-color)', fontSize: '14px' } } },
-      grid: { borderColor: 'var(--border-color-translucent)', xaxis: { lines: { show: false } }, yaxis: { lines: { show: true } } },
-      tooltip: { theme: 'dark', y: { formatter: (val: number) => `${val} Projects` } }, legend: { show: false }
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          horizontal: false,
+          distributed: true,
+          columnWidth: '70%'
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        style: { colors: ['var(--text-color)'] },
+        formatter: (val: any) => val.toLocaleString(),
+        background: { enabled: true, foreColor: 'var(--text-color)', padding: 4, borderRadius: 2, borderWidth: 1, borderColor: 'var(--border-color)', opacity: 0.9, dropShadow: { enabled: false } },
+        textAnchor: 'middle',
+      },
+      xaxis: {
+        categories: departments,
+        labels: { style: { colors: 'var(--subtle-text-color)' } },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      yaxis: {
+        labels: { show: true, style: { colors: 'var(--subtle-text-color)', fontSize: '14px' } },
+        forceNiceScale: true,
+        min: 0,
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      grid: {
+        borderColor: 'var(--border-color-translucent)',
+        xaxis: { lines: { show: false } },
+        yaxis: { lines: { show: true } },
+        strokeDashArray: 4
+      },
+      tooltip: { theme: 'dark', y: { formatter: (val: number) => `${val} Projects` } },
+      legend: { show: false }
     };
   }
 
@@ -330,23 +477,107 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
 
     return {
       series: [{ name: 'Project Count', data: seriesData }],
-      chart: { type: 'bar', height: 350, background: 'transparent', toolbar: { show: false } },
+      chart: {
+        type: 'bar',
+        height: 350,
+        background: 'transparent',
+        toolbar: { show: false },
+        fontFamily: 'var(--font-family-base)',
+        events: {
+            dataPointSelection: (event: any, chartContext: any, config: any) => {
+                const clickedTech = categories[config.dataPointIndex];
+                this.onTechnologyBarClick(clickedTech);
+            }
+        }
+      },
       colors: barColors,
-      plotOptions: { bar: { borderRadius: 4, horizontal: true, distributed: true, barHeight: '70%' } },
-      dataLabels: { enabled: true, style: { colors: ['#fff'] } },
-      xaxis: { categories: categories, labels: { style: { colors: 'var(--subtle-text-color)' } } },
-      yaxis: { labels: { show: true, style: { colors: 'var(--subtle-text-color)', fontSize: '14px' } } },
-      grid: { borderColor: 'var(--border-color-translucent)', xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
-      tooltip: { theme: 'dark', x: { show: false } }, legend: { show: false }
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          horizontal: true,
+          distributed: true,
+          barHeight: '70%',
+          dataLabels: {
+            position: 'top',
+            hideOverflowingLabels: true
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        style: { colors: ['#fff'], fontSize: '12px' },
+        formatter: (val: any) => val.toLocaleString(),
+        offsetX: 10,
+        dropShadow: {
+            enabled: true,
+            top: 1,
+            left: 1,
+            blur: 1,
+            color: '#000',
+            opacity: 0.45
+        }
+      },
+      xaxis: {
+        categories: categories,
+        labels: {
+          style: { colors: 'var(--subtle-text-color)' },
+          formatter: (val: string) => parseInt(val).toLocaleString()
+        },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        min: 0,
+      },
+      yaxis: {
+        labels: {
+          show: true,
+          style: { colors: 'var(--subtle-text-color)', fontSize: '14px' },
+          minWidth: 100,
+        },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      grid: {
+        borderColor: 'var(--border-color-translucent)',
+        xaxis: { lines: { show: true } },
+        yaxis: { lines: { show: false } },
+        strokeDashArray: 4
+      },
+      tooltip: {
+        theme: 'dark',
+        x: {
+          show: false
+        },
+        y: {
+          formatter: (val: number, { seriesIndex, dataPointIndex, w }) => {
+            return `${categories[dataPointIndex]}: ${val} Projects`;
+          },
+          title: { formatter: (seriesName: string) => '' }
+        }
+      },
+      legend: { show: false }
     };
   }
 
+  onTechnologyBarClick(technology: string): void {
+      if (this.clickedTechnology$.getValue() === technology) {
+          this.clickedTechnology$.next(null);
+      } else {
+          this.clickedTechnology$.next(technology);
+      }
+  }
+
+  clearTechnologySelection(): void {
+      this.clickedTechnology$.next(null);
+  }
+
   private animateCounters(): void {
-    this.kpiValueElements.forEach(el => {
-      const element = el.nativeElement;
-      const targetValue = parseInt(element.getAttribute('data-value') || '0', 10);
-      this.animateCount(element, targetValue);
-    });
+    if (this.kpiValueElements) {
+      this.kpiValueElements.forEach(el => {
+        const element = el.nativeElement;
+        const targetValue = parseInt(element.getAttribute('data-value') || '0', 10);
+        this.animateCount(element, targetValue);
+      });
+    }
   }
 
   private animateCount(element: HTMLElement, target: number): void {
@@ -362,8 +593,11 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
       const easedProgress = 1 - Math.pow(1 - progress, 3);
       const current = Math.round(target * easedProgress);
       element.innerText = current.toLocaleString();
-      if (frame < totalFrames) requestAnimationFrame(count);
-      else element.innerText = target.toLocaleString();
+      if (frame < totalFrames) {
+        requestAnimationFrame(count);
+      } else {
+        element.innerText = target.toLocaleString();
+      }
     };
     requestAnimationFrame(count);
   }

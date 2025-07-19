@@ -18,8 +18,7 @@
           <label for="status-filter">Status</label>
           <select id="status-filter" (change)="onStatusFilterChange($event)">
             <option value="all">All Statuses</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="submitted">Submitted</option>
+            <option *ngFor="let status of uniqueStatuses" [value]="status.toLowerCase()">{{ status }}</option>
           </select>
         </div>
       </div>
@@ -33,7 +32,7 @@
         <div class="chart-card-skeleton large"></div>
         <div class="chart-card-skeleton large"></div>
         <div class="chart-card-skeleton full-width"></div>
-        <div class="chart-card-skeleton full-width"></div>
+        <div class="chart-card-skeleton full-width"></div><!-- For projects by tech if it shows initially -->
       </div>
     </ng-container>
 
@@ -175,6 +174,49 @@
                 </apx-chart>
               </div>
             </div>
+
+            <!-- Projects by Selected Technology -->
+            <!-- Use a combined object in *ngIf to access both observables cleanly -->
+            <ng-container *ngIf="{ techProjects: selectedTechProjects$ | async, selectedTech: clickedTechnology$ | async } as data">
+              <!-- Use a nested ng-container to narrow the type of data.selectedTech -->
+              <ng-container *ngIf="data.selectedTech as techName">
+                <!-- Main section for displaying projects -->
+                <div class="selected-tech-projects-section" *ngIf="data.techProjects && data.techProjects.length > 0">
+                  <div class="section-header">
+                    <!-- Use the type-narrowed 'techName' variable here with non-null assertion for strictness -->
+                    <h3 class="chart-title">Projects Using Selected Technology: {{ techName! }}</h3>
+                    <button class="btn btn-secondary" (click)="clearTechnologySelection()">
+                      <i class="fas fa-times"></i> Clear Selection
+                    </button>
+                  </div>
+
+                  <div class="tech-projects-grid">
+                    <div class="project-card" *ngFor="let project of data.techProjects">
+                      <div class="project-card-header">
+                        <h4 class="project-title">{{ project.title }}</h4>
+                        <span class="project-status" [ngClass]="{'status-ongoing': getProjectStatus(project) === 'Ongoing', 'status-submitted': getProjectStatus(project) === 'Submitted'}">
+                          {{ getProjectStatus(project) }}
+                        </span>
+                      </div>
+                      <p class="project-description">{{ project.description | slice:0:100 }}...</p>
+                      <div class="project-meta">
+                        <!-- APPLY OPTIONAL CHAINING HERE -->
+                        <span *ngIf="project.category?.name" class="meta-item"><i class="fas fa-tag"></i> {{ project.category?.name }}</span>
+                        <span *ngIf="project.department?.name" class="meta-item"><i class="fas fa-building"></i> {{ project.department?.name }}</span>
+                        <span *ngIf="project.startDate" class="meta-item"><i class="fas fa-calendar-alt"></i> Started: {{ project.startDate | date:'mediumDate' }}</span>
+                        <span *ngIf="project.technologies" class="meta-item technologies"><i class="fas fa-code"></i> {{ project.technologies }}</span>
+                        <span *ngIf="project.grade" class="meta-item"><i class="fas fa-star"></i> Grade: {{ project.grade }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message for when a technology is selected but no projects are found -->
+                <div *ngIf="!data.techProjects || data.techProjects.length === 0" class="no-projects-message">
+                  No projects found for the selected technology: {{ techName! }}.
+                </div>
+              </ng-container>
+            </ng-container>
 
           </div>
         </ng-container>

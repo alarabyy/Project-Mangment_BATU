@@ -1,13 +1,22 @@
-import { Category } from './category'; // Assuming Category interface exists
-import { Department } from './department'; // Assuming Department interface exists
+// src/app/models/project.ts
+import { Category } from './category';
+import { Department } from './department';
 
-// Interface for a single project member
+export interface Student {
+  id: number;
+  name: string;
+}
+
+export interface Supervisor {
+  id: number;
+  name: string;
+}
+
 export interface Member {
   name: string;
   academicId: number;
 }
 
-// Full Project interface - used for project details and creation/update
 export interface Project {
   id: number;
   title: string;
@@ -16,24 +25,13 @@ export interface Project {
   technologies: string;
   toolsUsed: string;
   problemStatement: string;
-  images: string[]; // Array of image filenames
-  submissionDate: string | null; // Can be null
-  startDate: string;
-  teamLeaderId: number;
-  category: Category | null; // Can be null if not associated
-  department: Department | null; // Can be null if not associated
-  students: any[]; // Array of student objects/IDs
-  supervisers: any[]; // Array of superviser objects/IDs
-  members?: Member[]; // Optional array of project members
-}
-
-// ProjectMinimal interface - often used for lists where only basic data is needed
-// This matches the data structure of the JSON you provided for the get/all endpoint.
-export interface ProjectMinimal {
-  id: number;
-  title: string;
-  description: string;
-  technologies: string;
-  toolsUsed: string;
-  problemStatement: string;
+  images: string[]; // Will be empty if backend doesn't send
+  submissionDate: string | null; // ISO date string or null
+  startDate: string | null;      // ISO date string or null
+  teamLeaderId: number | null; // Allow null
+  category: Category | null;
+  department: Department | null;
+  students: Student[] | null; // Allow null
+  supervisers: Supervisor[] | null; // Allow null
+  members?: Member[] | null; // Allow null
 }

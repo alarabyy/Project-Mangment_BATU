@@ -1,12 +1,14 @@
+// src/app/components/User/user-analytics/user-analytics.component.ts
 import { Component, OnInit, ElementRef, QueryList, ViewChildren, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { Observable, of, BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { map, catchError, startWith, shareReplay } from 'rxjs/operators';
-import { User } from '../../../models/user';
+import { User } from '../../../models/user'; // **مسار معدّل**
 import { subDays, format, eachDayOfInterval, startOfDay } from 'date-fns';
 import { UserService } from '../../../Services/user.service';
 
+// تعريف أنواع المخططات لـ ApexCharts (لم يتغير)
 type ChartOptions = Partial<{ series: any; chart: any; plotOptions: any; labels: any; colors: any; dataLabels: any; legend: any; tooltip: any; stroke: any; xaxis: any; yaxis: any; grid: any; fill: any; title: any; subtitle: any; }>;
 interface AnalyticsState { users: User[]; isLoading: boolean; error: string | null; }
 
@@ -22,7 +24,8 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
   private kpiSubscription!: Subscription;
 
   public state$!: Observable<AnalyticsState>;
-  public filteredUsers$!: Observable<User[]>;
+  public filteredUsers$!: Observable<User[]>; // تم تغيير type
+  // لم يعد هناك حاجة لـ AuthService هنا، فقط UserService
 
   private roleFilter$ = new BehaviorSubject<string>('all');
   private statusFilter$ = new BehaviorSubject<string>('all');
@@ -35,23 +38,26 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
+    // 1) مصدر بيانات المستخدمين من الخدمة
     const source$ = this.userService.getUsers().pipe(
       map(users => ({ isLoading: false, users, error: null })),
       startWith({ isLoading: true, users: [], error: null }),
       catchError(err => of({ isLoading: false, users: [], error: 'Could not load analytics data.' })),
-      shareReplay(1)
+      shareReplay(1) // يحفظ آخر قيمة ويشاركها مع المشتركين الجدد
     );
 
     this.state$ = source$;
 
+    // 2) تطبيق الفلاتر
     this.filteredUsers$ = combineLatest([
-      source$.pipe(map(s => s.users)),
+      source$.pipe(map(s => s.users)), // نأخذ قائمة المستخدمين من الحالة
       this.roleFilter$,
       this.statusFilter$
     ]).pipe(
       map(([users, role, status]) => this.applyFilters(users, role, status))
     );
 
+    // 3) حساب وتجهيز بيانات الـ KPI والمخططات بناءً على المستخدمين المفلترين
     this.kpiData$ = this.filteredUsers$.pipe(map(users => this.calculateKpiData(users)));
     this.roleDistributionOptions$ = this.filteredUsers$.pipe(map(users => this.createRoleDistributionChart(users)));
     this.emailDomainOptions$ = this.filteredUsers$.pipe(map(users => this.createEmailDomainChart(users)));
@@ -59,40 +65,69 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit(): void {
+    // تشغيل عدادات الـ KPI بعد تهيئة المكون والعناصر
     this.kpiSubscription = this.kpiData$.subscribe(data => {
       if (data && this.kpiValueElements && this.kpiValueElements.length) {
+        // نستخدم setTimeout لضمان أن عناصر DOM مرئية وجاهزة للرسوم المتحركة
         setTimeout(() => this.animateCounters(), 0);
       }
     });
   }
 
   ngOnDestroy(): void {
+    // إلغاء الاشتراك لمنع تسرب الذاكرة
     if (this.kpiSubscription) this.kpiSubscription.unsubscribe();
   }
 
+  // تطبيق فلاتر الدور والحالة
   applyFilters(users: User[], role: string, status: string): User[] {
-    return users.filter(user =>
-      (role === 'all' || (user.role != null && this.getRoleInfo(user.role).name.toLowerCase() === role)) &&
-      (status === 'all' || (user.status && user.status.toLowerCase() === status))
-    );
+    return users.filter(user => {
+      // فلترة حسب الدور
+      const roleMatch = (role === 'all') ||
+                        (user.role != null && this.getRoleInfo(user.role).name.toLowerCase() === role);
+
+      // فلترة حسب الحالة (status)
+      // تأكد أن user.status موجود وغير null قبل الوصول إلى toLowerCase()
+      const statusMatch = (status === 'all') ||
+                          (user.status && user.status.toLowerCase() === status);
+
+      return roleMatch && statusMatch;
+    });
   }
 
   onRoleFilterChange(event: Event): void { this.roleFilter$.next((event.target as HTMLSelectElement).value); }
   onStatusFilterChange(event: Event): void { this.statusFilter$.next((event.target as HTMLSelectElement).value); }
 
-  // [تم التصحيح هنا]: تم تعديل قيم الـ case لتتناسب مع الـ Enum من الـ Backend
-  // Student = 0, Doctor = 1, Admin = 2
-  public getRoleInfo(roleId: number | string): { name: string; icon: string; class: string } {
-    const numericRoleId = typeof roleId === 'string' ? parseInt(roleId, 10) : roleId;
+  // دالة تحويل الدور إلى معلومات عرض (تم التصحيح)
+  public getRoleInfo(roleValue: number | string | string[] | undefined): { name: string; icon: string; class: string } {
+    /* تعتمد هذه القيم على الـ Enum فى الـ Back‑End:
+       Student = 0, Doctor = 1, Admin = 2
+    */
+
+    let normalizedRole: string | number | undefined;
+
+    // التعامل مع حالة إذا كان roleValue مصفوفة
+    if (Array.isArray(roleValue)) {
+      // إذا كانت مصفوفة، نأخذ العنصر الأول. إذا كانت المصفوفة فارغة، فستكون undefined.
+      normalizedRole = roleValue.length > 0 ? roleValue[0] : undefined;
+    } else {
+      // بخلاف ذلك، استخدم القيمة كما هي (نص، رقم، أو undefined).
+      normalizedRole = roleValue;
+    }
+
+    // الآن، normalizedRole مضمون ليكون string | number | undefined.
+    // يمكننا متابعة تحويله إلى رقم تعريف رقمي.
+    const numericRoleId = typeof normalizedRole === 'string' ? parseInt(normalizedRole, 10) : normalizedRole;
 
     switch (numericRoleId) {
       case 2: return { name: 'Admin', icon: 'fas fa-user-shield', class: 'admin' };
-      case 0: return { name: 'Student', icon: 'fas fa-user-graduate', class: 'student' }; // تم التصحيح: 0 للطالب
-      case 1: return { name: 'Doctor', icon: 'fas fa-user-tie', class: 'doctor' };   // تم التصحيح: 1 للدكتور
+      case 0: return { name: 'Student', icon: 'fas fa-user-graduate', class: 'student' };
+      case 1: return { name: 'Doctor', icon: 'fas fa-user-tie', class: 'doctor' };
       default: return { name: 'User', icon: 'fas fa-user', class: 'unknown' };
     }
   }
 
+  // حساب بيانات KPI (تم التعديل)
   private calculateKpiData(users: User[]): any {
     if (!users || users.length === 0) return { total: 0, active: 0, newLastMonth: 0, pending: 0 };
     const thirtyDaysAgo = subDays(new Date(), 30);
@@ -104,6 +139,7 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     };
   }
 
+  // إنشاء مخطط التسجيلات بمرور الوقت (تم التعديل)
   private createSignupsOverTimeChart(users: User[]): Partial<ChartOptions> {
       const last30Days = subDays(new Date(), 30);
       const signupsByDay = new Map<string, number>();
@@ -111,6 +147,7 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
       dateInterval.forEach(day => signupsByDay.set(format(day, 'yyyy-MM-dd'), 0));
 
       users.forEach(user => {
+          // التأكد أن user.createdAt موجود
           if (user.createdAt && new Date(user.createdAt) >= last30Days) {
               const dayKey = format(startOfDay(new Date(user.createdAt)), 'yyyy-MM-dd');
               if (signupsByDay.has(dayKey)) {
@@ -135,6 +172,7 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
       };
   }
 
+  // إنشاء مخطط توزيع الأدوار (لم يتغير)
   private createRoleDistributionChart(users: User[]): Partial<ChartOptions> {
     const roleCounts = users.reduce((acc, user) => {
       if (user.role != null) {
@@ -158,6 +196,7 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     };
   }
 
+  // إنشاء مخطط نطاق البريد الإلكتروني (لم يتغير)
   private createEmailDomainChart(users: User[]): Partial<ChartOptions> {
     const domainCounts = users.reduce((acc, user) => {
       if (user.email) {
@@ -194,6 +233,7 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     };
   }
 
+  // دوال الرسوم المتحركة للـ KPI (لم تتغير)
   private animateCounters(): void {
     this.kpiValueElements.forEach(el => {
       const element = el.nativeElement;

@@ -1,3 +1,4 @@
+// src/app/components/User/user-management/user-management.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,9 +9,8 @@ import {
   catchError, switchMap
 } from 'rxjs/operators';
 import { User } from '../../../models/user';
-import { UserService } from '../../../Services/user.service';
 import { AuthService } from '../../../Services/auth.service';
-
+import { UserService } from '../../../Services/user.service';
 interface UserManagementState {
   users: User[];
   isLoading: boolean;
@@ -93,13 +93,26 @@ export class UserManagementComponent implements OnInit {
   }
 
   /* ---------- ROLE MAPPING (fixed) ---------- */
-  // [التعديل هنا] لجعلها تتعامل مع الأرقام أو الـ strings
-  getRoleInfo(roleId: number | string): { name: string; icon: string } {
+  // [التعديل هنا] لجعلها تتعامل مع الأرقام أو الـ strings أو مصفوفة من الـ strings
+  getRoleInfo(roleValue: number | string | string[] | undefined): { name: string; icon: string } {
     /* تعتمد هذه القيم على الـ Enum فى الـ Back‑End:
        Student = 0, Doctor = 1, Admin = 2
     */
-    // قم بتحويل roleId إلى رقم إذا كان string
-    const numericRoleId = typeof roleId === 'string' ? parseInt(roleId, 10) : roleId;
+
+    let normalizedRole: string | number | undefined;
+
+    // First, handle if roleValue is an array
+    if (Array.isArray(roleValue)) {
+      // If it's an array, take the first element. If the array is empty, it will be undefined.
+      normalizedRole = roleValue.length > 0 ? roleValue[0] : undefined;
+    } else {
+      // Otherwise, use the value as is (string, number, or undefined).
+      normalizedRole = roleValue;
+    }
+
+    // Now, normalizedRole is guaranteed to be string | number | undefined.
+    // We can proceed to parse it to a numeric ID.
+    const numericRoleId = typeof normalizedRole === 'string' ? parseInt(normalizedRole, 10) : normalizedRole;
 
     switch (numericRoleId) {
       case 0: return { name: 'Student', icon: 'fa-user-graduate' };
@@ -128,6 +141,7 @@ export class UserManagementComponent implements OnInit {
 
   startEdit(user: User): void {
     this.editingUserId = user.id;
+    // يجب عمل نسخة عميقة إذا كانت User تحتوي على كائنات متداخلة
     this.editedUser    = { ...user };
   }
 
@@ -137,7 +151,10 @@ export class UserManagementComponent implements OnInit {
   }
 
   saveEdit(): void {
-    if (!this.editedUser?.id) return alert('No user selected for editing.');
+    if (!this.editedUser?.id) {
+      alert('No user selected for editing.');
+      return;
+    }
     this.userService.updateUser(this.editedUser).pipe(
       catchError(err => {
         console.error('Error updating user:', err);
@@ -147,7 +164,7 @@ export class UserManagementComponent implements OnInit {
     ).subscribe(ok => {
       if (ok !== null) {
         this.cancelEdit();
-        this.refreshUsers$.next();
+        this.refreshUsers$.next(); // إعادة تحميل قائمة المستخدمين
       }
     });
   }

@@ -1,36 +1,155 @@
-/* Ensure FontAwesome is available, or use Bootstrap Icons as needed */
+/* src/app/components/project/project-list/project-list.component.css */
+
+/* تأكد من تضمين FontAwesome في ملف styles.css العام أو index.html */
 /* @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"); */
+
+/* تعريف متغيرات CSS للثيم، يفضل أن تكون في ملف styles.css العام أو :root */
+:root {
+  --primary-accent: #6200ea; /* Deep Purple */
+  --primary-accent-rgb: 98, 0, 234;
+  --primary-accent-hover: #7b20ec;
+  --secondary-accent: #03dac6; /* Teal */
+  --secondary-accent-hover: #04b3a4;
+
+  --bg-color: #121212; /* Dark background */
+  --surface-color: #1e1e1e; /* Slightly lighter dark surface */
+  --bg-light-hover: #2a2a2a; /* Even lighter for hover */
+
+  --text-color: #e0e0e0; /* Light text */
+  --subtle-text-color: #a0a0a0; /* Subtler text for labels/hints */
+
+  --border-color: #383838; /* Darker border */
+  --border-color-translucent: rgba(56, 56, 56, 0.7); /* Translucent border */
+
+  --success-color: #4CAF50; /* Green */
+  --warning-color: #FFC107; /* Amber */
+  --error-color: #F44336; /* Red */
+  --error-color-translucent: rgba(244, 67, 54, 0.2);
+  --info-color: #2196F3; /* Blue for info/download */
+  --info-color-hover: #1976D2;
+
+  --font-family-base: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --border-radius-small: 4px;
+  --border-radius-base: 8px;
+  --border-radius-large: 12px;
+
+  --box-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --box-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --box-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
 
 :host {
   display: block;
   background-color: var(--bg-color);
   min-height: 100vh;
-  padding-bottom: 2rem; /* Add some bottom padding */
+  padding-bottom: 2rem;
+  font-family: var(--font-family-base);
+  color: var(--text-color);
 }
+
 .list-container {
-  padding: 2rem;
+  padding: 1.5rem; /* تعديل ليتناسب مع الشاشات الصغيرة بشكل أفضل */
   max-width: 1400px;
   margin: auto;
 }
+
 .list-header {
   display: flex;
+  flex-direction: column; /* التكدس الرأسي على الشاشات الصغيرة */
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  align-items: flex-start; /* محاذاة للبداية في الوضع العمودي */
+  margin-bottom: 2rem;
+  gap: 1.5rem;
 }
+
+@media (min-width: 768px) {
+  .list-header {
+    flex-direction: row; /* العرض في صف على الشاشات الأكبر */
+    align-items: center;
+  }
+}
+
 .list-header h1 {
-  font-size: 2.2rem;
+  font-size: 2rem; /* تعديل حجم الخط للشاشات الصغيرة */
   font-weight: var(--font-weight-bold);
   margin: 0;
   color: var(--text-color);
 }
+
+@media (min-width: 768px) {
+  .list-header h1 {
+    font-size: 2.2rem;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap; /* السماح للعناصر بالالتفاف */
+  justify-content: flex-start; /* محاذاة للبداية على الشاشات الصغيرة */
+  align-items: center;
+  width: 100%; /* عرض كامل على الشاشات الصغيرة */
+}
+
+@media (min-width: 768px) {
+  .header-actions {
+    width: auto; /* يتقلص ليتناسب مع المحتوى على الشاشات الأكبر */
+    justify-content: flex-end; /* محاذاة للنهاية على الشاشات الأكبر */
+  }
+}
+
+/* نمط مربع البحث */
+.search-input {
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--border-radius-base);
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%; /* عرض كامل على الشاشات الصغيرة */
+  flex-grow: 1; /* يسمح له بالنمو */
+  max-width: 300px; /* تحديد أقصى عرض حتى عند النمو */
+}
+
+@media (min-width: 768px) {
+  .search-input {
+    width: 250px; /* عرض ثابت على الشاشات الأكبر */
+    flex-grow: 0; /* لا ينمو على الشاشات الأكبر */
+  }
+}
+
+.search-input:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 2px rgba(var(--primary-accent-rgb), 0.2);
+}
+
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* تعديل minmax لتناسب أفضل مع الشاشات الصغيرة */
   gap: 1.5rem;
 }
+
+@media (min-width: 600px) { /* حجم التابلت */
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+@media (min-width: 992px) { /* حجم سطح المكتب */
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  }
+}
+
 .project-card {
   background-color: var(--surface-color);
   border: 1px solid var(--border-color);
@@ -39,44 +158,49 @@
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer; /* Added to indicate clickability */
-  overflow: hidden; /* Ensures rounded corners */
+  cursor: pointer;
+  overflow: hidden;
 }
 .project-card:hover {
   transform: translateY(-5px);
-  box-shadow: var(--box-shadow-lg); /* Larger shadow on hover */
+  box-shadow: var(--box-shadow-lg);
 }
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   border-bottom: 1px solid var(--border-color-translucent);
-  padding: 1.5rem;
-  background-color: var(--surface-color); /* Ensure consistent background */
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface-color);
 }
 .card-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem; /* تعديل ليناسب بشكل أفضل */
   font-weight: var(--font-weight-semibold);
   margin: 0;
   line-height: 1.3;
   color: var(--text-color);
+  word-break: break-word; /* لضمان التفاف العناوين الطويلة */
 }
-/* Removed grade-badge styling */
+@media (min-width: 768px) {
+  .card-title {
+    font-size: 1.25rem;
+  }
+}
 
 .card-body {
   padding: 1.5rem;
   flex-grow: 1;
-  color: var(--text-color); /* Default text color */
+  color: var(--text-color);
 }
 .card-description {
-  font-size: 0.95rem;
+  font-size: 0.9rem; /* أصغر قليلاً للوصف */
   color: var(--subtle-text-color);
   line-height: 1.6;
   margin-top: 0;
-  margin-bottom: 0.75rem; /* Adjusted margin */
+  margin-bottom: 0.75rem;
 }
-.card-detail-text { /* New style for problem statement or other basic text details */
-    font-size: 0.95rem;
+.card-detail-text {
+    font-size: 0.9rem; /* متناسق مع الوصف */
     color: var(--subtle-text-color);
     line-height: 1.6;
     margin-bottom: 1.5rem;
@@ -88,61 +212,67 @@
 .info-section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-top: auto; /* Push info section to the bottom of the body */
+  gap: 0.6rem; /* تقليل الفجوة قليلاً */
+  margin-top: auto;
 }
 .info-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* تعديل حجم الخط */
 }
 .info-item .label {
   color: var(--subtle-text-color);
   font-weight: var(--font-weight-medium);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem; /* تعديل فجوة الأيقونة */
 }
+.info-item .label i {
+    color: var(--primary-accent);
+    font-size: 0.85rem; /* حجم أيقونة متناسق */
+}
+
 .card-footer {
   padding: 0 1.5rem 1.5rem;
-  margin-top: 1.5rem; /* Ensure consistent spacing before footer */
+  margin-top: 1.5rem;
   display: flex;
   justify-content: flex-end;
-  background-color: var(--surface-color); /* Ensure consistent background */
+  background-color: var(--surface-color);
 }
-/* Buttons */
 .actions-group {
     display: flex;
-    gap: 0.75rem; /* Spacing between Edit and Delete buttons */
+    gap: 0.75rem;
+    flex-wrap: wrap; /* السماح للأزرار بالالتفاف داخل التذييل إذا لزم الأمر */
 }
 .btn {
-  padding: 0.6rem 1.2rem;
+  padding: 0.6rem 1.1rem; /* تعديل طفيف في الحشوة */
   border-radius: var(--border-radius-base);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem; /* تعديل فجوة الأيقونة */
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  font-size: 0.9rem; /* تعديل حجم الخط للأزرار */
 }
 .btn-primary {
   background-color: var(--primary-accent);
-  color: var(--bg-color); /* Text should contrast with green */
+  color: var(--bg-color);
   border-color: var(--primary-accent);
 }
 .btn-primary:hover {
   background-color: var(--primary-accent-hover);
 }
-.btn-secondary { /* Style for the Edit button */
+.btn-secondary {
     background-color: var(--surface-color);
     color: var(--text-color);
     border-color: var(--border-color);
 }
 .btn-secondary:hover {
-    background-color: var(--bg-light-hover); /* Lighter surface on hover */
+    background-color: var(--bg-light-hover);
     border-color: var(--text-color);
 }
 .btn-danger {
@@ -154,57 +284,77 @@
   background-color: var(--error-color, #f85149);
   color: white;
 }
-/* State Containers (Loading, Error, Empty) */
+.btn-info {
+  background-color: var(--info-color);
+  color: white;
+  border-color: var(--info-color);
+}
+.btn-info:hover {
+  background-color: var(--info-color-hover);
+}
+
+/* حاويات الحالات (تحميل، خطأ، فارغ) */
 .state-container {
   text-align: center;
-  padding: 4rem;
+  padding: 3rem; /* تعديل الحشوة */
   color: var(--subtle-text-color);
   background-color: var(--surface-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-large);
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   box-shadow: var(--box-shadow-sm);
 }
 .loading-spinner {
-  border: 5px solid var(--border-color);
+  border: 4px solid var(--border-color);
   border-top-color: var(--primary-accent);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
+  margin: 0 auto 0.75rem;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .empty-message h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
   color: var(--text-color);
 }
 .empty-message p {
-  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
 }
 .error-text {
   color: var(--error-color);
   font-weight: var(--font-weight-medium);
 }
 .state-container i {
-    font-size: 3rem; /* Adjust icon size */
-    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
 }
 .error-container i { color: var(--error-color); }
-.empty-message i { color: var(--subtle-text-color); } /* For folder-x icon if used */
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  flex-wrap: wrap;
-  gap: 1rem; /* Ensures gap between title and action group on wrap */
-}
+.empty-message i { color: var(--subtle-text-color); }
 
-/* Add this new style for the button group */
-.list-header .header-actions {
-  display: flex;
-  gap: 0.75rem; /* Spacing between the Add and Analysis buttons */
-  flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+/* تعديلات التصميم العام المتجاوبة */
+@media (max-width: 480px) { /* شاشات صغيرة جداً */
+  .list-container {
+    padding: 1rem;
+  }
+  .list-header h1 {
+    font-size: 1.8rem;
+  }
+  .header-actions {
+    flex-direction: column; /* إجبار الأزرار على التكدس */
+    align-items: stretch; /* تمديد الأزرار لملء العرض */
+  }
+  .btn, .search-input {
+    width: 100%;
+    max-width: none;
+  }
+  .projects-grid {
+    grid-template-columns: 1fr; /* عمود واحد */
+  }
+  .card-header, .card-body, .card-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
