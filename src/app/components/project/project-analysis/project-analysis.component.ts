@@ -35,7 +35,7 @@ interface AnalyticsState { projects: Project[]; isLoading: boolean; error: strin
 @Component({
   selector: 'app-project-analysis',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule],
+  imports: [CommonModule, NgApexchartsModule], // هذا هو المكان الصحيح الوحيد لـ imports
   templateUrl: './project-analysis.component.html',
   styleUrls: ['./project-analysis.component.css']
 })
@@ -146,7 +146,7 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
       total: projects.length,
       submitted: projects.filter(p => this.getProjectStatus(p) === 'Submitted').length,
       ongoing: projects.filter(p => this.getProjectStatus(p) === 'Ongoing').length,
-      newLastMonth: projects.filter(p => p.startDate && new Date(p.startDate) > thirtyDaysAgo).length,
+      newLastMonth: projects.filter(p => p.startDate && new Date(p.startDate).getTime() > thirtyDaysAgo.getTime()).length,
     };
   }
 
@@ -157,7 +157,7 @@ export class ProjectAnalysisComponent implements OnInit, AfterViewInit, OnDestro
       dateInterval.forEach(day => projectsByDay.set(format(day, 'yyyy-MM-dd'), 0));
 
       projects.forEach(project => {
-          if (project.startDate && !isNaN(new Date(project.startDate).getTime()) && new Date(project.startDate) >= last30Days) {
+          if (project.startDate && !isNaN(new Date(project.startDate).getTime()) && new Date(project.startDate).getTime() >= last30Days.getTime()) {
               const dayKey = format(startOfDay(new Date(project.startDate)), 'yyyy-MM-dd');
               if (projectsByDay.has(dayKey)) {
                   projectsByDay.set(dayKey, projectsByDay.get(dayKey)! + 1);

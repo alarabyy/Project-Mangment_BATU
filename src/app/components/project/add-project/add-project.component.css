@@ -1,3 +1,5 @@
+/* src/app/Components/add-project/add-project.component.css */
+
 :host {
   display: block;
   background-color: var(--bg-color);
@@ -70,7 +72,7 @@
 .section-title { font-size: 1.25rem; font-weight: var(--font-weight-bold); color: var(--text-color); margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
 @media (min-width: 768px) { .section-title { font-size: 1.5rem; } }
 
-/* --- NEW STYLES FOR MEMBERS SECTION --- */
+/* --- STYLES FOR MEMBERS SECTION (unchanged) --- */
 .members-section {
   padding: 1.5rem;
   border: 1px dashed var(--border-color);
@@ -145,4 +147,57 @@
   filter: blur(5px);
   pointer-events: none;
   user-select: none;
+}
+
+/* --- NEW STYLES FOR CHECKBOX GROUPS --- */
+.required-indicator {
+  color: var(--error-color);
+  margin-left: 0.25rem;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem; /* Row gap, column gap */
+  padding: 0.5rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  background-color: var(--bg-color);
+  padding: 1rem;
+  /* Add focus style for the group itself when any checkbox inside is focused */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Style for invalid checkbox groups */
+.checkbox-group.is-invalid {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px var(--error-color-translucent);
+}
+
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 150px; /* Ensures items don't get too narrow on smaller screens */
+  flex-grow: 1; /* Allows items to grow and fill space */
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 1.2em;
+  height: 1.2em;
+  accent-color: var(--primary-accent); /* Styles the checkbox itself */
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small);
+  margin: 0; /* Reset default margin */
+}
+
+.checkbox-item label {
+  margin: 0; /* Override default label margin */
+  font-weight: normal;
+  cursor: pointer;
+  color: var(--text-color);
+  white-space: nowrap; /* Prevent label text from wrapping */
+  font-size: 0.95rem;
 }
