@@ -70,12 +70,9 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.kpiSubscription) this.kpiSubscription.unsubscribe();
   }
 
-  // [تم التصحيح] استخدام الخصائص الصحيحة (camelCase/lowercase) وفحص وجود البيانات
   applyFilters(users: User[], role: string, status: string): User[] {
     return users.filter(user =>
-      // التأكد من أن user.role موجود قبل محاولة الوصول إليه
       (role === 'all' || (user.role != null && this.getRoleInfo(user.role).name.toLowerCase() === role)) &&
-      // التأكد من أن user.status موجود قبل محاولة الوصول إليه
       (status === 'all' || (user.status && user.status.toLowerCase() === status))
     );
   }
@@ -83,34 +80,30 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
   onRoleFilterChange(event: Event): void { this.roleFilter$.next((event.target as HTMLSelectElement).value); }
   onStatusFilterChange(event: Event): void { this.statusFilter$.next((event.target as HTMLSelectElement).value); }
 
-  // [تم التعديل] ليتعامل مع roleId كـ number أو string
+  // [تم التصحيح هنا]: تم تعديل قيم الـ case لتتناسب مع الـ Enum من الـ Backend
+  // Student = 0, Doctor = 1, Admin = 2
   public getRoleInfo(roleId: number | string): { name: string; icon: string; class: string } {
-    // قم بتحويل roleId إلى رقم إذا كان string لضمان المقارنة الصحيحة
     const numericRoleId = typeof roleId === 'string' ? parseInt(roleId, 10) : roleId;
 
     switch (numericRoleId) {
       case 2: return { name: 'Admin', icon: 'fas fa-user-shield', class: 'admin' };
-      case 1: return { name: 'Student', icon: 'fas fa-user-graduate', class: 'student' };
-      case 3: return { name: 'Doctor', icon: 'fas fa-user-tie', class: 'doctor' };
+      case 0: return { name: 'Student', icon: 'fas fa-user-graduate', class: 'student' }; // تم التصحيح: 0 للطالب
+      case 1: return { name: 'Doctor', icon: 'fas fa-user-tie', class: 'doctor' };   // تم التصحيح: 1 للدكتور
       default: return { name: 'User', icon: 'fas fa-user', class: 'unknown' };
     }
   }
 
-  // [تم التصحيح] استخدام الخاصية الصحيحة. تمت إضافة فحص للتأكد من وجود الخصائص.
   private calculateKpiData(users: User[]): any {
     if (!users || users.length === 0) return { total: 0, active: 0, newLastMonth: 0, pending: 0 };
     const thirtyDaysAgo = subDays(new Date(), 30);
     return {
       total: users.length,
-      // تم تعديل المقارنة لتكون case-insensitive لخاصية status
       active: users.filter(u => u.status && u.status.toLowerCase() === 'active').length,
       newLastMonth: users.filter(u => u.createdAt && new Date(u.createdAt) > thirtyDaysAgo).length,
-      // تم تعديل المقارنة لتكون case-insensitive لخاصية status
       pending: users.filter(u => u.status && u.status.toLowerCase() === 'pending').length,
     };
   }
 
-  // [تم التصحيح] استخدام الخاصية الصحيحة createdAt
   private createSignupsOverTimeChart(users: User[]): Partial<ChartOptions> {
       const last30Days = subDays(new Date(), 30);
       const signupsByDay = new Map<string, number>();
@@ -142,10 +135,8 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
       };
   }
 
-  // [تم التصحيح] استخدام الخاصية الصحيحة role والتأكد من وجودها
   private createRoleDistributionChart(users: User[]): Partial<ChartOptions> {
     const roleCounts = users.reduce((acc, user) => {
-      // التأكد من أن user.role موجود قبل محاولة الوصول إليه
       if (user.role != null) {
         const roleName = this.getRoleInfo(user.role).name;
         acc[roleName] = (acc[roleName] || 0) + 1;
@@ -167,10 +158,9 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     };
   }
 
-  // [تم التصحيح] استخدام الخاصية الصحيحة email والتأكد من وجودها
   private createEmailDomainChart(users: User[]): Partial<ChartOptions> {
     const domainCounts = users.reduce((acc, user) => {
-      if (user.email) { // التأكد من وجود email قبل التقسيم
+      if (user.email) {
         const domain = user.email.split('@')[1];
         if(domain) acc[domain] = (acc[domain] || 0) + 1;
       }
