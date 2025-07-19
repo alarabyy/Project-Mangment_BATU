@@ -70,10 +70,12 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.kpiSubscription) this.kpiSubscription.unsubscribe();
   }
 
-  // [تم التصحيح] استخدام الخصائص الصحيحة (camelCase/lowercase)
+  // [تم التصحيح] استخدام الخصائص الصحيحة (camelCase/lowercase) وفحص وجود البيانات
   applyFilters(users: User[], role: string, status: string): User[] {
     return users.filter(user =>
-      (role === 'all' || this.getRoleInfo(user.role).name.toLowerCase() === role) &&
+      // التأكد من أن user.role موجود قبل محاولة الوصول إليه
+      (role === 'all' || (user.role != null && this.getRoleInfo(user.role).name.toLowerCase() === role)) &&
+      // التأكد من أن user.status موجود قبل محاولة الوصول إليه
       (status === 'all' || (user.status && user.status.toLowerCase() === status))
     );
   }
@@ -81,8 +83,12 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
   onRoleFilterChange(event: Event): void { this.roleFilter$.next((event.target as HTMLSelectElement).value); }
   onStatusFilterChange(event: Event): void { this.statusFilter$.next((event.target as HTMLSelectElement).value); }
 
-  public getRoleInfo(roleId: number): { name: string; icon: string; class: string } {
-    switch (roleId) {
+  // [تم التعديل] ليتعامل مع roleId كـ number أو string
+  public getRoleInfo(roleId: number | string): { name: string; icon: string; class: string } {
+    // قم بتحويل roleId إلى رقم إذا كان string لضمان المقارنة الصحيحة
+    const numericRoleId = typeof roleId === 'string' ? parseInt(roleId, 10) : roleId;
+
+    switch (numericRoleId) {
       case 2: return { name: 'Admin', icon: 'fas fa-user-shield', class: 'admin' };
       case 1: return { name: 'Student', icon: 'fas fa-user-graduate', class: 'student' };
       case 3: return { name: 'Doctor', icon: 'fas fa-user-tie', class: 'doctor' };
@@ -90,15 +96,17 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  // [تم التصحيح] استخدام الخصائص الصحيحة. تمت إضافة فحص للتأكد من وجود الخصائص.
+  // [تم التصحيح] استخدام الخاصية الصحيحة. تمت إضافة فحص للتأكد من وجود الخصائص.
   private calculateKpiData(users: User[]): any {
     if (!users || users.length === 0) return { total: 0, active: 0, newLastMonth: 0, pending: 0 };
     const thirtyDaysAgo = subDays(new Date(), 30);
     return {
       total: users.length,
-      active: users.filter(u => u.status === 'Active').length,
+      // تم تعديل المقارنة لتكون case-insensitive لخاصية status
+      active: users.filter(u => u.status && u.status.toLowerCase() === 'active').length,
       newLastMonth: users.filter(u => u.createdAt && new Date(u.createdAt) > thirtyDaysAgo).length,
-      pending: users.filter(u => u.status === 'Pending').length,
+      // تم تعديل المقارنة لتكون case-insensitive لخاصية status
+      pending: users.filter(u => u.status && u.status.toLowerCase() === 'pending').length,
     };
   }
 
@@ -134,11 +142,14 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
       };
   }
 
-  // [تم التصحيح] استخدام الخاصية الصحيحة role
+  // [تم التصحيح] استخدام الخاصية الصحيحة role والتأكد من وجودها
   private createRoleDistributionChart(users: User[]): Partial<ChartOptions> {
     const roleCounts = users.reduce((acc, user) => {
-      const roleName = this.getRoleInfo(user.role).name;
-      acc[roleName] = (acc[roleName] || 0) + 1;
+      // التأكد من أن user.role موجود قبل محاولة الوصول إليه
+      if (user.role != null) {
+        const roleName = this.getRoleInfo(user.role).name;
+        acc[roleName] = (acc[roleName] || 0) + 1;
+      }
       return acc;
     }, {} as { [key: string]: number });
 
@@ -156,10 +167,10 @@ export class UserAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy 
     };
   }
 
-  // [تم التصحيح] استخدام الخاصية الصحيحة email
+  // [تم التصحيح] استخدام الخاصية الصحيحة email والتأكد من وجودها
   private createEmailDomainChart(users: User[]): Partial<ChartOptions> {
     const domainCounts = users.reduce((acc, user) => {
-      if (user.email) {
+      if (user.email) { // التأكد من وجود email قبل التقسيم
         const domain = user.email.split('@')[1];
         if(domain) acc[domain] = (acc[domain] || 0) + 1;
       }

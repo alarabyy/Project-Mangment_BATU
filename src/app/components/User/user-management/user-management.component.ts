@@ -1,4 +1,3 @@
-// File: src/app/admin/components/user-management/user-management.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -79,11 +78,13 @@ export class UserManagementComponent implements OnInit {
 
     term = term.toLowerCase();
     return users.filter(u =>
-      u.firstName.toLowerCase().includes(term)           ||
-      (u.lastname?.toLowerCase().includes(term) ?? false)||
-      u.email.toLowerCase().includes(term)               ||
-      u.id.toString().includes(term)                     ||
-      this.getRoleInfo(u.role).name.toLowerCase().includes(term)
+      // تمت إضافة فحوصات Nullish coalescing (?? false) و Optional chaining (?.)
+      (u.firstName?.toLowerCase().includes(term) ?? false) ||
+      (u.lastname?.toLowerCase().includes(term) ?? false) ||
+      (u.email?.toLowerCase().includes(term) ?? false) ||
+      (u.id?.toString().includes(term) ?? false) ||
+      // تأكد من أن u.role موجود قبل استخدامه
+      (u.role != null && this.getRoleInfo(u.role).name.toLowerCase().includes(term))
     );
   }
 
@@ -92,11 +93,15 @@ export class UserManagementComponent implements OnInit {
   }
 
   /* ---------- ROLE MAPPING (fixed) ---------- */
-  getRoleInfo(roleId: number): { name: string; icon: string } {
+  // [التعديل هنا] لجعلها تتعامل مع الأرقام أو الـ strings
+  getRoleInfo(roleId: number | string): { name: string; icon: string } {
     /* تعتمد هذه القيم على الـ Enum فى الـ Back‑End:
        Student = 0, Doctor = 1, Admin = 2
     */
-    switch (roleId) {
+    // قم بتحويل roleId إلى رقم إذا كان string
+    const numericRoleId = typeof roleId === 'string' ? parseInt(roleId, 10) : roleId;
+
+    switch (numericRoleId) {
       case 0: return { name: 'Student', icon: 'fa-user-graduate' };
       case 1: return { name: 'Doctor',  icon: 'fa-user-tie'      };
       case 2: return { name: 'Admin',   icon: 'fa-user-shield'   };

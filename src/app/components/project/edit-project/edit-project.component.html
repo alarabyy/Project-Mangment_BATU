@@ -14,21 +14,121 @@
   <div *ngIf="!isLoading && project">
     <div class="form-container">
       <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
-        <div class="form-group"><label for="title">Project Title</label><input type="text" id="title" formControlName="title" class="form-control"></div>
-        <div class="form-group"><label for="description">Description</label><textarea id="description" formControlName="description" class="form-control" rows="3"></textarea></div>
-        <div class="form-group"><label for="problemStatement">Problem Statement</label><textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3"></textarea></div>
-        <div class="form-row">
-            <div class="form-group"><label for="technologies">Technologies</label><input type="text" id="technologies" formControlName="technologies" class="form-control"></div>
-            <div class="form-group"><label for="toolsUsed">Tools Used</label><input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control"></div>
+        <!-- Project Details Section -->
+        <h2 class="section-title"><i class="fas fa-info-circle"></i> Project Details</h2>
+        <div class="form-group">
+          <label for="title">Project Title</label>
+          <input type="text" id="title" formControlName="title" class="form-control"
+                 [class.is-invalid]="f['title'].invalid && f['title'].touched">
+          <div *ngIf="f['title'].touched && f['title'].errors" class="error-message">
+            <small *ngIf="f['title'].errors?.['required']">Project title is required.</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" formControlName="description" class="form-control" rows="3"
+                    [class.is-invalid]="f['description'].invalid && f['description'].touched"></textarea>
+          <div *ngIf="f['description'].touched && f['description'].errors" class="error-message">
+            <small *ngIf="f['description'].errors?.['required']">Description is required.</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="problemStatement">Problem Statement</label>
+          <textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3"
+                    [class.is-invalid]="f['problemStatement'].invalid && f['problemStatement'].touched"></textarea>
+          <div *ngIf="f['problemStatement'].touched && f['problemStatement'].errors" class="error-message">
+            <small *ngIf="f['problemStatement'].errors?.['required']">Problem statement is required.</small>
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label for="grade">Grade</label><input type="number" id="grade" formControlName="grade" class="form-control"></div>
-          <div class="form-group"><label for="teamLeaderId">Leader ID</label><input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control"></div>
+            <div class="form-group">
+              <label for="technologies">Technologies</label>
+              <input type="text" id="technologies" formControlName="technologies" class="form-control"
+                     [class.is-invalid]="f['technologies'].invalid && f['technologies'].touched">
+              <div *ngIf="f['technologies'].touched && f['technologies'].errors" class="error-message">
+                <small *ngIf="f['technologies'].errors?.['required']">Technologies are required.</small>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="toolsUsed">Tools Used</label>
+              <input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control"
+                     [class.is-invalid]="f['toolsUsed'].invalid && f['toolsUsed'].touched">
+              <div *ngIf="f['toolsUsed'].touched && f['toolsUsed'].errors" class="error-message">
+                <small *ngIf="f['toolsUsed'].errors?.['required']">Tools used are required.</small>
+              </div>
+            </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label for="categoryId">Category ID</label><input type="number" id="categoryId" formControlName="categoryId" class="form-control"></div>
-          <div class="form-group"><label for="departmentId">Department ID</label><input type="number" id="departmentId" formControlName="departmentId" class="form-control"></div>
+          <div class="form-group">
+            <label for="grade">Grade (Optional)</label>
+            <input type="number" id="grade" formControlName="grade" class="form-control"
+                   [class.is-invalid]="f['grade'].invalid && f['grade'].touched">
+            <div *ngIf="f['grade'].touched && f['grade'].errors" class="error-message">
+              <small *ngIf="f['grade'].errors?.['min'] || f['grade'].errors?.['max']">Grade must be between 0 and 100.</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="teamLeaderId">Leader ID</label>
+            <input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control"
+                   [class.is-invalid]="f['teamLeaderId'].invalid && f['teamLeaderId'].touched">
+            <div *ngIf="f['teamLeaderId'].touched && f['teamLeaderId'].errors" class="error-message">
+              <small *ngIf="f['teamLeaderId'].errors?.['required']">Leader ID is required.</small>
+              <small *ngIf="f['teamLeaderId'].errors?.['pattern']">Leader ID must be a number.</small>
+            </div>
+          </div>
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="categoryId">Category ID</label>
+            <input type="number" id="categoryId" formControlName="categoryId" class="form-control"
+                   [class.is-invalid]="f['categoryId'].invalid && f['categoryId'].touched">
+            <div *ngIf="f['categoryId'].touched && f['categoryId'].errors" class="error-message">
+              <small *ngIf="f['categoryId'].errors?.['required']">Category ID is required.</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="departmentId">Department ID</label>
+            <input type="number" id="departmentId" formControlName="departmentId" class="form-control"
+                   [class.is-invalid]="f['departmentId'].invalid && f['departmentId'].touched">
+            <div *ngIf="f['departmentId'].touched && f['departmentId'].errors" class="error-message">
+              <small *ngIf="f['departmentId'].errors?.['required']">Department ID is required.</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Members Section -->
+        <h2 class="section-title mt-4"><i class="fas fa-users"></i> Team Members</h2>
+        <div formArrayName="members" class="members-section">
+          <div *ngFor="let memberGroup of members.controls; let i = index" [formGroupName]="i" class="member-group">
+            <div class="form-row">
+              <div class="form-group">
+                <label [for]="'memberName' + i">Member Name</label>
+                <input [id]="'memberName' + i" type="text" formControlName="name" class="form-control"
+                       [class.is-invalid]="memberGroup.get('name')?.invalid && memberGroup.get('name')?.touched">
+                <div *ngIf="memberGroup.get('name')?.touched && memberGroup.get('name')?.errors" class="error-message">
+                  <small *ngIf="memberGroup.get('name')?.errors?.['required']">Name is required.</small>
+                </div>
+              </div>
+              <div class="form-group">
+                <label [for]="'academicId' + i">Academic ID</label>
+                <input [id]="'academicId' + i" type="text" formControlName="academicId" class="form-control"
+                       [class.is-invalid]="memberGroup.get('academicId')?.invalid && memberGroup.get('academicId')?.touched">
+                <div *ngIf="memberGroup.get('academicId')?.touched && memberGroup.get('academicId')?.errors" class="error-message">
+                  <small *ngIf="memberGroup.get('academicId')?.errors?.['required']">Academic ID is required.</small>
+                  <small *ngIf="memberGroup.get('academicId')?.errors?.['min'] || memberGroup.get('academicId')?.errors?.['pattern']">Must be a valid ID.</small>
+                </div>
+              </div>
+            </div>
+            <button type="button" (click)="removeMember(i)" class="btn remove-member-btn" title="Remove Member">
+              <i class="fas fa-user-minus"></i>
+            </button>
+          </div>
+          <button type="button" (click)="addMember()" class="btn btn-add-member">
+            <i class="fas fa-user-plus"></i> Add Another Member
+          </button>
+        </div>
+
+        <!-- Form Actions -->
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
           <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">
@@ -39,6 +139,7 @@
       </form>
     </div>
 
+    <!-- Images Section -->
     <div class="images-section-container">
       <h2 class="section-title"><i class="fas fa-images"></i> Manage Project Images</h2>
 

@@ -64,3 +64,42 @@
 .btn-secondary { background-color: transparent; color: var(--text-color); }
 .btn-primary:hover { background-color: var(--primary-accent-hover); }
 .btn-secondary:hover { background-color: var(--surface-color); border-color: var(--text-color); }
+
+/* --- NEW STYLES FOR MEMBERS LIST --- */
+.members-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-bottom: 0.5rem; /* Space below list if section has border */
+}
+
+.member-item {
+  background-color: var(--bg-light-hover);
+  border: 1px solid var(--border-color-translucent);
+  border-radius: var(--border-radius-pill);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  white-space: nowrap; /* Prevents wrapping within a member item */
+}
+
+.member-item strong {
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-accent); /* Make name stand out */
+}
+
+.no-members-message {
+  padding: 1rem;
+  margin-top: 1rem;
+  background-color: var(--bg-light-hover);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-base);
+  color: var(--subtle-text-color);
+  text-align: center;
+}
+
+.no-members-message i {
+  margin-right: 0.5rem;
+  color: var(--primary-accent);
+}

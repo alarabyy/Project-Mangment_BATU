@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms'; // Import FormArray
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
-import { Project } from '../../../models/project';
+import { Project, Member } from '../../../models/project'; // Import Member interface
 import { finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -49,8 +49,27 @@ export class EditProjectComponent implements OnInit {
       grade: [null, [Validators.min(0), Validators.max(100)]],
       teamLeaderId: ['', Validators.required],
       categoryId: [null, Validators.required],
-      departmentId: [null, Validators.required]
+      departmentId: [null, Validators.required],
+      members: this.fb.array([]) // Initialize members as a FormArray
     });
+  }
+
+  get f() { return this.projectForm.controls; }
+  get members() { return this.projectForm.get('members') as FormArray; } // Getter for members FormArray
+
+  newMember(name: string = '', academicId: number | null = null): FormGroup {
+    return this.fb.group({
+      name: [name, Validators.required],
+      academicId: [academicId, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]]
+    });
+  }
+
+  addMember(): void {
+    this.members.push(this.newMember());
+  }
+
+  removeMember(index: number): void {
+    this.members.removeAt(index);
   }
 
   loadProjectData(): void {
@@ -60,6 +79,7 @@ export class EditProjectComponent implements OnInit {
       next: (projectData) => {
         this.project = projectData;
         this.pageTitle = `Edit: ${projectData.title}`;
+
         this.projectForm.patchValue({
              id: projectData.id,
              title: projectData.title,
@@ -72,15 +92,33 @@ export class EditProjectComponent implements OnInit {
              categoryId: projectData.category?.id,
              departmentId: projectData.department?.id
         });
+
+        // Populate members FormArray
+        this.members.clear(); // Clear existing controls
+        if (projectData.members && projectData.members.length > 0) {
+          projectData.members.forEach(member => {
+            this.members.push(this.newMember(member.name, member.academicId));
+          });
+        } else {
+          // Add one empty member field if no members exist initially
+          this.addMember();
+        }
       },
       error: () => this.router.navigate(['/not-found'])
     });
   }
 
-  get f() { return this.projectForm.controls; }
-
   onSubmit(): void {
-    if (this.projectForm.invalid) { this.projectForm.markAllAsTouched(); return; }
+    if (this.projectForm.invalid) {
+      this.projectForm.markAllAsTouched();
+      // Mark all member controls as touched as well
+      this.members.controls.forEach(control => {
+        if (control instanceof FormGroup) {
+          Object.values(control.controls).forEach(c => c.markAsTouched());
+        }
+      });
+      return;
+    }
     this.isSubmitting = true;
 
     const formValue = this.projectForm.value;
@@ -94,6 +132,12 @@ export class EditProjectComponent implements OnInit {
       LeaderId: Number(formValue.teamLeaderId),
       CategoryId: formValue.categoryId,
       DepartmentId: formValue.departmentId,
+      // Ensure members are included in the payload with correct structure
+      // Assuming backend expects camelCase 'members' array of objects with 'name' and 'academicId'
+      members: formValue.members.map((m: any) => ({
+        name: m.name,
+        academicId: Number(m.academicId) // Ensure academicId is a number
+      }))
     };
 
     this.projectService.updateProject(payload).pipe(finalize(() => this.isSubmitting = false))

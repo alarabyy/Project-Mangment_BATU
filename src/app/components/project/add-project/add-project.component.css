@@ -1,23 +1,21 @@
 :host {
   display: block;
   background-color: var(--bg-color);
-}
-
-/* Added to blur the background when the popup is active */
-.container.blurred {
-  filter: blur(5px);
-  pointer-events: none;
-  transition: filter 0.3s ease-out;
+  min-height: 100vh;
 }
 
 .container {
   max-width: 900px;
   margin: 2rem auto;
-  padding: 1rem;
+  padding: 1rem; /* Padding for mobile */
   font-family: var(--font-family-base);
 }
 
-@media (min-width: 768px) { .container { padding: 2rem; } }
+@media (min-width: 768px) {
+  .container {
+    padding: 2rem; /* Restore padding for larger screens */
+  }
+}
 
 .header {
   display: flex;
@@ -29,9 +27,11 @@
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 2.5rem;
 }
+
 .header-content { display: flex; align-items: center; gap: 1rem; }
 .header-icon { font-size: 2rem; color: var(--primary-accent); }
 .header-title { font-size: 1.5rem; font-weight: var(--font-weight-bold); margin: 0; }
+
 @media (min-width: 768px) { .header-title { font-size: 1.75rem; } }
 
 .form-container {
@@ -41,15 +41,17 @@
   padding: 1.5rem;
   animation: fadeIn 0.6s ease;
 }
-@media (min-width: 768px) { .form-container { padding: 2.5rem; } }
+
+@media (min-width: 768px) {
+  .form-container {
+    padding: 2.5rem;
+  }
+}
 
 .form-group { margin-bottom: 1.5rem; }
 .form-group label { display: block; margin-bottom: 0.5rem; font-weight: var(--font-weight-medium); color: var(--subtle-text-color); }
 .form-control { width: 100%; padding: 0.8rem 1rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-base); color: var(--text-color); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
 .form-control:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 3px var(--primary-accent-translucent); }
-.form-control.is-invalid { border-color: var(--error-color); }
-.error-message { color: var(--error-color); font-size: 0.875rem; margin-top: 0.25rem; }
-
 .form-row { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 @media (min-width: 600px) { .form-row { grid-template-columns: 1fr 1fr; } }
 
@@ -64,3 +66,83 @@
 .btn-secondary { background-color: transparent; color: var(--text-color); border: 1px solid var(--border-color); }
 .btn-secondary:hover { background-color: var(--surface-color); border-color: var(--text-color); }
 .btn:disabled { background-color: #3a4048; color: #848d97; cursor: not-allowed; }
+
+.section-title { font-size: 1.25rem; font-weight: var(--font-weight-bold); color: var(--text-color); margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+@media (min-width: 768px) { .section-title { font-size: 1.5rem; } }
+
+/* --- NEW STYLES FOR MEMBERS SECTION --- */
+.members-section {
+  padding: 1.5rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-base);
+  margin-top: 1.5rem;
+}
+
+.member-group {
+  position: relative;
+  border: 1px solid var(--border-color-translucent);
+  border-radius: var(--border-radius-base);
+  padding: 1rem;
+  padding-right: 3rem; /* Make space for the remove button */
+  margin-bottom: 1rem; /* Space between member groups */
+  background-color: var(--bg-light-hover);
+  display: block; /* Ensures it takes full width */
+}
+
+.member-group:last-of-type {
+  margin-bottom: 0; /* No margin after the last member group before the add button */
+}
+
+.remove-member-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background-color: var(--error-color-translucent);
+  color: var(--error-color);
+  border: 1px solid var(--error-color-translucent);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.remove-member-btn:hover {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.btn-add-member {
+  background-color: var(--secondary-accent);
+  color: var(--bg-color);
+  border-color: var(--secondary-accent);
+  margin-top: 1.5rem;
+  width: auto;
+  min-width: 180px;
+}
+
+.btn-add-member:hover {
+  background-color: var(--secondary-accent-hover);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.form-control.is-invalid {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px var(--error-color-translucent);
+}
+
+/* For popup blur effect */
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
