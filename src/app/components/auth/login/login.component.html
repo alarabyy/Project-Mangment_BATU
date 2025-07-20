@@ -15,18 +15,15 @@
         <svg *ngIf="currentMode === 'forgotPassword'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="key-icon">
           <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.5-9H8.5V6c0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5v2z"/>
         </svg>
-        <!-- Icon for Reset Password Mode -->
-        <svg *ngIf="currentMode === 'resetPassword'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="lock-reset-icon">
-          <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 11c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm3.5-9H8.5V6c0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5v2z"/>
-        </svg>
+        <!-- Removed Reset Password Icon: Moved to its own component -->
       </div>
       <h2 *ngIf="currentMode === 'login'">Secure Access</h2>
       <h2 *ngIf="currentMode === 'forgotPassword'">Forgot Password</h2>
-      <h2 *ngIf="currentMode === 'resetPassword'">Reset Password</h2>
+      <!-- Removed Reset Password Heading: Moved to its own component -->
 
       <p *ngIf="currentMode === 'login'">Authenticate to manage your projects</p>
       <p *ngIf="currentMode === 'forgotPassword'">Enter your email to receive a password reset link.</p>
-      <p *ngIf="currentMode === 'resetPassword'">Set your new password.</p>
+      <!-- Removed Reset Password Paragraph: Moved to its own component -->
     </div>
 
     <!-- --- Login Form Section --- -->
@@ -63,7 +60,7 @@
 
       <div class="form-footer">
         <!-- <p>No account yet? <a routerLink="/SignUp">Create One</a></p> -->
-        <p><a (click)="showForgotPasswordForm()">Forgot Password?</a></p> <!-- Changed to click handler -->
+        <p><a (click)="showForgotPasswordForm()">Forgot Password?</a></p>
       </div>
     </form>
 
@@ -94,55 +91,6 @@
       </div>
     </form>
 
-        <!-- --- Reset Password Form Section --- -->
-    <form *ngIf="currentMode === 'resetPassword'" [formGroup]="resetPasswordForm" (ngSubmit)="submitResetPassword()" class="auth-form">
-      <div *ngIf="!resetToken && !resetPasswordErrorMessage" class="server-error-message">
-        Loading... please ensure you came from a valid reset link.
-      </div>
-      <div *ngIf="resetPasswordErrorMessage" class="server-error-message">
-        {{ resetPasswordErrorMessage }}
-      </div>
-
-      <!-- Only show form fields if a token is present and no critical error -->
-      <ng-container *ngIf="resetToken && !resetPasswordErrorMessage">
-        <div class="input-field-wrapper">
-          <!-- الخطأ الأول: تم حذف || resetPasswordForm.submitted -->
-          <input id="newPassword" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="newPassword" [class.is-invalid]="newPasswordControl?.invalid && newPasswordControl?.touched"/>
-          <label for="newPassword">New Password</label>
-        </div>
-        <div class="error-message" *ngIf="newPasswordControl?.invalid && newPasswordControl?.touched">
-          <p *ngIf="newPasswordControl?.errors?.['required']">* New password is required.</p>
-          <p *ngIf="newPasswordControl?.errors?.['minlength']">* New password must be at least 6 characters long.</p>
-        </div>
-
-        <div class="input-field-wrapper">
-          <!-- الخطأ الثاني: تم حذف || resetPasswordForm.submitted -->
-          <input id="confirmPassword" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="confirmPassword" [class.is-invalid]="confirmPasswordControl?.invalid && confirmPasswordControl?.touched"/>
-          <label for="confirmPassword">Confirm New Password</label>
-        </div>
-        <div class="error-message" *ngIf="confirmPasswordControl?.invalid && confirmPasswordControl?.touched">
-          <p *ngIf="confirmPasswordControl?.errors?.['required']">* Confirm password is required.</p>
-          <!-- هنا يمكن أن يبقى resetPasswordForm.errors?.['mismatch'] لأنه خطأ على مستوى النموذج وليس حقل واحد -->
-          <p *ngIf="resetPasswordForm.errors?.['mismatch'] && confirmPasswordControl?.dirty">* Passwords do not match.</p>
-        </div>
-
-        <div class="options-wrapper">
-          <label class="toggle-switch"><input type="checkbox" (click)="togglePassword()"><span class="slider"></span></label>
-          <span>Show Password</span>
-        </div>
-
-        <div *ngIf="resetPasswordSuccessMessage" class="server-success-message">
-          {{ resetPasswordSuccessMessage }}
-        </div>
-
-        <button type="submit" class="btn-submit-glow" [disabled]="resetPasswordForm.invalid || isSubmitting">
-          {{ isSubmitting ? 'Resetting...' : 'Reset Password' }}
-        </button>
-      </ng-container>
-
-      <div class="form-footer">
-        <p><a (click)="showLoginForm()">Back to Login</a></p>
-      </div>
-    </form>
+    <!-- REMOVED: Reset Password Form Section - Moved to its own component -->
   </div>
 </div>

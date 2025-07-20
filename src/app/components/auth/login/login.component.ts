@@ -2,13 +2,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router'; // Import ActivatedRoute
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../Services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -16,36 +16,31 @@ export class LoginComponent implements OnInit {
   // --- Form Groups ---
   loginForm!: FormGroup;
   forgotPasswordForm!: FormGroup;
-  resetPasswordForm!: FormGroup;
+  // resetPasswordForm!: FormGroup; // REMOVED: Moved to ResetPasswordComponent
 
   // --- State Variables ---
-  currentMode: 'login' | 'forgotPassword' | 'resetPassword' = 'login'; // Controls which form is shown
-  showPassword = false; // For login and reset password
-  isSubmitting = false; // General submission flag
+  currentMode: 'login' | 'forgotPassword' = 'login'; // UPDATED: Only login and forgotPassword here
+  showPassword = false; // For login only now
+  isSubmitting = false;
 
   // --- Message Variables ---
   loginErrorMessage: string | null = null;
   forgotPasswordSuccessMessage: string | null = null;
   forgotPasswordErrorMessage: string | null = null;
-  resetPasswordSuccessMessage: string | null = null;
-  resetPasswordErrorMessage: string | null = null;
+  // resetPasswordSuccessMessage: string | null = null; // REMOVED: Moved to ResetPasswordComponent
+  // resetPasswordErrorMessage: string | null = null; // REMOVED: Moved to ResetPasswordComponent
 
-  resetToken: string | null = null; // Stores the token for reset password
+  // resetToken: string | null = null; // REMOVED: Moved to ResetPasswordComponent
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute // Inject ActivatedRoute
+    private route: ActivatedRoute // Still needed for queryParamMap in case of direct /Login access
   ) {}
 
   ngOnInit(): void {
-    // Check if already logged in (redirect)
-    if (this.authService.isLoggedIn()) {
-      this.redirectToDashboard();
-    }
-
-    // Initialize all forms
+    // 1. Initialize forms
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -55,41 +50,23 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]]
     });
 
-    this.resetPasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required]
-    }, { validator: this.passwordMatchValidator }); // Add custom validator
-
-    // Check for reset password token in URL on initialization
-    this.route.queryParamMap.subscribe(params => {
-      this.resetToken = params.get('token');
-      if (this.resetToken) {
-        this.currentMode = 'resetPassword';
-        // Clear any previous error messages related to other modes
-        this.loginErrorMessage = null;
-        this.forgotPasswordSuccessMessage = null;
-        this.forgotPasswordErrorMessage = null;
-      } else if (this.currentMode === 'resetPassword' && !this.resetToken) {
-        // If mode is resetPassword but no token, show error and default to login after a delay
-        this.resetPasswordErrorMessage = 'Password reset token is missing or invalid. Please request a new link.';
-        setTimeout(() => this.showLoginForm(), 5000); // Redirect to login after 5 seconds
-      }
-    });
+    // 2. Check if already logged in (redirect) - this should be prioritized IF NO specific token URL is requested
+    // This logic is now simpler as the /reset-password route goes to a different component entirely.
+    if (this.authService.isLoggedIn()) {
+      this.redirectToDashboard();
+    }
+    // No need to check queryParamMap for 'token' here anymore, as ResetPasswordComponent handles it.
   }
 
   // --- Form Control Getters ---
   get loginF() { return this.loginForm.controls; }
   get forgotF() { return this.forgotPasswordForm.controls; }
-  get resetF() { return this.resetPasswordForm.controls; }
-  get newPasswordControl() { return this.resetPasswordForm.get('newPassword'); }
-  get confirmPasswordControl() { return this.resetPasswordForm.get('confirmPassword'); }
+  // get resetF() { return this.resetPasswordForm.controls; } // REMOVED
+  // get newPasswordControl() { return this.resetPasswordForm.get('newPassword'); } // REMOVED
+  // get confirmPasswordControl() { return this.resetPasswordForm.get('confirmPassword'); } // REMOVED
 
   // --- Password Match Validator for Reset Password Form ---
-  passwordMatchValidator(form: FormGroup) {
-    const newPassword = form.get('newPassword')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return newPassword === confirmPassword ? null : { mismatch: true };
-  }
+  // passwordMatchValidator(form: FormGroup) { ... } // REMOVED: Moved to ResetPasswordComponent
 
   // --- UI Toggle Functions ---
   togglePassword(): void { this.showPassword = !this.showPassword; }
@@ -97,21 +74,24 @@ export class LoginComponent implements OnInit {
     this.currentMode = 'forgotPassword';
     this.loginErrorMessage = null; // Clear login errors when switching
     this.forgotPasswordForm.reset(); // Clear form fields
+    this.forgotPasswordSuccessMessage = null; // Clear previous success messages
+    this.forgotPasswordErrorMessage = null; // Clear previous error messages
   }
   showLoginForm(): void {
     this.currentMode = 'login';
-    // Clear any messages from forgot/reset password when returning to login
+    // Clear any messages from forgot password when returning to login
     this.forgotPasswordSuccessMessage = null;
     this.forgotPasswordErrorMessage = null;
-    this.resetPasswordSuccessMessage = null;
-    this.resetPasswordErrorMessage = null;
     this.loginForm.reset(); // Clear form fields
-    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true }); // Clear URL params
+    // No need to clear URL params here, as the reset password component would have handled its own URL
   }
 
   // --- Submission Handlers ---
   submitLogin(): void {
-    if (this.loginForm.invalid) { return; }
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
     this.isSubmitting = true;
     this.loginErrorMessage = null;
@@ -134,7 +114,10 @@ export class LoginComponent implements OnInit {
   }
 
   submitForgotPassword(): void {
-    if (this.forgotPasswordForm.invalid) { return; }
+    if (this.forgotPasswordForm.invalid) {
+      this.forgotPasswordForm.markAllAsTouched();
+      return;
+    }
 
     this.isSubmitting = true;
     this.forgotPasswordSuccessMessage = null;
@@ -144,10 +127,11 @@ export class LoginComponent implements OnInit {
 
     this.authService.forgotPassword(email).subscribe({
       next: () => {
-        this.forgotPasswordSuccessMessage = 'If an account with that email exists, a password reset link has been sent to your inbox.';
+        this.forgotPasswordSuccessMessage = 'If an account with that email exists, a password reset link has been sent to your inbox. Please check your email.';
         this.forgotPasswordForm.reset();
       },
       error: (err) => {
+        console.error('Forgot Password API error:', err);
         this.forgotPasswordErrorMessage = err.error?.message || 'Failed to send reset link. Please try again.';
       },
       complete: () => {
@@ -156,43 +140,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  submitResetPassword(): void {
-    this.resetPasswordForm.markAllAsTouched(); // Show validation errors immediately
-
-    if (this.resetPasswordForm.invalid) { return; }
-
-    if (!this.resetToken) {
-        this.resetPasswordErrorMessage = 'Cannot reset password: Token is missing.';
-        return;
-    }
-
-    this.isSubmitting = true;
-    this.resetPasswordSuccessMessage = null;
-    this.resetPasswordErrorMessage = null;
-
-    const payload = {
-      token: this.resetToken,
-      newPassword: this.resetPasswordForm.value.newPassword
-    };
-
-    this.authService.resetPassword(payload).subscribe({
-      next: () => {
-        this.resetPasswordSuccessMessage = 'Your password has been successfully reset. You can now log in with your new password.';
-        this.resetPasswordForm.reset();
-        this.resetToken = null; // Clear token after successful reset
-        // Automatically switch back to login mode after a short delay
-        setTimeout(() => {
-          this.showLoginForm();
-        }, 3000);
-      },
-      error: (err) => {
-        this.resetPasswordErrorMessage = err.error?.message || 'Failed to reset password. The token might be invalid or expired. Please try requesting a new link.';
-      },
-      complete: () => {
-        this.isSubmitting = false;
-      }
-    });
-  }
+  // submitResetPassword(): void { ... } // REMOVED: Moved to ResetPasswordComponent
 
   // --- Redirection after successful login ---
   private redirectToDashboard(): void {
@@ -202,7 +150,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/Home']);
         break;
       case 'doctor':
-      case 'professor': // هنا يمكن إزالة 'professor' إذا كنت متأكدًا أنه لن يظهر كدور نصي
+      case 'professor':
         this.router.navigate(['/Home']);
         break;
       case 'student':
