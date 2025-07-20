@@ -1,9 +1,7 @@
-<!-- src/app/components/project/project-list/project-list.component.html -->
 <div class="list-container">
   <header class="list-header">
     <h1>Project Dashboard</h1>
     <div class="header-actions">
-      <!-- Search Input -->
       <input type="text" placeholder="Search projects..." class="search-input" (input)="onSearchChange($event)">
 
       <a routerLink="/AddProject" class="btn btn-primary">
@@ -12,27 +10,20 @@
       <a routerLink="/ProjectAnalysis" class="btn btn-secondary">
         <i class="fas fa-chart-bar"></i> Project Analysis
       </a>
-      <!-- زر تحميل التقرير بصيغة PDF -->
-      <button (click)="downloadReport()" class="btn btn-info">
-        <i class="fas fa-download"></i> Download Report (PDF)
-      </button>
-    </div>
+      </div>
   </header>
 
-  <!-- عرض حالة التحميل -->
   <div *ngIf="isLoading" class="state-container">
     <div class="loading-spinner"></div>
     <p>Loading projects...</p>
   </div>
 
-  <!-- عرض حالة الخطأ -->
   <div *ngIf="!isLoading && error" class="state-container error-container">
     <i class="fas fa-exclamation-triangle"></i>
     <p>{{ error }}</p>
     <button class="btn btn-primary" (click)="ngOnInit()">Retry</button>
   </div>
 
-  <!-- عرض المشاريع أو رسالة "لا توجد مشاريع" -->
   <ng-container *ngIf="!isLoading && !error">
     <ng-container *ngIf="(filteredProjects$ | async) as projects">
       <div *ngIf="projects.length > 0; else noProjects">
@@ -46,21 +37,6 @@
               <p class="card-detail-text"><strong>Problem Statement:</strong> {{ project.problemStatement | slice:0:100 }}...</p>
 
               <div class="info-section">
-                <!-- تم إزالة هذه الحقول لأنها غير موجودة في الـ JSON المرفق -->
-                <!--
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-tag"></i> Category:</span>
-                  <span>{{ project.category?.name || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-building"></i> Department:</span>
-                  <span>{{ project.department?.name || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-star"></i> Grade:</span>
-                  <span>{{ project.grade ?? 'N/A' }}</span>
-                </div>
-                -->
                 <div class="info-item">
                   <span class="label"><i class="fas fa-cogs"></i> Technologies:</span>
                   <span>{{ project.technologies || 'N/A' }}</span>
@@ -69,29 +45,6 @@
                   <span class="label"><i class="fas fa-tools"></i> Tools Used:</span>
                   <span>{{ project.toolsUsed || 'N/A' }}</span>
                 </div>
-                <!-- تم إزالة هذه الحقول لأنها غير موجودة في الـ JSON المرفق -->
-                <!--
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-calendar-alt"></i> Start Date:</span>
-                  <span>{{ project.startDate ? (project.startDate | date:'mediumDate') : 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-calendar-check"></i> Submission Date:</span>
-                  <span>{{ project.submissionDate ? (project.submissionDate | date:'mediumDate') : 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-user-tie"></i> Team Leader ID:</span>
-                  <span>{{ project.teamLeaderId ?? 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-users"></i> Members:</span>
-                  <span>{{ getMembersDisplay(project) }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label"><i class="fas fa-chalkboard-teacher"></i> Supervisors:</span>
-                  <span>{{ getSupervisorsDisplay(project) }}</span>
-                </div>
-                -->
               </div>
             </div>
             <div class="card-footer">
@@ -108,7 +61,6 @@
         </div>
       </div>
 
-      <!-- عرض رسالة "لا توجد مشاريع" إذا كانت القائمة فارغة -->
       <ng-template #noProjects>
         <div class="state-container empty-message">
           <h3>No projects found.</h3>
