@@ -1,363 +1,236 @@
-<!-- home.component.html -->
-
- <div class="home-page-wrapper">
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-background-elements">
-      <!-- Added advanced tech grid for modern, subtle background -->
-      <div class="bg-tech-grid-pulse"></div>
-      <div class="bg-tech-grid-pulse-alt"></div> <!-- New: Second grid layer -->
-      <div class="bg-shape shape-glow-1"></div>
-      <div class="bg-shape shape-glow-2"></div>
-      <div class="bg-shape shape-glow-3"></div> <!-- New: Third glow shape -->
-      <div class="bg-lines-overlay"></div> <!-- New: Abstract animated lines -->
-    </div>
-    <div class="container hero-content-container">
-      <!-- Project Management Icons Cluster - Replacing the single main icon -->
-      <div class="project-icons-cluster animate-on-scroll scale-up" #animatable>
-        <!-- A variety of project management related icons -->
-        <i class="pi pi-chart-line icon-xl" style="--icon-float-x: -100px; --icon-float-y: 50px; --icon-delay: 0.1s; --icon-size: 85px;"></i>
-        <i class="pi pi-folder-open icon-lg" style="--icon-float-x: 80px; --icon-float-y: -70px; --icon-delay: 0.3s; --icon-size: 70px;"></i>
-        <i class="pi pi-calendar-plus icon-md" style="--icon-float-x: -150px; --icon-float-y: -20px; --icon-delay: 0.5s; --icon-size: 60px;"></i>
-        <i class="pi pi-code icon-xl" style="--icon-float-x: 60px; --icon-float-y: 100px; --icon-delay: 0.7s; --icon-size: 80px;"></i>
-        <i class="pi pi-users icon-lg" style="--icon-float-x: -50px; --icon-float-y: 120px; --icon-delay: 0.9s; --icon-size: 75px;"></i>
-        <i class="pi pi-lightbulb icon-md" style="--icon-float-x: 120px; --icon-float-y: -100px; --icon-delay: 1.1s; --icon-size: 65px;"></i>
-        <i class="pi pi-laptop icon-xl" style="--icon-float-x: -70px; --icon-float-y: 80px; --icon-delay: 1.3s; --icon-size: 90px;"></i>
-        <i class="pi pi-comments icon-lg" style="--icon-float-x: 100px; --icon-float-y: 20px; --icon-delay: 1.5s; --icon-size: 68px;"></i>
-        <i class="pi pi-book icon-md" style="--icon-float-x: -80px; --icon-float-y: -90px; --icon-delay: 1.7s; --icon-size: 55px;"></i>
-        <i class="pi pi-cog icon-xl" style="--icon-float-x: 0px; --icon-float-y: 0px; --icon-delay: 1.9s; --icon-size: 95px;"></i> <!-- Central icon, slightly delayed -->
-      </div>
-
-      <h1 class="animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.2s'">
-        <span class="main-title">{{ hero.titleMain }}</span>
-        <span class="sub-title">{{ hero.titleSub }}</span>
-      </h1>
-      <p class="hero-description animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.4s'">
-        <i class="pi pi-info-circle icon-before"></i>{{ hero.description }}
+<section id="home" class="hero">
+  <div class="hero-background-elements">
+    <div class="tech-grid-pattern"></div>
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+    <div class="floating-shape shape-4"></div>
+  </div>
+  <div class="container hero-content">
+    <div class="hero-text animate-fade-up">
+      <h1><i class="fas fa-graduation-cap hero-icon-inline"></i> {{ hero.titleMain }}</h1>
+      <p class="hero-subtitle">{{ hero.titleSub }}</p>
+      <p class="hero-description">
+        <i class="fas fa-lightbulb"></i>
+        {{ hero.description }}
       </p>
-      <a [href]="hero.ctaLink" class="cta-button primary animate-on-scroll scale-up" #animatable [style.animation-delay]="'0.6s'">
-        <i [class]="hero.ctaIcon" class="icon-before"></i>{{ hero.ctaText }} <i class="pi pi-arrow-right icon-after"></i>
-      </a>
-      <div class="university-unit-name-hero animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.8s'">
-        <p><i class="pi pi-building icon-before"></i>{{ unitName }}</p>
-        <p><i class="pi pi-flag icon-before"></i>{{ universityName }}</p>
+      <div class="cta-buttons">
+        <a href="#features" class="btn btn-primary">
+          <i class="fas fa-cogs"></i> Explore Features
+        </a>
+        <a href="#timeline" class="btn btn-secondary">
+          <i class="fas fa-calendar-alt"></i> Project Roadmap
+        </a>
       </div>
     </div>
-  </section>
+    <div class="hero-visual animate-slide-right">
+      <div class="project-dashboard card">
+        <div class="dashboard-header">
+          <div class="dashboard-title">
+            <div class="dashboard-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            Graduation Project Overview
+          </div>
+          <button class="btn-view-all"><i class="fas fa-arrow-right"></i> View All</button>
+        </div>
+        <div class="project-cards">
+          <div class="project-card" *ngFor="let project of featuredProjects">
+            <div class="project-header">
+              <h4><i class="fas" [ngClass]="project.icon"></i> {{ project.title }}</h4>
+              <span class="project-status" [ngClass]="'status-' + project.status">
+                <i class="fas fa-circle"></i> {{ project.status | titlecase }}
+              </span>
+            </div>
+            <p>{{ project.abstract }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- About Us Section -->
-  <section id="about-unit" class="about-unit-section content-section">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i [class]="aboutSection.titleIcon" class="icon-before"></i>{{ aboutSection.title }}
-      </h2>
-      <p class="section-intro animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.2s'">
-        {{ aboutSection.introduction }}
+---
+
+<section id="features" class="core-features">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-cogs section-title-icon"></i> Core System Features</h2>
+      <p class="section-subtitle">
+        Our system is designed to streamline and facilitate the graduation project management process for students and faculty at Borg El Arab Technological University.
       </p>
-      <div class="about-grid">
-        <div class="about-mission-vision">
-          <div class="mission animate-on-scroll fade-in-left" #animatable [style.animation-delay]="'0.3s'">
-            <h3><i [class]="aboutSection.missionIcon" class="icon-before"></i>Our Mission</h3>
-            <p>{{ aboutSection.mission }}</p>
-          </div>
-          <div class="vision animate-on-scroll fade-in-right" #animatable [style.animation-delay]="'0.4s'">
-            <h3><i [class]="aboutSection.visionIcon" class="icon-before"></i>Our Vision</h3>
-            <p>{{ aboutSection.vision }}</p>
-          </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card card" *ngFor="let feature of coreFeatures">
+        <div class="feature-icon">
+          <i class="fas" [ngClass]="feature.icon"></i>
         </div>
-        <div class="about-image-container animate-on-scroll scale-up" #animatable [style.animation-delay]="'0.5s'">
-          <img [src]="aboutSection.imageUrl" [alt]="universityName + ' campus view'" class="about-image">
-        </div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+        <ul class="feature-benefits">
+          <li *ngFor="let benefit of feature.benefits">
+            <i class="fas fa-check-circle"></i> {{ benefit }}
+          </li>
+        </ul>
       </div>
-      <div class="about-values">
-        <h3 class="subsection-title animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.6s'">
-          <i class="pi pi-heart-fill icon-before"></i>Core Values
-        </h3>
-        <div class="values-list">
-          <div *ngFor="let value of aboutSection.values; let i = index"
-               class="value-item animate-on-scroll fade-in-up" #animatable
-               [style.animation-delay]="(0.7 + i * 0.1) + 's'">
-            <i [class]="value.icon"></i>
-            <span>{{ value.text }}</span>
-          </div>
+    </div>
+  </div>
+</section>
+
+---
+
+<section id="skills-outcomes" class="skills-outcomes">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-brain section-title-icon"></i> Skills & Outcomes Gained</h2>
+      <p class="section-subtitle">
+        Beyond project completion, our platform fosters crucial skills essential for your future career and academic success.
+      </p>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card card" *ngFor="let skill of skillsOutcomes">
+        <div class="skill-icon">
+          <i class="fas" [ngClass]="skill.icon"></i>
+        </div>
+        <h3>{{ skill.title }}</h3>
+        <p>{{ skill.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+---
+
+<section class="stats">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-chart-bar section-title-icon"></i> Our Achievements in Numbers</h2>
+      <p class="section-subtitle">
+        Celebrating the milestones and accomplishments within our thriving graduation project community at our university.
+      </p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card card" *ngFor="let stat of statistics">
+        <div class="stat-icon">
+          <i class="fas" [ngClass]="stat.icon"></i>
+        </div>
+        <div class="stat-number">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+        <p class="stat-description">{{ stat.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+---
+
+<section id="services" class="services">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-handshake section-title-icon"></i> Comprehensive Project Support</h2>
+      <p class="section-subtitle">
+        We offer a suite of services designed to empower students and faculty throughout the entire project lifecycle.
+      </p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card card" *ngFor="let service of services">
+        <div class="service-icon">
+          <i class="fas" [ngClass]="service.icon"></i>
+        </div>
+        <h3>{{ service.title }}</h3>
+        <p>{{ service.description }}</p>
+        <ul class="service-features">
+          <li *ngFor="let feature of service.features">
+            <i class="fas fa-check-circle"></i> {{ feature }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+---
+
+<section id="timeline" class="timeline-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-calendar-alt section-title-icon"></i> Project Milestones & Important Dates</h2>
+      <p class="section-subtitle">
+        Stay informed about critical deadlines, events, and phases of your graduation project journey.
+      </p>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item" *ngFor="let event of timelineEvents">
+        <div class="timeline-icon">
+          <i class="fas" [ngClass]="event.icon"></i>
+        </div>
+        <div class="timeline-content card">
+          <div class="timeline-date">{{ event.date }}</div>
+          <h3>{{ event.title }}</h3>
+          <p>{{ event.description }}</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Statistics Section -->
-  <section id="statistics" class="statistics-section content-section alt-bg">
-    <div class="container">
-       <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-chart-pie icon-before"></i>Our Impact in Numbers
-      </h2>
-      <div class="statistics-grid">
-        <div *ngFor="let stat of statistics; let i = index"
-             class="stat-card animate-on-scroll fade-in-up" #animatable
-             [style.animation-delay]="(i * 0.15) + 's'">
-          <div class="stat-icon"><i [class]="stat.icon"></i></div>
-          <div class="stat-value">{{ stat.value }}</div>
-          <div class="stat-label">{{ stat.label }}</div>
-          <p *ngIf="stat.description" class="stat-description"><i class="pi pi-info-circle icon-before-small"></i>{{ stat.description }}</p>
-        </div>
-      </div>
+---
+
+<section id="contact" class="contact">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-envelope section-title-icon"></i> Get in Touch</h2>
+      <p class="section-subtitle">
+        Have questions or need assistance? Reach out to the Graduation Projects Management Unit.
+      </p>
     </div>
-  </section>
-
-  <!-- Services Section -->
-  <section id="services" class="services-section content-section">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-th-large icon-before"></i>Comprehensive Support Services
-      </h2>
-      <div class="services-accordion">
-        <div *ngFor="let service of services; let i = index"
-             class="service-item animate-on-scroll fade-in-up" #animatable
-             [style.animation-delay]="(i * 0.2) + 's'">
-          <details class="service-details">
-            <summary class="service-summary">
-              <i [class]="service.titleIcon" class="icon-before"></i>
-              <span>{{ service.title }}</span>
-              <i class="pi pi-chevron-down expand-icon"></i>
-            </summary>
-            <div class="service-content">
-              <p class="service-description-main">{{ service.description }}</p>
-              <ul *ngIf="service.listItems && service.listItems.length > 0" class="service-features-list">
-                <li *ngFor="let item of service.listItems; let k = index"
-                    class="animate-on-scroll fade-in-left" #animatable
-                    [style.animation-delay]="(0.1 + k * 0.05) + 's'">
-                  <i [class]="item.icon" class="icon-before-small"></i>{{ item.text }}
-                </li>
-              </ul>
-            </div>
-          </details>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="contact-details">
+            <h4>Our Location</h4>
+            <p>{{ contactInfo.address }}</p>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Project Lifecycle / Timeline Section -->
-  <section id="project-timeline" class="timeline-section content-section alt-bg">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-hourglass icon-before"></i>The Project Journey: Key Milestones
-      </h2>
-      <div class="timeline">
-        <div *ngFor="let event of projectTimeline; let i = index; let isEven = even"
-             class="timeline-item animate-on-scroll" #animatable
-             [ngClass]="{'timeline-item-left': isEven, 'timeline-item-right': !isEven, 'fade-in-left': isEven, 'fade-in-right': !isEven}"
-             [style.animation-delay]="(i * 0.2) + 's'">
-          <div class="timeline-marker"><i [class]="event.icon"></i></div>
-          <div class="timeline-content-card">
-            <h3 class="timeline-event-title"><i class="pi pi-flag icon-before-small"></i>{{ event.title }}</h3>
-            <p class="timeline-event-date"><i class="pi pi-calendar-minus icon-before-small"></i>{{ event.date }}</p>
-            <p class="timeline-event-description">{{ event.description }}</p>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-phone"></i></div>
+          <div class="contact-details">
+            <h4>Phone Number</h4>
+            <p>{{ contactInfo.phone }}</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+          <div class="contact-details">
+            <h4>Email Address</h4>
+            <p>{{ contactInfo.email }}</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Meet The Team Section -->
-  <section id="team" class="team-section content-section">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-users icon-before"></i>Meet Our Dedicated Team
-      </h2>
-      <div class="team-grid">
-        <div *ngFor="let member of teamMembers; let i = index"
-             class="team-member-card animate-on-scroll fade-in-up" #animatable
-             [style.animation-delay]="(i * 0.15) + 's'">
-          <div class="team-member-photo-wrapper">
-            <img [src]="member.imageUrl" [alt]="member.name" class="team-member-photo">
+      <div class="contact-form card">
+        <form>
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name">
           </div>
-          <div class="team-member-info">
-            <h3>{{ member.name }}</h3>
-            <p class="member-role"><i [class]="member.icon" class="icon-before-small"></i>{{ member.role }}</p>
-            <p *ngIf="member.bio" class="member-bio">{{ member.bio }}</p>
-            <div *ngIf="member.socialLinks && member.socialLinks.length > 0" class="member-socials">
-              <a *ngFor="let link of member.socialLinks" [href]="link.url" target="_blank" [attr.aria-label]="link.platformIcon">
-                <i [class]="link.platformIcon"></i>
-              </a>
-            </div>
+          <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email">
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Resources & Downloads Section -->
-  <section id="resources" class="resources-section content-section alt-bg">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-folder icon-before"></i>Resources & Downloads
-      </h2>
-      <div class="resources-grid">
-        <div *ngFor="let resource of resources; let i = index"
-             class="resource-card animate-on-scroll fade-in-up" #animatable
-             [style.animation-delay]="(i * 0.1) + 's'">
-          <div class="resource-icon-type"><i [class]="resource.typeIcon"></i></div>
-          <div class="resource-details">
-            <h4><i class="pi pi-info-circle icon-before-small"></i>{{ resource.title }}</h4>
-            <p class="resource-category"><i class="pi pi-tag icon-before-small"></i>Category: {{ resource.category }}</p>
-            <p class="resource-description">{{ resource.description }}</p>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" placeholder="Enter the subject">
           </div>
-          <div class="resource-action">
-            <a *ngIf="resource.downloadLink" [href]="resource.downloadLink" download class="cta-button tertiary small">
-              <i class="pi pi-download icon-before"></i>Download
-            </a>
-            <a *ngIf="resource.externalUrl" [href]="resource.externalUrl" target="_blank" class="cta-button tertiary small">
-              <i class="pi pi-external-link icon-before"></i>Access Link
-            </a>
+          <div class="form-group">
+            <label for="message">Your Message</label>
+            <textarea id="message" name="message" rows="5" placeholder="Your message"></textarea>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Events & Workshops Section -->
-  <section id="events" class="events-section content-section">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-calendar-plus icon-before"></i>Upcoming Events & Workshops
-      </h2>
-      <div class="events-list">
-        <div *ngFor="let event of events; let i = index"
-             class="event-card animate-on-scroll fade-in-up" #animatable
-             [style.animation-delay]="(i * 0.15) + 's'">
-          <div class="event-icon-main"><i [class]="event.icon"></i></div>
-          <div class="event-details">
-            <h3>{{ event.title }}</h3>
-            <p class="event-date-time"><i class="pi pi-calendar icon-before-small"></i>{{ event.date }} <span *ngIf="event.time"> / <i class="pi pi-clock icon-before-small"></i>{{ event.time }}</span></p>
-            <p class="event-location"><i class="pi pi-map-marker icon-before-small"></i>{{ event.location }}</p>
-            <p class="event-description">{{ event.description }}</p>
-          </div>
-          <div class="event-action">
-            <a *ngIf="event.registrationLink" [href]="event.registrationLink" target="_blank" class="cta-button secondary small">
-              <i class="pi pi-ticket icon-before"></i>Register Now
-            </a>
-            <a *ngIf="!event.registrationLink" class="cta-button tertiary small disabled">
-                <i class="pi pi-info-circle icon-before"></i>Details Coming Soon
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ Section -->
-  <section id="faq" class="faq-section content-section alt-bg">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i class="pi pi-question icon-before"></i>Frequently Asked Questions
-      </h2>
-      <div class="faq-list">
-        <div *ngFor="let item of faqItems; let i = index"
-             class="faq-item animate-on-scroll fade-in-up" #animatable
-             [style.animation-delay]="(i * 0.1) + 's'"
-             [ngClass]="{'open': item.isOpen}">
-          <button class="faq-question unstyled-link" (click)="toggleFaq(item)" [attr.aria-expanded]="item.isOpen">
-            <span><i [class]="item.icon" class="icon-before"></i>{{ item.question }}</span>
-            <i class="pi expand-chevron" [ngClass]="item.isOpen ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> Send Message
           </button>
-          <div class="faq-answer-wrapper">
-            <div class="faq-answer">
-                <p><i class="pi pi-angle-right icon-before-small"></i>{{ item.answer }}</p>
-            </div>
-          </div>
-        </div>
+        </form>
       </div>
     </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact" class="contact-section content-section">
-    <div class="container">
-      <h2 class="section-title animate-on-scroll fade-in-down" #animatable>
-        <i [class]="contactInfo.sectionIcon" class="icon-before"></i>{{ contactInfo.title }}
-      </h2>
-      <p class="section-intro animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.2s'">
-        {{ contactInfo.description }}
-      </p>
-      <div class="contact-grid">
-        <div class="contact-details-list">
-          <div class="contact-detail-item animate-on-scroll fade-in-left" #animatable [style.animation-delay]="'0.3s'">
-            <i [class]="contactInfo.emailIcon"></i>
-            <div>
-              <strong>Email Us:</strong>
-              <a [href]="'mailto:' + contactInfo.email" class="unstyled-link">{{ contactInfo.email }}</a>
-            </div>
-          </div>
-          <div class="contact-detail-item animate-on-scroll fade-in-left" #animatable [style.animation-delay]="'0.4s'">
-            <i [class]="contactInfo.phoneIcon"></i>
-            <div>
-              <strong>Call Us:</strong>
-              <span>{{ contactInfo.phone }}</span>
-            </div>
-          </div>
-          <div class="contact-detail-item animate-on-scroll fade-in-left" #animatable [style.animation-delay]="'0.5s'">
-            <i [class]="contactInfo.officeIcon"></i>
-            <div>
-              <strong>Visit Our Office:</strong>
-              <span>{{ contactInfo.officeLocation }}</span>
-            </div>
-          </div>
-          <div class="contact-detail-item animate-on-scroll fade-in-left" #animatable [style.animation-delay]="'0.6s'">
-            <i [class]="contactInfo.officeHoursIcon"></i>
-            <div>
-              <strong>Office Hours:</strong>
-              <span>{{ contactInfo.officeHours }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="contact-form-placeholder animate-on-scroll fade-in-right" #animatable [style.animation-delay]="'0.7s'">
-          <h4><i class="pi pi-send icon-before"></i>Send a Quick Message</h4>
-          <p>Contact form functionality coming soon. For now, please use the details provided.</p>
-           <img src="assets/images/contact-illustration-dark.svg" alt="Contact illustration" class="contact-graphic"/> <!-- Ensure this path is correct -->
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="container footer-content">
-        <div class="footer-logo-info animate-on-scroll fade-in-up" #animatable>
-            <img src="assets/images/university-logo-light.svg" alt="University Logo" class="footer-logo"> <!-- Placeholder logo, ensure it's suitable for dark background -->
-            <p>{{ universityName }}</p>
-            <p>{{ unitName }}</p>
-            <p>© {{ getYear() }} All rights reserved.</p>
-        </div>
-        <div class="footer-links animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.1s'">
-            <h4>Quick Links</h4>
-            <ul>
-                <li><a href="#about-unit"><i class="pi pi-angle-right icon-before-small"></i>About Us</a></li>
-                <li><a href="#services"><i class="pi pi-angle-right icon-before-small"></i>Services</a></li>
-                <li><a href="#project-timeline"><i class="pi pi-angle-right icon-before-small"></i>Project Timeline</a></li>
-                <li><a href="#resources"><i class="pi pi-angle-right icon-before-small"></i>Resources</a></li>
-                <li><a href="#events"><i class="pi pi-angle-right icon-before-small"></i>Events</a></li>
-            </ul>
-        </div>
-        <div class="footer-links animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.2s'">
-            <h4>Support</h4>
-            <ul>
-                <li><a href="#faq"><i class="pi pi-angle-right icon-before-small"></i>FAQ</a></li>
-                <li><a href="#contact"><i class="pi pi-angle-right icon-before-small"></i>Contact Us</a></li>
-                <li><a href="#"><i class="pi pi-angle-right icon-before-small"></i>Privacy Policy</a></li>
-                <li><a href="#"><i class="pi pi-angle-right icon-before-small"></i>Terms of Service</a></li>
-            </ul>
-        </div>
-        <div class="footer-links animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.3s'">
-            <h4>Connect</h4>
-            <ul>
-                <li><a href="#" target="_blank"><i class="pi pi-facebook icon-before-small"></i>Facebook</a></li>
-                <li><a href="#" target="_blank"><i class="pi pi-twitter icon-before-small"></i>Twitter</a></li>
-                <li><a href="#" target="_blank"><i class="pi pi-linkedin icon-before-small"></i>LinkedIn</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="footer-copyright animate-on-scroll fade-in-up" #animatable [style.animation-delay]="'0.4s'">
-        <p>Built with <i class="pi pi-heart-fill" style="color: var(--primary-accent); font-size: 0.8em; vertical-align: middle;"></i> for {{ universityName }}.</p>
-    </div>
-  </footer>
-</div>
+  </div>
+</section>
