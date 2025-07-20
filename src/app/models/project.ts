@@ -1,6 +1,15 @@
 // src/app/models/project.ts
-import { Category } from './category';
-import { Department } from './department';
+
+// تم إعادة تعريف الواجهات الفرعية لأنها مطلوبة لتحليل البيانات
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Department {
+  id: number;
+  name: string;
+}
 
 export interface Student {
   id: number;
@@ -14,24 +23,26 @@ export interface Supervisor {
 
 export interface Member {
   name: string;
-  academicId: number;
+  academicId: number; // أو أي حقل تعريف آخر للعضو
+  // ... أي خصائص أخرى للعضو
 }
 
+// الواجهة الشاملة Project لدعم جميع ميزات التحليل والتقرير
 export interface Project {
   id: number;
   title: string;
   description: string;
-  grade: number | null; // Can be null
-  technologies: string;
-  toolsUsed: string;
+  grade: number | null; // يمكن أن تكون null
+  technologies: string; // سلسلة نصية مفصولة بفواصل
+  toolsUsed: string;    // سلسلة نصية مفصولة بفواصل
   problemStatement: string;
-  images: string[]; // Will be empty if backend doesn't send
-  submissionDate: string | null; // ISO date string or null
-  startDate: string | null;      // ISO date string or null
-  teamLeaderId: number | null; // Allow null
-  category: Category | null;
-  department: Department | null;
-  students: Student[] | null; // Allow null
-  supervisers: Supervisor[] | null; // Allow null
-  members?: Member[] | null; // Allow null
+  images?: string[]; // مصفوفة أسماء ملفات الصور (اختيارية إذا لم ترجع دائمًا)
+  submissionDate: string | null; // تاريخ التسليم (ISO date string أو null)
+  startDate: string | null;      // تاريخ البدء (ISO date string أو null)
+  teamLeaderId: number | null; // معرف قائد الفريق (يمكن أن يكون null)
+  category: Category | null; // يمكن أن تكون null إذا لم تكن مرتبطة بفئة
+  department: Department | null; // يمكن أن تكون null إذا لم تكن مرتبطة بقسم
+  students?: Student[] | null; // مصفوفة الطلاب (اختيارية ويمكن أن تكون null)
+  supervisers?: Supervisor[] | null; // مصفوفة المشرفين (اختيارية ويمكن أن تكون null)
+  members?: Member[] | null; // مصفوفة أعضاء المشروع (اختيارية ويمكن أن تكون null)
 }

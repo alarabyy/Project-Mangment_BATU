@@ -1,7 +1,8 @@
+// import statement (unchanged)
 import { Component, OnInit, OnDestroy, Renderer2, ElementRef, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // DOCUMENT injection removed as ThemeService handles body class
+import { CommonModule } from '@angular/common';
 
-// Interfaces (re-used and new)
+// Interfaces (re-used and new) - (No changes needed here)
 interface Project {
   id: number;
   title: string;
@@ -77,6 +78,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   unitName: string = "Graduation Project Management Unit";
 
   hero = {
+    // هذه الأيقونة لم تعد تُستخدم كأيقونة مركزية كبيرة، ولكن يمكن الاحتفاظ بها كخاصية
     mainIcon: "pi pi-atom",
     titleMain: "Igniting Innovation, Shaping Futures",
     titleSub: `The Hub for Graduation Projects at ${this.universityName}`,
@@ -94,7 +96,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     mission: "To cultivate an environment that empowers students to conceive, develop, and execute impactful graduation projects, fostering critical thinking, technical mastery, collaborative spirit, and contributing to labor market needs according to international standards.",
     visionIcon: "pi pi-eye",
     vision: "To be a nationally recognized center for student-led technological innovation, producing graduates equipped to solve real-world challenges, contribute significantly to societal and industrial advancement, and achieve sustainable development goals (Egypt Vision 2030).",
-    imageUrl: "assets/images/university-campus-modern.jpg",
+    imageUrl: "assets/images/university-campus-dark.jpg", // Updated image path
     values: [
       { icon: "pi pi-lightbulb", text: "Innovation & Creativity" },
       { icon: "pi pi-check-circle", text: "Academic & Applied Excellence" },
@@ -150,7 +152,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   ];
 
-  featuredProjects: Project[] = [
+  featuredProjects: Project[] = [ // Data kept but section removed from HTML
     { id: 1, title: "Smart City Traffic Control System using IoT", supervisor: "Dr. Rana Mahmoud", department: "Computer Systems Engineering", yearCompleted: 2023, abstract: "An innovative system employing IoT sensors and AI algorithms to dynamically manage urban traffic flow, reducing congestion and improving emergency response times.", imageUrl: "assets/images/project-smart-traffic.jpg", tags: ["IoT", "AI", "Smart City", "Embedded Systems"], studentNames: ["Ahmed Hassan", "Sara Khaled"], impactStatement: "Demonstrated a 20% reduction in average commute times in simulated environments." },
     { id: 2, title: "Portable Water Purification Device for Disaster Relief", supervisor: "Prof. Omar Farouk", department: "Chemical Engineering", yearCompleted: 2023, abstract: "A low-cost, portable device utilizing advanced filtration and UV sterilization to provide safe drinking water in emergency situations and remote areas.", imageUrl: "assets/images/project-water-purification.jpg", tags: ["Water", "Sustainability", "Health", "Chemical Eng."], studentNames: ["Fatima Ali", "Youssef Mohamed"], impactStatement: "Winner of the University Innovation Challenge 2023." },
     { id: 3, title: "VR Training Simulator for Complex Surgical Procedures", supervisor: "Dr. Heba Salem", department: "Biomedical Engineering", yearCompleted: 2022, abstract: "A virtual reality simulator offering immersive and risk-free training for medical students learning intricate surgical techniques.", imageUrl: "assets/images/project-vr-surgery.jpg", tags: ["VR", "Medical", "Simulation", "Software Dev"], studentNames: ["Khalid Tarek"], impactStatement: "Adopted by the university's medical faculty for training purposes." }
@@ -168,9 +170,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   teamMembers: TeamMember[] = [
-    { name: "Prof. Dr. Ali Hassan", role: "Head of Project Management Unit", imageUrl: "assets/images/team-prof-ali.jpg", icon: "pi pi-user-edit", bio: "Oversees the strategic direction and operational efficiency of the unit, ensuring alignment with university academic goals. Expert in research methodologies.", socialLinks: [{platformIcon: "pi pi-linkedin", url: "#"}] },
-    { name: "Eng. Mariam Soliman", role: "Projects Coordinator & Technical Support", imageUrl: "assets/images/team-eng-mariam.jpg", icon: "pi pi-cog", bio: "Manages day-to-day operations, provides technical guidance to students, and coordinates supervisor assignments. Specialist in software engineering projects.", socialLinks: [{platformIcon: "pi pi-linkedin", url: "#"}, {platformIcon: "pi pi-github", url: "#"}] },
-    { name: "Ms. Fatima Ahmed", role: "Administrative Officer & Student Liaison", imageUrl: "assets/images/team-ms-fatima.jpg", icon: "pi pi-comments", bio: "Handles administrative tasks, student inquiries, and communication, ensuring a smooth experience for all participants.", socialLinks: [{platformIcon: "pi pi-envelope", url: "mailto:..."}]}
+    { name: "Prof. Dr. Ali Hassan", role: "Head of Project Management Unit", imageUrl: "assets/images/team-prof-ali-dark.jpg", icon: "pi pi-user-edit", bio: "Oversees the strategic direction and operational efficiency of the unit, ensuring alignment with university academic goals. Expert in research methodologies.", socialLinks: [{platformIcon: "pi pi-linkedin", url: "#"}] },
+    { name: "Eng. Mariam Soliman", role: "Projects Coordinator & Technical Support", imageUrl: "assets/images/team-eng-mariam-dark.jpg", icon: "pi pi-cog", bio: "Manages day-to-day operations, provides technical guidance to students, and coordinates supervisor assignments. Specialist in software engineering projects.", socialLinks: [{platformIcon: "pi pi-linkedin", url: "#"}, {platformIcon: "pi pi-github", url: "#"}] },
+    { name: "Ms. Fatima Ahmed", role: "Administrative Officer & Student Liaison", imageUrl: "assets/images/team-ms-fatima-dark.jpg", icon: "pi pi-comments", bio: "Handles administrative tasks, student inquiries, and communication, ensuring a smooth experience for all participants.", socialLinks: [{platformIcon: "pi pi-envelope", url: "mailto:..."}]}
   ];
 
   resources: ResourceItem[] = [

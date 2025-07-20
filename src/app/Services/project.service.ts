@@ -15,6 +15,8 @@ export class ProjectService {
   ) {}
 
   getProjects(): Observable<Project[]> {
+    // هذا الاستدعاء يجب أن يرجع البيانات بالهيكل المحدد في واجهة Project الجديدة.
+    // إذا كان بطيئاً، فإن هذا هو المكان الذي يجب أن تبدأ فيه بالبحث عن التحسينات في الـ Backend.
     return this.http.get<Project[]>(`${this.apiUrl}/get/all`);
   }
 
