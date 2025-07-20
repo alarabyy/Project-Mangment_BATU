@@ -46,6 +46,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
 import { ProjectAnalysisComponent } from './components/project/project-analysis/project-analysis.component';
 import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -61,6 +62,7 @@ export const routes: Routes = [
   { path: 'blog/:id', component: DetailsBlogComponent },
   { path: 'AllBlogsUser', component: AllBlogsUserComponent },
   { path: 'staff', component: AllStaffComponent },
+  { path: 'reset-password', component: ResetPasswordComponent }, // <--- NEW ROUTE
 
   // --- SignUp is now an Admin-only route ---
   { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },

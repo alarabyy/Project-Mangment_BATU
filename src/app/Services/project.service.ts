@@ -1,7 +1,8 @@
+// src/app/services/project.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { Project } from '../models/project';
+import { Project } from '../models/project'; // تم تحديث هذه الواجهة
 import { AuthService } from './auth.service';
 import { environment } from '../environments/environment';
 
@@ -33,6 +34,7 @@ export class ProjectService {
     return this.http.get<Project>(`${this.apiUrl}/get/${id}`);
   }
 
+  // projectData: 'any' for flexibility as payload structure might differ slightly from retrieved Project model
   createProject(projectData: any): Observable<string> {
     const headers = this.getAuthHeaders();
     return this.http.post(`${this.apiUrl}/create`, projectData, {

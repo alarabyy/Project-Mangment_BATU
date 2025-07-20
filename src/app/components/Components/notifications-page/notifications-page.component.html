@@ -23,9 +23,9 @@
               >
                 <div class="icon-container" [ngClass]="notification.type">
                   <i class="fas" [ngClass]="{
-                    'fa-plus-circle': notification.type === 'success',
-                    'fa-pencil-alt': notification.type === 'info',
-                    'fa-trash-alt': notification.type === 'error'
+                    'fa-check-circle': notification.type === 'success',
+                    'fa-info-circle': notification.type === 'info',
+                    'fa-times-circle': notification.type === 'error'
                   }"></i>
                 </div>
                 <div class="content-container">

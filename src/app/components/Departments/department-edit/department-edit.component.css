@@ -224,6 +224,4 @@
     transform: rotate(360deg);
   }
 }
-.form-group.hidden { /* Added CSS to visually hide the hidden inputs if needed */
-  display: none;
-}
+/* Removed .form-group.hidden { display: none; } as it's no longer needed for headId/facultyId */

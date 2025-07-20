@@ -2,10 +2,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserProfile } from './auth.service';
-import { User } from '../models/user';
+import { UserProfile } from './auth.service'; // تأكد من المسار الصحيح
+import { User } from '../models/user'; // تأكد من المسار الصحيح
 import { AuthService } from './auth.service';
 import { environment } from '../environments/environment';
+
+// تعريف واجهة للعميد
+export interface Dean {
+  id: number;
+  name: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +37,7 @@ export class UserService {
       id: user.id,
       firstName: user.firstName,
       middleName: user.middleName !== undefined ? user.middleName : null,
-      lastName: user.lastname, // **تم التعديل: استخدام user.lastname**
+      lastName: user.lastname,
       email: user.email,
       gender: user.gender !== undefined ? user.gender : null
     };
@@ -41,5 +47,10 @@ export class UserService {
   getUserProfile(id: number): Observable<UserProfile> {
     const headers = this.authService.getAuthHeaders();
     return this.http.get<UserProfile>(`${this.baseUrl}/profile/${id}`, { headers });
+  }
+
+  searchUsers(name: string): Observable<Dean[]> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.get<Dean[]>(`${this.baseUrl}/search/${name}`, { headers });
   }
 }

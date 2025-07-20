@@ -1,3 +1,4 @@
+<!-- src/app/components/project/edit-project/edit-project.component.html -->
 <div class="container">
   <header class="header">
     <div class="header-content">
@@ -67,15 +68,7 @@
               <small *ngIf="f['grade'].errors?.['min'] || f['grade'].errors?.['max']">Grade must be between 0 and 100.</small>
             </div>
           </div>
-          <div class="form-group">
-            <label for="teamLeaderId">Leader ID</label>
-            <input type="text" id="teamLeaderId" formControlName="teamLeaderId" class="form-control"
-                   [class.is-invalid]="f['teamLeaderId'].invalid && f['teamLeaderId'].touched">
-            <div *ngIf="f['teamLeaderId'].touched && f['teamLeaderId'].errors" class="error-message">
-              <small *ngIf="f['teamLeaderId'].errors?.['required']">Leader ID is required.</small>
-              <small *ngIf="f['teamLeaderId'].errors?.['pattern']">Leader ID must be a number.</small>
-            </div>
-          </div>
+          <!-- تم إزالة حقل Leader ID بالكامل -->
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -98,8 +91,8 @@
 
         <!-- Team Members Section -->
         <h2 class="section-title mt-4"><i class="fas fa-users"></i> Team Members</h2>
-        <div formArrayName="members" class="members-section">
-          <div *ngFor="let memberGroup of members.controls; let i = index" [formGroupName]="i" class="member-group">
+        <div formArrayName="members" class="array-section">
+          <div *ngFor="let memberGroup of members.controls; let i = index" [formGroupName]="i" class="array-group">
             <div class="form-row">
               <div class="form-group">
                 <label [for]="'memberName' + i">Member Name</label>
@@ -119,12 +112,34 @@
                 </div>
               </div>
             </div>
-            <button type="button" (click)="removeMember(i)" class="btn remove-member-btn" title="Remove Member">
+            <button type="button" (click)="removeMember(i)" class="btn remove-item-btn" title="Remove Member">
               <i class="fas fa-user-minus"></i>
             </button>
           </div>
-          <button type="button" (click)="addMember()" class="btn btn-add-member">
+          <button type="button" (click)="addMember()" class="btn btn-add-item">
             <i class="fas fa-user-plus"></i> Add Another Member
+          </button>
+        </div>
+
+        <!-- Team Supervisors Section -->
+        <h2 class="section-title mt-4"><i class="fas fa-user-tie"></i> Project Supervisors</h2>
+        <div formArrayName="supervisors" class="array-section">
+          <div *ngFor="let supervisorGroup of supervisorsArray.controls; let i = index" [formGroupName]="i" class="array-group">
+            <div class="form-group">
+              <label [for]="'supervisorId' + i">Supervisor ID</label>
+              <input [id]="'supervisorId' + i" type="text" formControlName="id" class="form-control"
+                     [class.is-invalid]="supervisorGroup.get('id')?.invalid && supervisorGroup.get('id')?.touched">
+              <div *ngIf="supervisorGroup.get('id')?.touched && supervisorGroup.get('id')?.errors" class="error-message">
+                <small *ngIf="supervisorGroup.get('id')?.errors?.['required']">Supervisor ID is required.</small>
+                <small *ngIf="supervisorGroup.get('id')?.errors?.['min'] || supervisorGroup.get('id')?.errors?.['pattern']">Must be a valid ID.</small>
+              </div>
+            </div>
+            <button type="button" (click)="removeSupervisor(i)" class="btn remove-item-btn" title="Remove Supervisor">
+              <i class="fas fa-user-minus"></i>
+            </button>
+          </div>
+          <button type="button" (click)="addSupervisor()" class="btn btn-add-item">
+            <i class="fas fa-user-plus"></i> Add Another Supervisor
           </button>
         </div>
 

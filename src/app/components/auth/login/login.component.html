@@ -1,4 +1,4 @@
-<!-- src/app/authentication/login/login.component.html -->
+ <!-- src/app/authentication/login/login.component.html -->
 <div class="auth-page-container">
   <div class="aurora-background"></div>
   <div class="animated-grid-background"></div>
@@ -15,15 +15,12 @@
         <svg *ngIf="currentMode === 'forgotPassword'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="key-icon">
           <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.5-9H8.5V6c0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5v2z"/>
         </svg>
-        <!-- Removed Reset Password Icon: Moved to its own component -->
       </div>
       <h2 *ngIf="currentMode === 'login'">Secure Access</h2>
       <h2 *ngIf="currentMode === 'forgotPassword'">Forgot Password</h2>
-      <!-- Removed Reset Password Heading: Moved to its own component -->
 
       <p *ngIf="currentMode === 'login'">Authenticate to manage your projects</p>
       <p *ngIf="currentMode === 'forgotPassword'">Enter your email to receive a password reset link.</p>
-      <!-- Removed Reset Password Paragraph: Moved to its own component -->
     </div>
 
     <!-- --- Login Form Section --- -->
@@ -59,7 +56,6 @@
       </button>
 
       <div class="form-footer">
-        <!-- <p>No account yet? <a routerLink="/SignUp">Create One</a></p> -->
         <p><a (click)="showForgotPasswordForm()">Forgot Password?</a></p>
       </div>
     </form>
@@ -90,7 +86,5 @@
         <p><a (click)="showLoginForm()">Back to Login</a></p>
       </div>
     </form>
-
-    <!-- REMOVED: Reset Password Form Section - Moved to its own component -->
   </div>
 </div>

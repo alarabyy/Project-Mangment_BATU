@@ -3,13 +3,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subscription, filter, Observable } from 'rxjs';
+import { NotificationService } from '../../../Services/notification-proxy.service'; // Corrected path
+import { ThemeService } from '../../../Services/theme-service.service'; // Corrected path
+import { NavigationControlsComponent } from "../navigation-controls/navigation-controls.component"; // Assuming this is correct
 import { AuthService } from '../../../Services/auth.service';
-import { NotificationService } from '../../../Services/notification-proxy.service';
-import { ThemeService } from '../../../Services/theme-service.service.spec';
-import { NavigationControlsComponent } from "../navigation-controls/navigation-controls.component";
-// ==========================================================
-// ==            THIS IS THE CORRECTED IMPORT              ==
-// ==========================================================
 
 @Component({
   selector: 'app-nav',
@@ -31,33 +28,38 @@ export class NavComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     private themeService: ThemeService,
     private router: Router,
-    private notificationService: NotificationService // Injection is now correct
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
+    // Subscribe to theme changes from ThemeService
     const themeSub = this.themeService.isDarkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
-      document.body.classList.toggle('dark-theme', isDark);
+      // ThemeService already handles body classes: dark-theme-active/light-theme-active
+      // No need for 'dark' class on body directly from here.
     });
 
+    // Close menu and update user role on navigation
     const routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.userRole = this.authService.getUserRole();
-      this.isMenuOpen = false;
+      this.isMenuOpen = false; // Close menu on navigation
     });
 
+    // Get initial user role
     this.userRole = this.authService.getUserRole();
-    // This will now correctly get the unread count from the right service
+
+    // Get observable for unread notification count
     this.unreadCount$ = this.notificationService.unreadCount$;
 
+    // Add subscriptions to manage them on component destruction
     this.subscriptions.add(themeSub);
     this.subscriptions.add(routerSub);
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-    document.body.classList.remove('dark-theme');
   }
 
   toggleDarkMode(): void {
@@ -71,7 +73,7 @@ export class NavComponent implements OnInit, OnDestroy {
   onLogout(): void {
     this.authService.logout();
     this.userRole = null;
-    this.isMenuOpen = false;
-    this.router.navigate(['/auth/login']);
+    this.isMenuOpen = false; // Close menu on logout
+    this.router.navigate(['/Login']); // Redirect to login page
   }
 }

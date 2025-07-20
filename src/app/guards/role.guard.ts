@@ -14,7 +14,7 @@ export class RoleGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     // الخطوة 1: التحقق مما إذا كان المستخدم مسجلاً دخوله أساسًا
     if (!this.authService.isLoggedIn()) {
-      console.log('[RoleGuard] DENIED: User is not logged in. Redirecting to /Login...');
+      console.log(`[RoleGuard] DENIED (${state.url}): User is not logged in. Redirecting to /Login...`);
       this.router.navigate(['/Login']); // التوجيه لصفحة تسجيل الدخول
       return false;
     }
@@ -24,7 +24,7 @@ export class RoleGuard implements CanActivate {
 
     // إذا كان المسار لا يتطلب صلاحيات معينة، اسمح للجميع بالمرور (طالما هم مسجلون)
     if (!requiredRoles || requiredRoles.length === 0) {
-      console.log('[RoleGuard] GRANTED: Route does not require specific roles.');
+      console.log(`[RoleGuard] GRANTED (${state.url}): Route does not require specific roles.`);
       return true;
     }
 
@@ -38,11 +38,11 @@ export class RoleGuard implements CanActivate {
 
     // الخطوة 4: التحقق مما إذا كانت صلاحية المستخدم ضمن الصلاحيات المطلوبة
     if (userRole && requiredRoles.includes(userRole)) {
-      console.log('[RoleGuard] GRANTED: User has the required role.');
+      console.log(`[RoleGuard] GRANTED (${state.url}): User has the required role '${userRole}'.`);
       return true;
     } else {
       // إذا كان مسجلاً ولكن دوره خطأ أو غير كافٍ، سيتم توجيهه هنا
-      console.log('[RoleGuard] DENIED: User role is not sufficient. Redirecting to /unauthorized...');
+      console.log(`[RoleGuard] DENIED (${state.url}): User role '${userRole}' is not sufficient for required roles [${requiredRoles.join(', ')}]. Redirecting to /unauthorized...`);
       this.router.navigate(['/unauthorized']);
       return false;
     }

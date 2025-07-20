@@ -1,18 +1,21 @@
 /* Ensure global CSS variables are defined in your styles.css or :root */
-/* Example:
+/* These are placeholders to guide usage; actual values come from styles.css */
+/*
 :root {
-  --primary-accent: #1DB954;
-  --secondary-accent: #4CAF50;
-  --bg-color: #ffffff; // Main page background
-  --text-color-primary: #191414; // Main text color
-  --surface-color: #f8f9fa; // For cards/popups in light mode
-  --border-color: #dee2e6; // Border color in light mode
-
-  // Dark mode overrides (applied via body.dark-theme-active)
-  // --bg-color-dark: #121212;
-  // --text-color-primary-dark: #e0e0e0;
-  // --surface-color-dark: #1e1e1e;
-  // --border-color-dark: #383838;
+  --primary-accent: #23d160;
+  --secondary-accent: #00b4d8;
+  --bg-color: #000000;
+  --text-color-primary: #c9d1d9;
+  --surface-color: #101010;
+  --border-color: #2a3038;
+  --text-color-secondary: #848d97;
+}
+body.light-theme-active {
+  --bg-color: #ffffff;
+  --text-color-primary: #1c1e21;
+  --surface-color: #f8f9fa;
+  --border-color: #dce1e6;
+  --text-color-secondary: #56595c;
 }
 */
 
@@ -45,7 +48,7 @@
 
 .fab-main:hover {
   transform: scale(1.08) rotate(15deg); /* More engaging hover */
-  background-color: var(--secondary-accent);
+  background-color: var(--secondary-accent); /* Change color on hover */
 }
 
 .floating-controls-container.active .fab-main {
@@ -74,7 +77,7 @@
 /* Common style for all option items (buttons and divs) */
 .fab-option-item {
   background-color: var(--surface-color); /* Use themed surface color */
-  color: var(--text-color-primary);    /* Use themed text color */
+  color: var(--text-color);    /* Use themed text color */
   border: 1px solid var(--border-color);    /* Use themed border color */
   border-radius: 25px; /* Pill shape */
   min-width: 48px; /* For icon-only buttons */
@@ -92,6 +95,7 @@
   font-weight: 500;
   white-space: nowrap;
   outline: none;
+  text-decoration: none; /* For routerLink buttons */
 }
 
 .fab-option-item:last-child {
@@ -121,6 +125,35 @@
   justify-content: flex-start;
 }
 
+/* Scroll to Top Button specific styles */
+.scroll-top-fab {
+  background-color: var(--primary-accent);
+  color: white;
+}
+.scroll-top-fab i {
+  color: white;
+}
+.scroll-top-fab span {
+  color: white;
+}
+.scroll-top-fab:hover {
+  background-color: var(--primary-accent-hover);
+}
+
+/* Theme Toggle Button specific styles */
+.theme-toggle-fab i {
+  color: var(--secondary-accent); /* Default icon color for theme toggle */
+}
+/* When in dark mode, its icon is 'fa-sun', so we might want it yellow */
+.theme-toggle-fab.fab-option-item i.fa-sun {
+  color: #FFD700; /* Gold/Yellow for sun icon */
+}
+/* When in light mode, its icon is 'fa-moon', so we might want it blue */
+.theme-toggle-fab.fab-option-item i.fa-moon {
+  color: #4A90E2; /* Blue for moon icon */
+}
+
+
 /* Font Size Controls Group */
 .font-size-control-group {
   justify-content: space-between;
@@ -141,13 +174,13 @@
 .font-adjust-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  color: var(--text-color-secondary); /* Dim disabled color */
+  color: var(--subtle-text-color); /* Dim disabled color */
 }
 .font-size-display {
   font-weight: 600;
   min-width: 40px;
   text-align: center;
-  /* Color inherited from .fab-option-item */
+  color: var(--text-color); /* Inherit from text-color */
 }
 
 /* Digital Clock FAB Item */
@@ -156,75 +189,80 @@
   justify-content: flex-start; /* Align clock icon and time to the start */
 }
 .digital-clock-fab i {
+  color: var(--secondary-accent); /* A different accent for the clock */
   margin-right: 8px; /* Space between icon and time */
 }
 
-/* ASL AI Button Specific Styles */
-.asl-ai-fab {
-  /* Inherits common fab-option-item styles */
-  background: linear-gradient(45deg, #FF6F61, #DE473F); /* Warm, engaging gradient */
-  color: white; /* White text for contrast */
-  border: 1px solid #FF6F61;
-  box-shadow: 0 5px 15px rgba(255, 111, 97, 0.4); /* Soft shadow reflecting gradient */
-  position: relative; /* For the pseudo-element animation */
-  overflow: hidden; /* Hide overflow for the ripple effect */
-}
-
-.asl-ai-fab i {
-  color: white; /* Ensure icon is white */
-}
-
-.asl-ai-fab span {
-  color: white; /* Ensure text is white */
-  font-weight: 600;
-}
-
-.asl-ai-fab:hover {
-  transform: scale(1.08); /* More pronounced hover effect */
-  box-shadow: 0 8px 20px rgba(255, 111, 97, 0.6); /* Stronger shadow on hover */
-  border-color: #fff; /* White border on hover for emphasis */
-}
-
-/* Ripple effect on click for ASL AI button */
-.asl-ai-fab:active::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3); /* White ripple */
-  width: 0;
-  height: 0;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  animation: ripple 0.6s ease-out forwards;
-}
-
-@keyframes ripple {
-  from {
-    width: 0;
-    height: 0;
-    opacity: 1;
-  }
-  to {
-    width: 200%; /* Expands beyond button size */
-    height: 200%;
-    opacity: 0;
-  }
-}
+/* Ask AI Button Specific Styles */
 .ask-ai-fab {
   background-color: #28a745; /* Professional green */
   color: #fff;
   border: 1px solid #1e7e34;
-  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .ask-ai-fab:hover {
   background-color: #218838;
   transform: scale(1.06) translateX(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 .ask-ai-fab i {
   color: #ffffff;
 }
+.ask-ai-fab span {
+  color: #ffffff;
+}
 
-/* ... باقي التنسيقات موجودة بالفعل من الكود السابق ... */
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .floating-controls-container {
+    bottom: 20px;
+    right: 20px;
+  }
+  .fab-main {
+    width: 50px;
+    height: 50px;
+    font-size: 1.4em;
+  }
+  .fab-option-item {
+    height: 44px;
+    padding: 0 15px;
+    font-size: 0.9em;
+  }
+  .fab-option-item i {
+    font-size: 1.1em;
+  }
+  .font-size-control-group {
+    min-width: 130px;
+  }
+  .digital-clock-fab {
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-controls-container {
+    bottom: 15px;
+    right: 15px;
+  }
+  .fab-main {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3em;
+  }
+  .fab-option-item {
+    height: 40px;
+    padding: 0 12px;
+    font-size: 0.85em;
+    margin-bottom: 8px;
+  }
+  .fab-option-item i {
+    font-size: 1em;
+  }
+  .font-size-control-group {
+    min-width: 120px;
+  }
+  .digital-clock-fab {
+    min-width: 100px;
+  }
+}

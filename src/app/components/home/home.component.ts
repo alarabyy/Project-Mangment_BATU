@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, Renderer2, ElementRef, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, Renderer2, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Important for NgIf, NgFor, NgClass
-import { ThemeService } from '../../Services/theme-service.service';
+import { ThemeService } from '../../Services/theme-service.service'; // Corrected import path
 
 // Interfaces
 interface Project {
@@ -53,7 +53,7 @@ interface SkillOutcome { // NEW interface for Skills & Outcomes section
   templateUrl: './home.component.html',
   styleUrl: './home.component.css' // Note: This will be loaded as a component-specific style
 })
-export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy {
   universityName: string = "Borg El Arab Technological University";
   unitName: string = "Graduation Projects Management Unit";
   isDarkMode: boolean = true; // This will now be controlled by ThemeService
@@ -193,7 +193,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       icon: "fa-folder-open",
       value: "500+",
       label: "Archived Projects",
-      description: "Successfully completed and documented graduation projects at ${this.universityName}."
+      description: "Successfully completed and documented graduation projects at BATU."
     },
     {
       icon: "fa-users-cog",
@@ -301,7 +301,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     about: "The Graduation Projects Management Unit at Borg El Arab Technological University is dedicated to fostering innovation and guiding students through their final projects."
   }
 
-  // Inject ThemeService
   constructor(private renderer: Renderer2, private el: ElementRef, private themeService: ThemeService) {}
 
   ngOnInit(): void {
@@ -309,30 +308,28 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.themeService.isDarkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
-    this.addAnimationClasses(); // Keep existing animation
-  }
-
-  ngAfterViewInit(): void {
-    // Add animations after view is initialized
-    // This is now called from ngOnInit, but can remain here if animations depend on DOM being fully ready
+    this.addAnimationClasses();
   }
 
   ngOnDestroy(): void {
-    // Clean up if necessary (e.g., event listeners)
+    // No specific cleanup needed here for subscriptions if they complete or are handled by Angular (e.g., async pipe)
+    // If you had manual event listeners or intervals, you'd unsubscribe them here.
   }
-
-  // Removed toggleTheme() method as it's now handled by the navbar and ThemeService directly
 
   private addAnimationClasses(): void {
     // Select elements and add animation classes.
-    const heroText = this.el.nativeElement.querySelector('.hero-text');
-    const heroVisual = this.el.nativeElement.querySelector('.hero-visual');
+    // Using setTimeout to ensure elements are rendered before applying animations
+    // This provides a smoother initial load effect.
+    setTimeout(() => {
+      const heroText = this.el.nativeElement.querySelector('.hero-text');
+      const heroVisual = this.el.nativeElement.querySelector('.hero-visual');
 
-    if (heroText) {
-      this.renderer.addClass(heroText, 'animate-fade-up');
-    }
-    if (heroVisual) {
-      this.renderer.addClass(heroVisual, 'animate-slide-right');
-    }
+      if (heroText) {
+        this.renderer.addClass(heroText, 'animate-fade-up');
+      }
+      if (heroVisual) {
+        this.renderer.addClass(heroVisual, 'animate-slide-right');
+      }
+    }, 100); // Small delay to ensure DOM is ready
   }
 }

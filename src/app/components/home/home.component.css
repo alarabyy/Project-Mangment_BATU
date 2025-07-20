@@ -1,259 +1,12 @@
 /* Import a modern font like Inter with more weights */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-/* @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap'); */ /* Cairo can be a fallback or for specific elements if needed */
 
-/* Import Font Awesome (if you are using it for icons) */
-/* Make sure Font Awesome is installed: npm install @fortawesome/fontawesome-free */
-/* @import "~@fortawesome/fontawesome-free/css/all.css"; */
+/* Note: Font Awesome is typically imported globally in styles.css or angular.json */
 
-
-:root {
-  /* DARK MODE Variables are NOW DEFAULT */
-  --bg-color: #000000;
-  --text-color: #c9d1d9;
-  --surface-color: #101010;
-  --border-color: #2a3038;
-  --border-color-translucent: rgba(180, 200, 230, 0.1);
-
-  --primary-accent: #23d160;
-  --primary-accent-hover: #20c997;
-  --primary-accent-active: #1db451;
-  --primary-accent-translucent: rgba(35, 209, 96, 0.15);
-  --primary-accent-rgb: 35, 209, 96;
-
-  /* Specific variable for the mandated green text on HomeComponent */
-  --home-component-text-color: var(--primary-accent);
-
-  --secondary-accent: #00b4d8;
-  --secondary-accent-hover: #00a2c6;
-  --secondary-accent-rgb: 0, 180, 216;
-
-  --subtle-text-color: #848d97;
-  --link-hover-color: var(--primary-accent-hover);
-  --error-color: #f85149;
-  --error-color-rgb: 248, 81, 73;
-
-  --navbar-height: 75px;
-  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
-  --font-weight-black: 900;
-
-  --border-radius-sm: 6px;
-  --border-radius-base: 10px;
-  --border-radius-large: 18px;
-  --border-radius-xl: 24px;
-  --border-radius-pill: 50px;
-
-  --shadow-color: rgba(0,0,0, 0.5);
-  --shadow-color-accent: rgba(35, 209, 96, 0.2);
-  --box-shadow-sm: 0 2px 5px var(--shadow-color);
-  --box-shadow-md: 0 6px 15px var(--shadow-color);
-  --box-shadow-lg: 0 10px 30px var(--shadow-color);
-  --box-shadow-xl: 0 20px 40px var(--shadow-color); /* Added larger shadow */
-  --box-shadow-inset: inset 0 2px 4px 0 rgba(0,0,0,0.5);
-
-  --transition-speed-fast: 0.2s;
-  --transition-speed-normal: 0.35s;
-  --transition-speed-slow: 0.6s;
-  --easing-curve-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
-  --easing-curve-elegant: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --easing-curve-sharp: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Optional: Light Theme Variables (if you implement a toggle) */
-body.light-theme-active {
-  --bg-color: #ffffff;
-  --text-color: #1c1e21;
-  --surface-color: #f8f9fa;
-  --border-color: #dce1e6;
-  --border-color-translucent: rgba(0,0,0,0.07);
-  --home-component-text-color: var(--primary-accent);
-  --secondary-accent: #007bff;
-  --secondary-accent-hover: #0069d9;
-  --secondary-accent-rgb: 0, 123, 255;
-  --subtle-text-color: #56595c;
-  --link-hover-color: var(--primary-accent-hover);
-  --shadow-color: rgba(0,0,0, 0.1);
-  --shadow-color-accent: rgba(35, 209, 96, 0.15);
-}
-
-/* Global Resets and Base Styles */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary-accent) var(--surface-color);
-}
-html::-webkit-scrollbar { width: 10px; }
-html::-webkit-scrollbar-track { background: var(--surface-color); }
-html::-webkit-scrollbar-thumb {
-  background-color: var(--primary-accent);
-  border-radius: var(--border-radius-pill);
-  border: 2px solid var(--surface-color);
-}
-html::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-hover); }
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: var(--font-family-base);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* Removed padding-top: var(--navbar-height, 0px); as user has their own navbar */
-  overflow-x: hidden;
-  transition: background-color var(--transition-speed-normal) var(--easing-curve-elegant),
-              color var(--transition-speed-normal) var(--easing-curve-elegant);
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* Removed Theme Toggle styles as the button is now in the navbar */
-
-
-/* Base Button Styles (Reusable) */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.5rem; /* Slightly larger padding */
-  font-size: 1rem; /* Slightly larger font */
-  font-weight: var(--font-weight-semibold);
-  border-radius: var(--border-radius-base);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all var(--transition-speed-fast) var(--easing-curve-elegant);
-  text-decoration: none;
-  justify-content: center;
-  white-space: nowrap;
-}
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background-color: var(--primary-accent);
-  color: var(--bg-color);
-  border-color: var(--primary-accent);
-  box-shadow: 0 5px 15px rgba(var(--primary-accent-rgb), 0.3); /* Stronger shadow for primary */
-}
-.btn-primary:not(:disabled):hover {
-  background-color: var(--primary-accent-hover);
-  border-color: var(--primary-accent-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(var(--primary-accent-rgb), 0.4);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: var(--primary-accent);
-  border: 2px solid var(--primary-accent); /* Solid accent border */
-}
-.btn-secondary:not(:disabled):hover {
-  background-color: var(--primary-accent-translucent);
-  border-color: var(--primary-accent-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(var(--primary-accent-rgb), 0.1); /* Subtle accent shadow */
-}
-
-.btn-view-all {
-  background: none;
-  border: none;
-  color: var(--primary-accent);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: color var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease;
-}
-
-.btn-view-all:hover {
-  color: var(--primary-accent-hover);
-  transform: translateX(5px);
-}
-
-/* Base Card Styles (Reusable) */
-.card {
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color-translucent);
-  border-radius: var(--border-radius-large);
-  padding: 2rem; /* Increased padding */
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  transition: all var(--transition-speed-fast) var(--easing-curve-elegant);
-  box-shadow: var(--box-shadow-sm);
-  overflow: hidden;
-  position: relative; /* For potential inner elements */
-}
-
-.card:hover {
-  box-shadow: var(--box-shadow-md);
-  border-color: var(--primary-accent-translucent); /* Accent border on hover */
-  transform: translateY(-5px); /* More pronounced lift effect */
-}
-
-
-/* Section Header Styles */
-.section-header {
-  text-align: center;
-  margin-bottom: 5rem; /* More space */
-}
-
-.section-title {
-  font-size: 3rem; /* Larger title */
-  font-weight: var(--font-weight-extrabold);
-  margin-bottom: 1.2rem;
-  position: relative;
-  color: var(--text-color);
-  display: flex; /* Allow icon next to title */
-  justify-content: center;
-  align-items: center;
-  gap: 15px; /* Space between icon and text */
-}
-
-.section-title-icon {
-  color: var(--primary-accent); /* Make title icons green */
-  font-size: 2.5rem; /* Size for the inline icon */
-}
-
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -15px; /* Lower the underline */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px; /* Longer underline */
-  height: 6px; /* Thicker underline */
-  background: linear-gradient(90deg, transparent, var(--primary-accent), transparent); /* Gradient underline */
-  border-radius: var(--border-radius-pill);
-}
-
-.section-subtitle {
-  font-size: 1.3rem; /* Larger subtitle */
-  color: var(--subtle-text-color);
-  max-width: 800px;
-  margin: 0 auto;
-  line-height: 1.8;
-}
+/*
+  Component-Specific Variables (if any, otherwise rely on global ones)
+  No specific variables needed here, relying entirely on styles.css :root and body.light-theme-active
+*/
 
 /* Hero Section */
 .hero {
@@ -401,7 +154,6 @@ body {
 }
 
 .hero-visual {
-  /* No specific styles needed here, as the content inside it (project-dashboard) is styled as a card */
   display: flex;
   justify-content: center; /* Center the dashboard visually */
   align-items: center;
@@ -961,7 +713,9 @@ body {
   margin-top: 1rem;
 }
 
-/* Footer Styles */
+/* Footer Styles - Note: Footer is likely a separate component in a real app */
+/* However, if it's part of HomeComponent, these styles apply. */
+/* If it's a separate component, move these to its own CSS file. */
 .footer {
   background-color: var(--bg-color);
   color: var(--subtle-text-color);

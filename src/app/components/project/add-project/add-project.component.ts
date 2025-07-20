@@ -1,3 +1,4 @@
+// src/app/components/add-project/add-project.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -5,11 +6,10 @@ import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
 import { CategoryService } from '../../../Services/category.service';
 import { DepartmentService } from '../../../Services/department.service';
-// import { FacultyService } from '../../../Services/faculty.service'; // تم إزالة الاستيراد لأن الكليات ستكون ثابتة
 import { finalize } from 'rxjs';
 import { Category } from '../../../models/category';
 import { Department } from '../../../models/department';
-import { Faculty } from '../../../models/faculty'; // لا يزال مستخدماً للنوع فقط
+import { Faculty } from '../../../models/faculty';
 import { SuccessPopupComponent } from '../success-popup/success-popup.component';
 import { Member } from '../../../models/project'; // Make sure Project model defines Member interface correctly
 
@@ -25,7 +25,6 @@ export class AddProjectComponent implements OnInit {
   isSubmitting = false;
   categories: Category[] = [];
   departments: Department[] = [];
-  // الكليات الثابتة المطلوبة، الآن مع جميع الخصائص المطلوبة من Faculty interface
   faculties: Faculty[] = [
     {
       id: 1,
@@ -57,7 +56,6 @@ export class AddProjectComponent implements OnInit {
     }
   ];
 
-  // قائمة 20 تقنية مركزة على الكليات المحددة
   availableTechnologies: string[] = [
     'Artificial Intelligence (AI)', 'Machine Learning (ML)', 'Data Science', 'Big Data Analytics',
     'Internet of Things (IoT)', 'Cybersecurity', 'Cloud Computing', 'Web Development',
@@ -66,9 +64,20 @@ export class AddProjectComponent implements OnInit {
     'Renewable Energy Systems', 'Food Processing Automation', 'Quality Control Systems', 'Supply Chain Optimization'
   ];
 
+  availableTools: string[] = [
+    'Python', 'Java', 'C++', 'JavaScript', 'TypeScript', 'Node.js', 'React', 'Angular', 'Vue.js', 'Spring Boot',
+    'Django', 'Flask', 'ASP.NET Core', 'SQL Server', 'MySQL', 'PostgreSQL', 'MongoDB', 'Firebase', 'AWS', 'Azure',
+    'Google Cloud Platform (GCP)', 'Docker', 'Kubernetes', 'Git', 'GitHub', 'Jira', 'Confluence', 'Figma', 'Adobe XD', 'Photoshop',
+    'Illustrator', 'Unity', 'Unreal Engine', 'TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy', 'MATLAB', 'RStudio'
+  ];
+
   showSuccessPopup = false;
   popupTitle = '';
   popupMessage = '';
+
+  // New state variables for toggling checkbox visibility
+  showTechnologiesCheckboxes: boolean = false;
+  showToolsUsedCheckboxes: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -88,28 +97,29 @@ export class AddProjectComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       grade: [null, [Validators.min(0), Validators.max(100)]],
-      // Technologies لا تزال FormArray مع Checkboxes
       technologies: this.fb.array([], this.minOneCheckboxSelectedValidator('technologies')),
-      // Tools Used عادت إلى حقل نصي واحد
-      toolsUsed: ['', Validators.required],
+      toolsUsed: this.fb.array([], this.minOneCheckboxSelectedValidator('toolsUsed')),
       problemStatement: ['', Validators.required],
-      teamLeaderId: [null, [Validators.required, Validators.pattern("^[0-9]*$")]],
+      // تم حذف teamLeaderId بناءً على الطلب
       categoryId: [null, Validators.required],
       departmentId: [null, Validators.required],
-      facultyId: [null, Validators.required], // حقل الكلية
-      members: this.fb.array([this.newMember()])
+      facultyId: [null, Validators.required],
+      members: this.fb.array([this.newMember()]),
+      supervisors: this.fb.array([this.newSupervisor()]) // Supervisor ID validation handled within newSupervisor
     });
 
-    // ملء FormArray بالـ Checkboxes للـ Technologies فقط
     this.addTechnologyCheckboxes();
+    this.addToolsCheckboxes();
   }
 
-  // دالة مساعدة لملء Technologies FormArray
   private addTechnologyCheckboxes(): void {
     this.availableTechnologies.forEach(() => (this.projectForm.get('technologies') as FormArray).push(this.fb.control(false)));
   }
 
-  // Validator مخصص للتأكد من اختيار checkbox واحد على الأقل (للـ Technologies)
+  private addToolsCheckboxes(): void {
+    this.availableTools.forEach(() => (this.projectForm.get('toolsUsed') as FormArray).push(this.fb.control(false)));
+  }
+
   minOneCheckboxSelectedValidator(controlName: string): ValidatorFn {
     return (formArray: AbstractControl): { [key: string]: any } | null => {
       if (!(formArray instanceof FormArray)) {
@@ -131,13 +141,13 @@ export class AddProjectComponent implements OnInit {
         next: (data) => this.departments = data,
         error: (err) => console.error('Failed to load departments', err)
     });
-    // الكليات لم تعد تُجلب من الخدمة، بل هي ثابتة
   }
 
   get f() { return this.projectForm.controls; }
   get members() { return this.projectForm.get('members') as FormArray; }
-  // Getter للـ FormArray الخاص بالـ Technologies فقط
   get technologiesArray() { return this.projectForm.get('technologies') as FormArray; }
+  get toolsUsedArray() { return this.projectForm.get('toolsUsed') as FormArray; }
+  get supervisorsArray() { return this.projectForm.get('supervisors') as FormArray; }
 
   newMember(name: string = '', academicId: number | null = null): FormGroup {
     return this.fb.group({
@@ -154,6 +164,39 @@ export class AddProjectComponent implements OnInit {
     this.members.removeAt(index);
   }
 
+  newSupervisor(id: number | null = null): FormGroup {
+    // التحقق من وجود المشرف يتم على مستوى الـ Backend
+    // هنا يتم فقط التحقق من صحة تنسيق الـ ID
+    return this.fb.group({
+      id: [id, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]]
+    });
+  }
+
+  addSupervisor(): void {
+    this.supervisorsArray.push(this.newSupervisor());
+  }
+
+  removeSupervisor(index: number): void {
+    this.supervisorsArray.removeAt(index);
+  }
+
+  // New methods to toggle visibility
+  toggleTechnologiesVisibility(): void {
+    this.showTechnologiesCheckboxes = !this.showTechnologiesCheckboxes;
+    // Optionally, mark as touched when shown to trigger validation feedback immediately
+    if (this.showTechnologiesCheckboxes) {
+      this.technologiesArray.markAsTouched();
+    }
+  }
+
+  toggleToolsUsedVisibility(): void {
+    this.showToolsUsedCheckboxes = !this.showToolsUsedCheckboxes;
+    // Optionally, mark as touched when shown to trigger validation feedback immediately
+    if (this.showToolsUsedCheckboxes) {
+      this.toolsUsedArray.markAsTouched();
+    }
+  }
+
   onSubmit(): void {
     if (this.projectForm.invalid) {
       this.projectForm.markAllAsTouched();
@@ -162,49 +205,56 @@ export class AddProjectComponent implements OnInit {
           Object.values(control.controls).forEach(c => c.markAsTouched());
         }
       });
-      this.technologiesArray.markAsTouched(); // للتأكد من التحقق من الـ Technologies
+      this.supervisorsArray.controls.forEach(control => {
+        if (control instanceof FormGroup) {
+          Object.values(control.controls).forEach(c => c.markAsTouched());
+        }
+      });
+      // Ensure hidden FormArrays are also marked as touched on submit
+      this.technologiesArray.markAsTouched();
+      this.toolsUsedArray.markAsTouched();
       return;
     }
     this.isSubmitting = true;
 
     const formValue = this.projectForm.value;
 
-    // تحويل الـ Technologies المختارة إلى string مفصول بفاصلة
     const selectedTechnologies = this.availableTechnologies
       .filter((tech, i) => this.technologiesArray.controls[i].value)
       .join(', ');
 
-    // Tools Used أصبح نصاً عادياً مباشرة من formValue
-    const toolsUsed = formValue.toolsUsed;
+    const selectedToolsUsed = this.availableTools
+      .filter((tool, i) => this.toolsUsedArray.controls[i].value)
+      .join(', ');
+
+    const supervisorIds = formValue.supervisors.map((s: any) => Number(s.id));
 
     const payload = {
       title: formValue.title,
       description: formValue.description,
       grade: formValue.grade,
-      technologies: selectedTechnologies, // استخدام السلسلة النصية المعالجة
-      toolsUsed: toolsUsed,               // استخدام النص مباشرة
+      technologies: selectedTechnologies,
+      toolsUsed: selectedToolsUsed,
       problemStatement: formValue.problemStatement,
-      teamLeaderId: Number(formValue.teamLeaderId),
+      // تم حذف teamLeaderId من الـ payload
       categoryId: formValue.categoryId,
       departmentId: formValue.departmentId,
-      facultyId: formValue.facultyId, // تضمين facultyId
+      facultyId: formValue.facultyId,
       members: formValue.members.map((m: any) => ({
         name: m.name,
         academicId: Number(m.academicId)
-      }))
+      })),
+      supervisors: supervisorIds
     };
 
     this.projectService.createProject(payload).pipe(
       finalize(() => this.isSubmitting = false)
     ).subscribe({
       next: (response) => {
-        // Handle response from the backend. Assuming backend returns a string message or success object
         if (typeof response === 'string' && response.trim() !== '') {
-            // If it's a string message, display it as an alert
             alert(response);
-            this.router.navigate(['/Home']); // Navigate after displaying alert
+            this.router.navigate(['/Home']);
         } else {
-            // Otherwise, assume successful object response, show popup
             this.popupTitle = 'Project Created!';
             this.popupMessage = 'Your project has been successfully created. Find it in the project list to edit it and upload images.';
             this.showSuccessPopup = true;

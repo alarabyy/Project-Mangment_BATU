@@ -1,0 +1,24 @@
+<!-- src/app/components/Components/toast-container/toast-container.component.html -->
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+  <!-- Corrected trackBy usage -->
+  <div *ngFor="let toast of toasts; trackBy: trackById"
+       class="toast-message"
+       [ngClass]="toast.type"
+       role="alert"
+       [style.--toast-duration.ms]="toast.duration"
+       (click)="dismissToast(toast.id)">
+    <div class="toast-icon">
+      <i class="fas" [ngClass]="{
+        'fa-check-circle': toast.type === 'success',
+        'fa-info-circle': toast.type === 'info',
+        'fa-times-circle': toast.type === 'error'
+      }"></i>
+    </div>
+    <div class="toast-content">
+      <p class="toast-message-text">{{ toast.message }}</p>
+      <button type="button" class="close-toast-btn" title="Dismiss" (click)="dismissToast(toast.id); $event.stopPropagation()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div>

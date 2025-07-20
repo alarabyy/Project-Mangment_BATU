@@ -1,4 +1,4 @@
-// src/app/core/services/auth.service.ts
+// src/app/Services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -10,8 +10,8 @@ export interface UserProfile {
   id: string;
   email: string;
   firstName: string;
-  lastname: string | null; // **تم التعديل: lastName -> lastname**
-  middleName?: string;     // هذا الحقل سيظل موجودًا ولكن قد لا يتم إرساله من الـ API
+  lastname: string | null;
+  middleName?: string;
   imageUrl: string | null;
   role: string | number;
   gender?: number;
@@ -56,16 +56,20 @@ export class AuthService {
         if (response && response.token) {
           localStorage.setItem(this.authTokenKey, response.token);
           this._isAuthenticated.next(true);
+          console.log('[AuthService] Login successful, token stored, isAuthenticated = true.');
+          this.redirectToDashboard();
         }
       })
     );
   }
 
   public forgotPassword(email: string): Observable<any> {
+    console.log(`[AuthService] Sending forgot password request for email: ${email}`);
     return this.http.post(`${this.authApiUrl}/forgot-password?email=${encodeURIComponent(email)}`, null);
   }
 
   public resetPassword(request: PasswordResetRequest): Observable<any> {
+    console.log('[AuthService] Sending reset password request with token and new password.');
     return this.http.post(`${this.authApiUrl}/reset-password`, request);
   }
 
@@ -77,29 +81,38 @@ export class AuthService {
   public logout(): void {
     localStorage.removeItem(this.authTokenKey);
     this._isAuthenticated.next(false);
+    console.log('[AuthService] User logged out. isAuthenticated = false.');
     this.router.navigate(['/Login']);
   }
 
   public getUserProfileFromApi(): Observable<UserProfile> {
     const userId = this.getUserId();
     if (!userId) {
-      const errorMsg = "[AuthService] Cannot fetch profile, User ID not found in token.";
+      const errorMsg = "[AuthService] Cannot fetch profile, User ID not found in token. Logging out.";
       console.error(errorMsg);
       this.logout();
       return throwError(() => new Error(errorMsg));
     }
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
     const headers = this.getAuthHeaders();
+    console.log(`[AuthService] Fetching user profile for ID: ${userId}`);
     return this.http.get<UserProfile>(profileUrl, { headers });
   }
 
   private checkInitialAuthState(): void {
     const token = this.getToken();
-    this._isAuthenticated.next(!!token && !this.isTokenExpired(token));
+    const isAuthenticated = !!token && !this.isTokenExpired(token);
+    this._isAuthenticated.next(isAuthenticated);
+    console.log(`[AuthService] Initial auth state checked: isAuthenticated = ${isAuthenticated}`);
   }
 
   public isLoggedIn(): boolean {
-    return this._isAuthenticated.value;
+    const token = this.getToken();
+    const valid = !!token && !this.isTokenExpired(token);
+    if (this._isAuthenticated.value !== valid) {
+        this._isAuthenticated.next(valid);
+    }
+    return valid;
   }
 
   public getToken(): string | null {
@@ -108,11 +121,16 @@ export class AuthService {
 
   private getDecodedToken(): any | null {
     const token = this.getToken();
-    if (!token) return null;
+    if (!token) {
+      console.warn('[AuthService] No token found when trying to decode.');
+      return null;
+    }
     try {
-      return jwtDecode(token);
+      const decoded = jwtDecode(token);
+      console.log('[AuthService] Token decoded successfully:', decoded);
+      return decoded;
     } catch (error) {
-      console.error("Error decoding token:", error);
+      console.error("[AuthService] Error decoding token:", error, "Logging out.");
       this.logout();
       return null;
     }
@@ -120,39 +138,64 @@ export class AuthService {
 
   public getUserId(): string | null {
     const decoded = this.getDecodedToken();
-    return decoded ? (decoded.sub || decoded.nameid || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
+    const userId = decoded ? (decoded.sub || decoded.nameid || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
+    console.log(`[AuthService] Extracted User ID: '${userId}'`);
+    return userId;
   }
 
   public getUserRole(): string | null {
     const decoded = this.getDecodedToken();
-    if (!decoded) return null;
+    if (!decoded) {
+      console.warn('[AuthService] No decoded token found in getUserRole.');
+      return null;
+    }
 
-    let roleValue = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
+    const potentialRoleClaims = [
+        'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
+        'role',
+        'Role',
+        'roles',
+    ];
+
+    let roleValue: any = null;
+
+    for (const claim of potentialRoleClaims) {
+        if (decoded[claim] !== undefined && decoded[claim] !== null) {
+            roleValue = decoded[claim];
+            console.log(`[AuthService] Found raw role value for claim '${claim}':`, roleValue);
+            break;
+        }
+    }
 
     if (roleValue === undefined || roleValue === null) {
+      console.warn('[AuthService] No role claim found in token for any checked property.');
       return null;
     }
 
     if (Array.isArray(roleValue)) {
-      roleValue = roleValue[0];
+      roleValue = roleValue.length > 0 ? roleValue[0] : null;
+      console.log(`[AuthService] Role was an array, using first element: '${roleValue}'`);
     }
 
-    const numericRole = Number(roleValue);
+    if (roleValue === null) {
+        console.warn('[AuthService] Role value became null after array processing.');
+        return null;
+    }
 
-    if (!isNaN(numericRole)) {
+    const lowerCaseRole = (roleValue?.toString() || '').toLowerCase();
+    console.log(`[AuthService] Processed lowerCaseRole: '${lowerCaseRole}'`);
+
+    if (!isNaN(Number(lowerCaseRole))) {
+      const numericRole = Number(lowerCaseRole);
       switch (numericRole) {
-        case 0:
-          return 'student';
-        case 1:
-          return 'doctor';
-        case 2:
-          return 'admin';
+        case 0: return 'student';
+        case 1: return 'doctor';
+        case 2: return 'admin';
         default:
+          console.warn(`[AuthService] Unknown numeric role: ${numericRole}`);
           return null;
       }
     } else {
-      const lowerCaseRole = (roleValue?.toString() || '').toLowerCase();
-
       if (lowerCaseRole === 'student') {
         return 'student';
       } else if (lowerCaseRole === 'doctor') {
@@ -160,6 +203,7 @@ export class AuthService {
       } else if (lowerCaseRole === 'admin') {
         return 'admin';
       }
+      console.warn(`[AuthService] Unknown string role: '${lowerCaseRole}'`);
       return null;
     }
   }
@@ -168,12 +212,20 @@ export class AuthService {
     try {
       const decoded: { exp?: number } = jwtDecode(token);
       if (typeof decoded.exp !== 'number') {
-        console.warn("Token does not contain a numeric 'exp' claim, or 'exp' is missing. Treating as expired.");
+        console.warn("[AuthService] Token does not contain a numeric 'exp' claim, or 'exp' is missing. Treating as expired.");
         return true;
       }
-      return decoded.exp < (Date.now() / 1000);
+      const expirationTime = decoded.exp * 1000;
+      const currentTime = Date.now();
+      const expired = expirationTime < currentTime;
+      if (expired) {
+          console.warn(`[AuthService] Token expired. Expiration: ${new Date(expirationTime).toLocaleString()}, Current: ${new Date(currentTime).toLocaleString()}`);
+      } else {
+          console.log(`[AuthService] Token is valid. Expires in ${Math.round((expirationTime - currentTime) / 1000 / 60)} minutes.`);
+      }
+      return expired;
     } catch (error) {
-      console.error("Error checking token expiration:", error);
+      console.error("[AuthService] Error checking token expiration:", error, "Treating as expired.");
       return true;
     }
   }
@@ -189,17 +241,15 @@ export class AuthService {
 
   private redirectToDashboard(): void {
     const role = this.getUserRole();
+    console.log(`[AuthService] Redirecting to dashboard based on role: '${role}'`);
     switch (role) {
       case 'admin':
-        this.router.navigate(['/Home']);
-        break;
       case 'doctor':
-        this.router.navigate(['/Home']);
-        break;
       case 'student':
         this.router.navigate(['/Home']);
         break;
       default:
+        console.warn(`[AuthService] Unknown role '${role}' during dashboard redirection. Navigating to /Home.`);
         this.router.navigate(['/Home']);
         break;
     }

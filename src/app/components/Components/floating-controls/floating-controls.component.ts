@@ -3,9 +3,9 @@
 import { Component, OnInit, OnDestroy, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map } from 'rxjs/operators'; // Removed startWith as it's not needed with interval(1000)
 import { RouterModule } from '@angular/router';
-import { ThemeService } from '../../../Services/theme-service.service.spec';
+import { ThemeService } from '../../../Services/theme-service.service'; // Corrected import path
 
 @Component({
   selector: 'app-floating-controls',
@@ -36,14 +36,15 @@ export class FloatingControlsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Subscribe to theme changes
     this.themeSubscription = this.themeService.isDarkMode$.subscribe(mode => {
       this.isDarkMode = mode;
-      this.cdr.markForCheck();
+      this.cdr.markForCheck(); // Ensure view updates
     });
 
     this.loadFontSizePreference();
     this.startClock();
-    this.onWindowScroll();
+    this.onWindowScroll(); // Call once on init to set initial state
   }
 
   toggleDarkMode(): void {
@@ -77,13 +78,13 @@ export class FloatingControlsComponent implements OnInit, OnDestroy {
         this.currentFontSize = size;
       }
     }
+    // Apply initial or loaded font size to the root HTML element
     this.document.documentElement.style.fontSize = `${this.currentFontSize}px`;
   }
 
   startClock(): void {
     this.clockSubscription = interval(1000)
       .pipe(
-        startWith(0),
         map(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
       )
       .subscribe(timeStr => {
@@ -98,10 +99,11 @@ export class FloatingControlsComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
-    const yOffset = window.pageYOffset || this.document.documentElement.scrollTop || this.document.body.scrollTop || 0;
-    const showOffset = 250;
+    const yOffset = window.pageYOffset || this.document.documentElement.scrollTop;
+    const showOffset = 250; // Pixels to scroll down before showing button
     const shouldShow = yOffset > showOffset;
 
+    // Only update and trigger change detection if the state actually changes
     if (this.showScrollToTopButton !== shouldShow) {
       this.showScrollToTopButton = shouldShow;
       this.cdr.markForCheck();

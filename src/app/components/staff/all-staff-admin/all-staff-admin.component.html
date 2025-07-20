@@ -34,9 +34,8 @@
   <!-- Staff Admin Grid -->
   <div class="staff-admin-grid">
     <div class="card staff-card" *ngFor="let staff of staffMembers; trackBy: trackById">
-
-      <!-- Display section for viewing Staff details (shown when NOT editing) -->
-      <div *ngIf="!staff.isEditing">
+      <!-- Always display the view section here -->
+      <div>
          <img *ngIf="getStaffImageUrl(staff.image) as imageUrl" [src]="imageUrl" [alt]="'Photo of ' + staff.name" class="card-image">
           <div *ngIf="!getStaffImageUrl(staff.image)" class="card-image-placeholder">
               <i class="fas fa-user-circle"></i>
@@ -45,6 +44,7 @@
          <p class="card-subtitle">{{ staff.position }}</p>
          <p class="card-text">{{ staff.about }}</p>
          <div class="card-actions">
+           <!-- The toggleEdit button will now open the global modal -->
            <button (click)="toggleEdit(staff)" class="btn btn-secondary" [disabled]="isAnyOperationInProgress()">
              <i class="fas fa-edit"></i> Edit
            </button>
@@ -53,80 +53,90 @@
            </button>
          </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Display section for editing Staff details (inline form, shown when isEditing is true) -->
-      <div *ngIf="staff.isEditing" class="edit-form-section">
-          <h4>Edit Staff Member: {{ staff.name }}</h4>
-          <form #editStaffForm="ngForm" (ngSubmit)="saveEdit(staff, editStaffForm)">
+  <!-- Modal/Popup for Editing Staff Details -->
+  <!-- This section will be displayed when activeEditStaff is not null -->
+  <div class="modal-overlay" *ngIf="activeEditStaff" [class.show]="activeEditStaff">
+      <div class="modal-content">
+          <!-- Close button for the modal -->
+          <button class="modal-close-btn" (click)="cancelEdit(activeEditStaff!)" [disabled]="activeEditStaff.isSavingEdit">
+              <i class="fas fa-times"></i>
+          </button>
+
+          <h4>Edit Staff Member: {{ activeEditStaff.name }}</h4>
+          <form #editStaffForm="ngForm" (ngSubmit)="saveEdit(activeEditStaff!, editStaffForm)">
               <div class="form-group">
-                <label for="edit-name-{{staff.id}}">Name</label>
-                <input type="text" id="edit-name-{{staff.id}}" name="edit-name-{{staff.id}}" [(ngModel)]="staff.editModel!.name" required class="form-input" minlength="3">
-                 <div *ngIf="editStaffForm.controls['edit-name-' + staff.id]?.invalid && (editStaffForm.controls['edit-name-' + staff.id]?.dirty || editStaffForm.controls['edit-name-' + staff.id]?.touched)" class="error-text">
-                    <small *ngIf="editStaffForm.controls['edit-name-' + staff.id]?.errors?.['required']">Name is required.</small>
-                    <small *ngIf="editStaffForm.controls['edit-name-' + staff.id]?.errors?.['minlength']">Name must be at least 3 characters.</small>
+                <label for="edit-name-modal">Name</label>
+                <!-- Bind to activeEditStaff.editModel! -->
+                <input type="text" id="edit-name-modal" name="edit-name-modal" [(ngModel)]="activeEditStaff!.editModel!.name" required class="form-input" minlength="3">
+                 <div *ngIf="editStaffForm.controls['edit-name-modal']?.invalid && (editStaffForm.controls['edit-name-modal']?.dirty || editStaffForm.controls['edit-name-modal']?.touched)" class="error-text">
+                    <small *ngIf="editStaffForm.controls['edit-name-modal']?.errors?.['required']">Name is required.</small>
+                    <small *ngIf="editStaffForm.controls['edit-name-modal']?.errors?.['minlength']">Name must be at least 3 characters.</small>
                  </div>
               </div>
 
                <div class="form-group">
-                <label for="edit-position-{{staff.id}}">Position</label>
-                <input type="text" id="edit-position-{{staff.id}}" name="edit-position-{{staff.id}}" [(ngModel)]="staff.editModel!.position" required class="form-input" minlength="3">
-                  <div *ngIf="editStaffForm.controls['edit-position-' + staff.id]?.invalid && (editStaffForm.controls['edit-position-' + staff.id]?.dirty || editStaffForm.controls['edit-position-' + staff.id]?.touched)" class="error-text">
-                    <small *ngIf="editStaffForm.controls['edit-position-' + staff.id]?.errors?.['required']">Position is required.</small>
-                    <small *ngIf="editStaffForm.controls['edit-position-' + staff.id]?.errors?.['minlength']">Position must be at least 3 characters.</small>
+                <label for="edit-position-modal">Position</label>
+                <!-- Bind to activeEditStaff.editModel! -->
+                <input type="text" id="edit-position-modal" name="edit-position-modal" [(ngModel)]="activeEditStaff!.editModel!.position" required class="form-input" minlength="3">
+                  <div *ngIf="editStaffForm.controls['edit-position-modal']?.invalid && (editStaffForm.controls['edit-position-modal']?.dirty || editStaffForm.controls['edit-position-modal']?.touched)" class="error-text">
+                    <small *ngIf="editStaffForm.controls['edit-position-modal']?.errors?.['required']">Position is required.</small>
+                    <small *ngIf="editStaffForm.controls['edit-position-modal']?.errors?.['minlength']">Position must be at least 3 characters.</small>
                  </div>
               </div>
 
               <div class="form-group">
-                <label for="edit-about-{{staff.id}}">About</label>
-                <textarea id="edit-about-{{staff.id}}" name="edit-about-{{staff.id}}" [(ngModel)]="staff.editModel!.about" required class="form-input" rows="3" minlength="10"></textarea>
-                  <div *ngIf="editStaffForm.controls['edit-about-' + staff.id]?.invalid && (editStaffForm.controls['edit-about-' + staff.id]?.dirty || editStaffForm.controls['edit-about-' + staff.id]?.touched)" class="error-text">
-                    <small *ngIf="editStaffForm.controls['edit-about-' + staff.id]?.errors?.['required']">About is required.</small>
-                    <small *ngIf="editStaffForm.controls['edit-about-' + staff.id]?.errors?.['minlength']">About must be at least 10 characters.</small>
+                <label for="edit-about-modal">About</label>
+                <!-- Bind to activeEditStaff.editModel! -->
+                <textarea id="edit-about-modal" name="edit-about-modal" [(ngModel)]="activeEditStaff!.editModel!.about" required class="form-input" rows="3" minlength="10"></textarea>
+                  <div *ngIf="editStaffForm.controls['edit-about-modal']?.invalid && (editStaffForm.controls['edit-about-modal']?.dirty || editStaffForm.controls['edit-about-modal']?.touched)" class="error-text">
+                    <small *ngIf="editStaffForm.controls['edit-about-modal']?.errors?.['required']">About is required.</small>
+                    <small *ngIf="editStaffForm.controls['edit-about-modal']?.errors?.['minlength']">About must be at least 10 characters.</small>
                  </div>
               </div>
 
               <!-- Image Upload/Management for Edit -->
                <div class="form-group">
-                   <label for="edit-image-{{staff.id}}">Image</label>
-                   <input type="file" id="edit-image-{{staff.id}}" name="edit-image-{{staff.id}}" (change)="onEditFileSelected($event, staff)" class="form-input-file">
+                   <label for="edit-image-modal">Image</label>
+                   <!-- Pass activeEditStaff to the image handling functions -->
+                   <input type="file" id="edit-image-modal" name="edit-image-modal" (change)="onEditFileSelected($event, activeEditStaff!)" class="form-input-file">
 
-                   <ng-container *ngIf="getStaffImageUrl(staff.image) as currentImageUrl">
-                        <div *ngIf="!staff.selectedEditImageFile && staff.editModel?.removeImage !== true" class="current-image-preview">
+                   <ng-container *ngIf="getStaffImageUrl(activeEditStaff.image) as currentImageUrl">
+                        <div *ngIf="!activeEditStaff.selectedEditImageFile && activeEditStaff.editModel?.removeImage !== true" class="current-image-preview">
                              Current Image:
-                              <img [src]="currentImageUrl" [alt]="'Current photo of ' + staff.name" style="height: 50px; vertical-align: middle; margin-left: 10px; border-radius: var(--border-radius-sm);">
-                             <button type="button" class="btn-clear-file" (click)="markExistingImageForRemoval(staff)">Remove Image</button>
+                              <img [src]="currentImageUrl" [alt]="'Current photo of ' + activeEditStaff.name" style="height: 50px; vertical-align: middle; margin-left: 10px; border-radius: var(--border-radius-sm);">
+                             <button type="button" class="btn-clear-file" (click)="markExistingImageForRemoval(activeEditStaff!)">Remove Image</button>
                         </div>
                    </ng-container>
 
-
-                    <div *ngIf="staff.selectedEditImageFile" class="selected-file-info">
-                        Selected new file: {{ staff.selectedEditImageFile.name }}
-                         <button type="button" class="btn-clear-file" (click)="clearSelectedEditImage(staff)">Clear Selected File</button>
+                    <div *ngIf="activeEditStaff.selectedEditImageFile" class="selected-file-info">
+                        Selected new file: {{ activeEditStaff.selectedEditImageFile.name }}
+                         <button type="button" class="btn-clear-file" (click)="clearSelectedEditImage(activeEditStaff!)">Clear Selected File</button>
                     </div>
 
-                    <div *ngIf="staff.editModel?.removeImage === true" class="info-message-small">
+                    <div *ngIf="activeEditStaff.editModel?.removeImage === true" class="info-message-small">
                          Current image will be removed on save.
-                          <button type="button" class="btn-clear-file" (click)="staff.editModel!.removeImage = false; staff.selectedEditImageFile = undefined;">Undo Remove</button>
+                          <button type="button" class="btn-clear-file" (click)="activeEditStaff!.editModel!.removeImage = false; activeEditStaff!.selectedEditImageFile = undefined;">Undo Remove</button>
                     </div>
                </div>
 
-
-               <!-- Error Message specific to the inline edit form -->
-               <div *ngIf="staff.editErrorMessage" class="form-error-box">
+               <!-- Error Message specific to the modal edit form -->
+               <div *ngIf="activeEditStaff.editErrorMessage" class="form-error-box">
                  <i class="fas fa-exclamation-triangle"></i>
-                 <span>{{ staff.editErrorMessage }}</span>
+                 <span>{{ activeEditStaff.editErrorMessage }}</span>
                </div>
 
-               <!-- Actions for the inline edit form -->
+               <!-- Actions for the modal edit form -->
                <div class="form-actions">
-                   <button type="button" class="btn btn-secondary" (click)="cancelEdit(staff)" [disabled]="staff.isSavingEdit">Cancel</button>
-                   <button type="submit" class="btn btn-primary" [disabled]="staff.isSavingEdit || editStaffForm.invalid">
-                       <span *ngIf="!staff.isSavingEdit"><i class="fas fa-save"></i> Save Changes</span>
-                       <span *ngIf="staff.isSavingEdit"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+                   <button type="button" class="btn btn-secondary" (click)="cancelEdit(activeEditStaff!)" [disabled]="activeEditStaff.isSavingEdit">Cancel</button>
+                   <button type="submit" class="btn btn-primary" [disabled]="activeEditStaff.isSavingEdit || editStaffForm.invalid">
+                       <span *ngIf="!activeEditStaff.isSavingEdit"><i class="fas fa-save"></i> Save Changes</span>
+                       <span *ngIf="activeEditStaff.isSavingEdit"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
                    </button>
                </div>
           </form>
       </div>
-    </div>
   </div>
 </main>

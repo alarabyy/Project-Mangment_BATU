@@ -6,19 +6,19 @@
   </button>
 
   <div class="fab-options" [class.visible]="showControls">
-    <!-- Scroll to Top -->
+    <!-- Scroll to Top (Only shows when scrolled down) -->
     <button *ngIf="showScrollToTopButton" class="fab-option-item scroll-top-fab" (click)="scrollToTop()" title="Scroll to Top">
       <i class="fas fa-arrow-up"></i>
       <span>Top</span>
     </button>
 
-    <!-- Dark Mode -->
+    <!-- Dark Mode Toggle -->
     <button class="fab-option-item theme-toggle-fab" (click)="toggleDarkMode()" title="Toggle Dark Mode">
       <i class="fas" [ngClass]="isDarkMode ? 'fa-sun' : 'fa-moon'"></i>
       <span>{{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}</span>
     </button>
 
-    <!-- Font Size -->
+    <!-- Font Size Controls -->
     <div class="fab-option-item font-size-control-group">
       <button class="font-adjust-btn" (click)="decreaseFontSize()" [disabled]="currentFontSize <= minFontSize">
         <i class="fas fa-minus"></i>
@@ -29,12 +29,17 @@
       </button>
     </div>
 
-    <!-- Clock -->
+    <!-- Digital Clock -->
     <div class="fab-option-item digital-clock-fab">
       <i class="fas fa-clock"></i>
       <span>{{ timeString }}</span>
     </div>
 
-   
+    <!-- Example of another button for AI chat, assuming a route /Chat -->
+    <button class="fab-option-item ask-ai-fab" routerLink="/Chat" title="Ask AI for help">
+        <i class="fas fa-robot"></i>
+        <span>Ask AI</span>
+    </button>
+
   </div>
 </div>

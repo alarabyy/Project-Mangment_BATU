@@ -1,5 +1,4 @@
 // src/app/models/project.ts
-
 // تم إعادة تعريف الواجهات الفرعية لأنها مطلوبة لتحليل البيانات
 export interface Category {
   id: number;
@@ -28,6 +27,7 @@ export interface Member {
 }
 
 // الواجهة الشاملة Project لدعم جميع ميزات التحليل والتقرير
+// تم حذف teamLeaderId وتوحيد supervisors
 export interface Project {
   id: number;
   title: string;
@@ -39,10 +39,9 @@ export interface Project {
   images?: string[]; // مصفوفة أسماء ملفات الصور (اختيارية إذا لم ترجع دائمًا)
   submissionDate: string | null; // تاريخ التسليم (ISO date string أو null)
   startDate: string | null;      // تاريخ البدء (ISO date string أو null)
-  teamLeaderId: number | null; // معرف قائد الفريق (يمكن أن يكون null)
   category: Category | null; // يمكن أن تكون null إذا لم تكن مرتبطة بفئة
   department: Department | null; // يمكن أن تكون null إذا لم تكن مرتبطة بقسم
   students?: Student[] | null; // مصفوفة الطلاب (اختيارية ويمكن أن تكون null)
-  supervisers?: Supervisor[] | null; // مصفوفة المشرفين (اختيارية ويمكن أن تكون null)
+  supervisors?: Supervisor[] | null; // مصفوفة المشرفين (اختيارية ويمكن أن تكون null) - تم تغيير 'e' إلى 'o'
   members?: Member[] | null; // مصفوفة أعضاء المشروع (اختيارية ويمكن أن تكون null)
 }

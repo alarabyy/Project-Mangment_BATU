@@ -1,9 +1,10 @@
+// src/app/components/project/edit-project/edit-project.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms'; // Import FormArray
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
-import { Project, Member } from '../../../models/project'; // Import Member interface
+import { Project, Member, Supervisor } from '../../../models/project'; // Import Supervisor interface
 import { finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -47,15 +48,17 @@ export class EditProjectComponent implements OnInit {
       technologies: ['', Validators.required],
       toolsUsed: ['', Validators.required],
       grade: [null, [Validators.min(0), Validators.max(100)]],
-      teamLeaderId: ['', Validators.required],
+      // تم إزالة teamLeaderId
       categoryId: [null, Validators.required],
       departmentId: [null, Validators.required],
-      members: this.fb.array([]) // Initialize members as a FormArray
+      members: this.fb.array([]), // Initialize members as a FormArray
+      supervisors: this.fb.array([]) // Initialize supervisors as a FormArray
     });
   }
 
   get f() { return this.projectForm.controls; }
   get members() { return this.projectForm.get('members') as FormArray; } // Getter for members FormArray
+  get supervisorsArray() { return this.projectForm.get('supervisors') as FormArray; } // Getter for supervisors FormArray
 
   newMember(name: string = '', academicId: number | null = null): FormGroup {
     return this.fb.group({
@@ -70,6 +73,20 @@ export class EditProjectComponent implements OnInit {
 
   removeMember(index: number): void {
     this.members.removeAt(index);
+  }
+
+  newSupervisor(id: number | null = null): FormGroup {
+    return this.fb.group({
+      id: [id, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]]
+    });
+  }
+
+  addSupervisor(): void {
+    this.supervisorsArray.push(this.newSupervisor());
+  }
+
+  removeSupervisor(index: number): void {
+    this.supervisorsArray.removeAt(index);
   }
 
   loadProjectData(): void {
@@ -88,7 +105,7 @@ export class EditProjectComponent implements OnInit {
              technologies: projectData.technologies,
              toolsUsed: projectData.toolsUsed,
              grade: projectData.grade,
-             teamLeaderId: projectData.teamLeaderId,
+             // تم إزالة teamLeaderId
              categoryId: projectData.category?.id,
              departmentId: projectData.department?.id
         });
@@ -103,6 +120,17 @@ export class EditProjectComponent implements OnInit {
           // Add one empty member field if no members exist initially
           this.addMember();
         }
+
+        // Populate supervisors FormArray
+        this.supervisorsArray.clear(); // Clear existing controls
+        if (projectData.supervisors && projectData.supervisors.length > 0) {
+          projectData.supervisors.forEach(supervisor => {
+            this.supervisorsArray.push(this.newSupervisor(supervisor.id));
+          });
+        } else {
+          // Add one empty supervisor field if no supervisors exist initially
+          this.addSupervisor();
+        }
       },
       error: () => this.router.navigate(['/not-found'])
     });
@@ -111,8 +139,13 @@ export class EditProjectComponent implements OnInit {
   onSubmit(): void {
     if (this.projectForm.invalid) {
       this.projectForm.markAllAsTouched();
-      // Mark all member controls as touched as well
+      // Mark all member and supervisor controls as touched as well
       this.members.controls.forEach(control => {
+        if (control instanceof FormGroup) {
+          Object.values(control.controls).forEach(c => c.markAsTouched());
+        }
+      });
+      this.supervisorsArray.controls.forEach(control => {
         if (control instanceof FormGroup) {
           Object.values(control.controls).forEach(c => c.markAsTouched());
         }
@@ -129,15 +162,16 @@ export class EditProjectComponent implements OnInit {
       Technologies: formValue.technologies,
       ToolsUsed: formValue.toolsUsed,
       ProblemStatement: formValue.problemStatement,
-      LeaderId: Number(formValue.teamLeaderId),
+      // تم إزالة LeaderId
       CategoryId: formValue.categoryId,
       DepartmentId: formValue.departmentId,
       // Ensure members are included in the payload with correct structure
-      // Assuming backend expects camelCase 'members' array of objects with 'name' and 'academicId'
       members: formValue.members.map((m: any) => ({
         name: m.name,
-        academicId: Number(m.academicId) // Ensure academicId is a number
-      }))
+        academicId: Number(m.academicId)
+      })),
+      // Ensure supervisors are included in the payload with correct structure
+      supervisors: formValue.supervisors.map((s: any) => Number(s.id))
     };
 
     this.projectService.updateProject(payload).pipe(finalize(() => this.isSubmitting = false))

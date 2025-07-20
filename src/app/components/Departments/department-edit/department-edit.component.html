@@ -70,20 +70,21 @@
         </div>
       </div>
 
-      <!-- Hidden inputs for facultyId and headId to ensure they are sent with the update payload -->
-      <!-- These values will be loaded from the 'department' object, which now has them flattened -->
-      <div class="form-group" [class.hidden]="true"> <!-- Optional: Hide these fields visually -->
+      <!-- Input for Faculty ID (now visible) -->
+      <div class="form-group">
         <label for="facultyId">Faculty ID</label>
         <input type="number" id="facultyId" name="facultyId" [(ngModel)]="department.facultyId" required class="form-input" #facultyId="ngModel">
         <div *ngIf="facultyId.invalid && (facultyId.dirty || facultyId.touched)" class="error-text">
-          <small>Faculty ID is required and must be a number.</small>
+          <small>Faculty ID is required and must be a number greater than 0.</small>
         </div>
       </div>
-      <div class="form-group" [class.hidden]="true"> <!-- Optional: Hide these fields visually -->
+
+      <!-- Input for Head ID (NO LONGER HIDDEN) -->
+      <div class="form-group">
         <label for="headId">Head ID</label>
         <input type="number" id="headId" name="headId" [(ngModel)]="department.headId" required class="form-input" #headId="ngModel">
         <div *ngIf="headId.invalid && (headId.dirty || headId.touched)" class="error-text">
-          <small>Head ID is required and must be a number.</small>
+          <small>Head ID is required and must be a number greater than 0.</small>
         </div>
       </div>
 

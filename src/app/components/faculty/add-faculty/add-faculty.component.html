@@ -11,7 +11,6 @@
   </header>
 
   <div class="form-container fade-in">
-    <!-- استخدام ngForm للتحقق من صحة النموذج وتعطيل الزر -->
     <form (ngSubmit)="createFaculty()" #facultyForm="ngForm" class="faculty-form">
       <div class="form-group">
         <label for="name">Faculty Name</label>
@@ -34,21 +33,33 @@
       </div>
 
       <div class="form-row">
-        <div class="form-group">
-          <label for="deanId">Dean ID</label>
-          <input type="number" id="deanId" name="deanId" [(ngModel)]="newFaculty.deanId" required class="form-input"
-                 placeholder="Enter numeric Dean ID" min="1" #deanId="ngModel">
-          <div *ngIf="deanId.invalid && (deanId.dirty || deanId.touched)" class="error-text">
-            <small>Valid Dean ID is required.</small>
-          </div>
-        </div>
-        <div class="form-group">
+        <!-- تم إزالة حقل Dean ID -->
+
+        <div class="form-group dean-search-group">
           <label for="deanName">Dean Name</label>
           <input type="text" id="deanName" name="deanName" [(ngModel)]="newFaculty.deanName" required class="form-input"
-                 placeholder="e.g., Dr. Jane Doe" minlength="3" maxlength="100" #deanName="ngModel">
+                 placeholder="Search for Dean (e.g., Dr. Jane Doe)" minlength="3" maxlength="100"
+                 (input)="onDeanNameInput($event)" (blur)="onDeanInputBlur()" #deanName="ngModel" autocomplete="off">
+
           <div *ngIf="deanName.invalid && (deanName.dirty || deanName.touched)" class="error-text">
             <small *ngIf="deanName.errors?.['required']">Dean name is required.</small>
             <small *ngIf="deanName.errors?.['minlength']">Must be at least 3 characters.</small>
+          </div>
+
+          <!-- رسالة خطأ إضافية لاختيار العميد -->
+          <!-- يتم عرض هذه الرسالة إذا كان الحقل صالحًا من حيث الطول ولكنه لم يحدد عميدًا فعليًا -->
+          <div *ngIf="deanName.valid && newFaculty.deanId === null && deanName.value.trim().length >= 3 && (deanName.dirty || deanName.touched)" class="error-text">
+            <small>Please select a Dean from the suggestions.</small>
+          </div>
+
+          <!-- قائمة الاقتراحات -->
+          <ul *ngIf="showDeanSuggestions && availableDeans.length > 0" class="suggestions-list">
+            <li *ngFor="let dean of availableDeans" (mousedown)="selectDean(dean)" class="suggestion-item">
+              {{ dean.name }} (ID: {{ dean.id }})
+            </li>
+          </ul>
+          <div *ngIf="showDeanSuggestions && availableDeans.length === 0 && newFaculty.deanName.trim().length >= 2" class="no-suggestions">
+            No deans found.
           </div>
         </div>
       </div>
@@ -65,8 +76,8 @@
 
       <div class="form-actions">
         <button type="button" (click)="cancel()" class="btn btn-secondary" [disabled]="isSaving">Cancel</button>
-        <!-- تعطيل الزر إذا كان النموذج غير صالح أو جاري الحفظ -->
-        <button type="submit" class="btn btn-primary" [disabled]="isSaving || facultyForm.invalid">
+        <!-- تعطيل الزر إذا كان النموذج غير صالح أو جاري الحفظ، أو لم يتم اختيار عميد -->
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving || facultyForm.invalid || newFaculty.deanId === null">
           <span *ngIf="!isSaving"><i class="fas fa-plus"></i> Add Faculty</span>
           <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i> Adding...</span>
         </button>

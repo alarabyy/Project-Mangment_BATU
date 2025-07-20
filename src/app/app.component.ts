@@ -10,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FooterComponent } from './components/Components/footer/footer.component';
 import { GeneralPopupComponent } from "./components/project/general-popup/general-popup.component";
 import { NavigationControlsComponent } from "./components/Components/navigation-controls/navigation-controls.component";
+import { ToastContainerComponent } from "./components/Components/toast-container/toast-container.component";
 
 @Component({
   selector: 'app-root',
@@ -24,8 +25,8 @@ import { NavigationControlsComponent } from "./components/Components/navigation-
     FloatingControlsComponent,
     LoaderComponent,
     GeneralPopupComponent,
-    NavigationControlsComponent
-  ],
+    ToastContainerComponent ,
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

@@ -10,16 +10,39 @@ export const notificationInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Customize which errors trigger notifications
+      let errorMessage = 'An unknown error occurred.';
+
       if (error.status === 0) {
-        notificationService.showNotification('Network error: Could not connect to server.', 'error');
+        // Client-side or network error (e.g., disconnected, CORS issues)
+        errorMessage = 'Network error: Could not connect to server. Please check your internet connection.';
+        notificationService.showError(errorMessage);
       } else if (error.status >= 500) {
-        notificationService.showNotification(`Server error ${error.status}: Something went wrong.`, 'error');
-      } else if (error.status >= 400 && error.status !== 401) {
-        const errorMessage = error.error?.message || error.error?.title || `Error ${error.status}: ${error.statusText}`;
-        notificationService.showNotification(`Request failed: ${errorMessage}`, 'error');
+        // Server-side errors (5xx status codes)
+        errorMessage = `Server error ${error.status}: Something went wrong on the server.`;
+        // Attempt to get more specific message from server response body
+        if (error.error && typeof error.error === 'object') {
+          errorMessage = error.error.message || error.error.title || errorMessage;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
+        notificationService.showError(errorMessage);
+      } else if (error.status >= 400 && error.status !== 401 && error.status !== 403) {
+        // Client-side errors (4xx status codes, excluding 401 Unauthorized and 403 Forbidden
+        // which might be handled by an authentication interceptor or specific login logic).
+        errorMessage = `Request failed (${error.status}): ${error.statusText || 'Bad Request'}`;
+        // Attempt to get more specific message from server response body
+        if (error.error && typeof error.error === 'object') {
+          errorMessage = error.error.message || error.error.title || errorMessage;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
+        notificationService.showError(errorMessage);
       }
-      return throwError(() => error);
+      // For 401 Unauthorized or 403 Forbidden, you might have a dedicated interceptor
+      // or logic to redirect to login, so we might not show a generic toast here.
+      // If no specific handling, the error will still be re-thrown.
+
+      return throwError(() => error); // Re-throw the error so downstream components can handle it
     })
   );
 };

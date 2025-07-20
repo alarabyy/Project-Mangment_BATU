@@ -1,0 +1,109 @@
+/* src/app/components/toast-container/toast-container.component.css */
+.toast-container {
+  position: fixed;
+  top: 1rem; /* Distance from the top */
+  right: 1rem; /* Distance from the right */
+  z-index: 1050; /* Ensure it's above most other content */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* Space between multiple toasts */
+  max-width: 350px; /* Limit the width of the toast stack */
+  pointer-events: none; /* Allow clicks to pass through the container itself */
+}
+
+.toast-message {
+  pointer-events: auto; /* Re-enable pointer events for individual toasts */
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-color); /* Background for the toast */
+  color: var(--text-color);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-lg); /* Rounded corners */
+  box-shadow: var(--shadow-md); /* Subtle shadow */
+  border: 1px solid var(--border-color);
+  opacity: 0;
+  transform: translateX(100%); /* Start off-screen to the right */
+  animation: slideInFromRight 0.3s ease-out forwards,
+             fadeOut var(--toast-duration, 3s) ease-out forwards; /* Custom property for duration */
+  animation-delay: 0s, 0s; /* Start slide in immediately, fade out timing is handled by CSS custom property*/
+  cursor: pointer;
+}
+
+/* Specific styling for each notification type */
+.toast-message.success { border-left: 5px solid var(--success-color); }
+.toast-message.info { border-left: 5px solid var(--info-color); }
+.toast-message.error { border-left: 5px solid var(--error-color); }
+
+.toast-icon {
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+  font-size: 1.5rem;
+}
+.toast-message.success .toast-icon { color: var(--success-color); }
+.toast-message.info .toast-icon { color: var(--info-color); }
+.toast-message.error .toast-icon { color: var(--error-color); }
+
+.toast-content {
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toast-message-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.close-toast-btn {
+  background: none;
+  border: none;
+  color: var(--subtle-text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+.close-toast-btn:hover {
+  background-color: var(--bg-color-hover);
+  color: var(--text-color);
+}
+
+/* Animations */
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  80% { opacity: 1; } /* Stay fully opaque for most of the duration */
+  100% { opacity: 0; } /* Then fade out */
+}
+
+/* Responsive adjustments for smaller screens (e.g., mobile) */
+@media (max-width: 576px) {
+  .toast-container {
+    top: auto; /* Remove top positioning */
+    bottom: 1rem; /* Position at the bottom */
+    left: 1rem;
+    right: 1rem;
+    max-width: calc(100% - 2rem); /* Full width minus padding */
+  }
+
+  .toast-message {
+    transform: translateY(100%); /* Start off-screen at the bottom */
+    animation: slideInFromBottom 0.3s ease-out forwards,
+               fadeOut var(--toast-duration, 3s) ease-out forwards;
+    animation-delay: 0s, 0s;
+  }
+
+  @keyframes slideInFromBottom {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}

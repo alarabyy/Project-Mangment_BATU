@@ -1,9 +1,10 @@
+// src/app/pages/notifications-page/notifications-page.component.ts
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription, BehaviorSubject } from 'rxjs';
 import { AppNotification } from '../../../models/notification';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
-import { PopupService } from '../../../Services/popup.service'; // Import PopupService
+import { PopupService } from '../../../Services/popup.service';
 import { NotificationService } from '../../../Services/notification-proxy.service';
 
 @Component({
@@ -20,7 +21,7 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private popupService: PopupService, // Inject PopupService
+    private popupService: PopupService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -33,7 +34,6 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  // FIX: Using the popup service for confirmation
   clearAllNotifications(): void {
     this.popupService.showConfirm({
       title: 'Clear All Notifications?',
@@ -41,19 +41,19 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Yes, Clear All',
       onConfirm: () => {
         this.notificationService.clearAll();
-        // Optional: show a success feedback
-        this.popupService.showSuccess('Cleared!', 'All notifications have been deleted.');
+        // Corrected: Combined messages into a single string argument for showSuccess
+        this.notificationService.showSuccess('Cleared! All notifications have been deleted.');
       }
     });
   }
 
   deleteNotification(id: number, event: Event): void {
     event.stopPropagation();
-    // No need for a popup for a single delete, it's quick. But you could add it.
     this.notificationService.deleteNotification(id);
+    // Optional: show a success feedback toast for this action
+    this.notificationService.showSuccess('Notification deleted.', 2000); // This one was already correct
   }
 
-  // ... rest of the component logic (groupNotifications, getTimeAgo, etc. remain the same)
   ngOnDestroy(): void {
     if (this.notificationsSubscription) {
       this.notificationsSubscription.unsubscribe();
