@@ -20,7 +20,7 @@
 
   <div *ngIf="!isLoading && error" class="state-container error-container">
     <i class="fas fa-exclamation-triangle"></i>
-    <p>{{ error }}</p>
+    <p class="error-text">{{ error }}</p>
     <button class="btn btn-primary" (click)="ngOnInit()">Retry</button>
   </div>
 
@@ -33,8 +33,8 @@
               <h2 class="card-title">{{ project.title }}</h2>
             </div>
             <div class="card-body">
-              <p class="card-description">{{ project.description | slice:0:150 }}...</p>
-              <p class="card-detail-text"><strong>Problem Statement:</strong> {{ project.problemStatement | slice:0:100 }}...</p>
+              <p class="card-description">{{ project.description | slice:0:150 }}<span *ngIf="project.description.length > 150">...</span></p>
+              <p class="card-detail-text"><strong>Problem Statement:</strong> {{ project.problemStatement | slice:0:100 }}<span *ngIf="project.problemStatement.length > 100">...</span></p>
 
               <div class="info-section">
                 <div class="info-item">
@@ -63,6 +63,7 @@
 
       <ng-template #noProjects>
         <div class="state-container empty-message">
+          <i class="fas fa-folder-open"></i> <!-- أيقونة مناسبة للمحتوى الفارغ -->
           <h3>No projects found.</h3>
           <p *ngIf="searchTermSubject.getValue()">No projects match "{{ searchTermSubject.getValue() }}". Try a different search term.</p>
           <p *ngIf="!searchTermSubject.getValue()">Let's create the first one!</p>

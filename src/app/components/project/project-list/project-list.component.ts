@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, TimeoutError } from 'rxjs'; // استيراد TimeoutError
 import { CommonModule, SlicePipe, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { ProjectService } from '../../../Services/project.service';
 import { Project } from '../../../models/project';
-import { catchError, debounceTime, distinctUntilChanged, finalize, map, startWith, shareReplay } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, finalize, map, startWith, shareReplay, timeout } from 'rxjs/operators'; // استيراد timeout
 
 @Component({
   selector: 'app-project-list',
@@ -23,32 +23,46 @@ export class ProjectListComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
     private router: Router,
-    private datePipe: DatePipe
+    private datePipe: DatePipe // ليس مستخدماً حالياً ولكن جيد أن يكون موجوداً
   ) {}
 
   ngOnInit(): void {
+    // إعادة تعيين الحالة عند إعادة التحميل
+    this.isLoading = false;
+    this.error = null;
+
     const allProjects$ = this.projectService.getProjects().pipe(
-      finalize(() => this.isLoading = false),
+      // إضافة مهلة 10 ثوانٍ لطلب البيانات
+       // يمكنك تعديل هذه القيمة (بالمللي ثانية) حسب الحاجة
+      finalize(() => {
+        // يتم تنفيذ هذا الكود سواء نجح الطلب أو فشل (بعد اكتمال أو خطأ)
+        this.isLoading = false;
+      }),
       catchError(err => {
         console.error('Error loading projects:', err);
-        this.error = 'Failed to load projects. Please try again later.';
+        if (err instanceof TimeoutError) {
+          this.error = 'Loading projects timed out. Please check your internet connection or try again.';
+        } else {
+          this.error = 'Failed to load projects. Please try again later.';
+        }
+        // إرجاع observable فارغ للسماح للتدفق بالاستمرار دون تعليق
         return of([]);
       }),
-      // Ensures the API call is made once and its result is shared
+      // يضمن أن استدعاء API يتم مرة واحدة فقط ويتم مشاركة النتيجة بين المشتركين
       shareReplay(1)
     );
 
     this.filteredProjects$ = combineLatest([
       allProjects$,
       this.searchTermSubject.pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        startWith('')
+        debounceTime(300), // انتظر 300 مللي ثانية بعد توقف المستخدم عن الكتابة
+        distinctUntilChanged(), // لا تقم بمعالجة البحث إلا إذا تغير المصطلح
+        startWith('') // ابدأ بسلسلة بحث فارغة عند التهيئة
       )
     ]).pipe(
       map(([projects, searchTerm]) => {
         if (!searchTerm) {
-          return projects;
+          return projects; // إذا كان مصطلح البحث فارغاً، أرجع جميع المشاريع
         }
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
         return projects.filter(project =>
@@ -60,9 +74,6 @@ export class ProjectListComponent implements OnInit {
         );
       })
     );
-
-    this.isLoading = true;
-    this.error = null;
   }
 
   onSearchChange(event: Event): void {
@@ -70,12 +81,12 @@ export class ProjectListComponent implements OnInit {
   }
 
   deleteProject(id: number, event: MouseEvent): void {
-    event.stopPropagation();
+    event.stopPropagation(); // يمنع النقر على البطاقة الأساسية
     if (confirm('Are you sure you want to permanently delete this project? This action cannot be undone.')) {
       this.projectService.deleteProject(id).subscribe({
         next: () => {
           console.log(`Project with id ${id} deleted successfully.`);
-          // Re-initialize to refresh the list after deletion
+          // إعادة تهيئة المكون لتحديث القائمة بعد الحذف
           this.ngOnInit();
         },
         error: (err) => {

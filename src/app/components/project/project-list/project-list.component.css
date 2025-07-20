@@ -1,7 +1,7 @@
 /* src/app/components/project/project-list/project-list.component.css */
 
 /* تأكد من تضمين FontAwesome في ملف styles.css العام أو index.html */
-/* @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"); */
+/* @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"); */
 
 /* تعريف متغيرات CSS للثيم، يفضل أن تكون في ملف styles.css العام أو :root */
 :root {
@@ -276,12 +276,12 @@
     border-color: var(--text-color);
 }
 .btn-danger {
-  background-color: var(--error-color-translucent, rgba(248, 81, 73, 0.1));
-  color: var(--error-color, #f85149);
-  border-color: var(--error-color-translucent, rgba(248, 81, 73, 0.1));
+  background-color: var(--error-color-translucent, rgba(244, 67, 54, 0.2)); /* استخدام اللون من المتغيرات */
+  color: var(--error-color, #F44336);
+  border-color: var(--error-color-translucent, rgba(244, 67, 54, 0.2));
 }
 .btn-danger:hover {
-  background-color: var(--error-color, #f85149);
+  background-color: var(--error-color, #F44336);
   color: white;
 }
 .btn-info {
