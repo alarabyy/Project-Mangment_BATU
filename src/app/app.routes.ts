@@ -12,7 +12,7 @@ import { UnauthorizedComponent } from './components/Components/unauthorized/unau
 
 // --- User-Specific Protected Components ---
 import { MyProfileComponent } from './components/my-profile/my-profile.component';
-import { ChatComponent } from './components/chat/chat.component';
+import { ChatComponent } from './components/chat-AI/chat.component';
 import { UserProfileComponent } from './components/User/user-profile/user-profile.component';
 
 // --- Project Management Components ---
@@ -47,6 +47,8 @@ import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
 import { ProjectAnalysisComponent } from './components/project/project-analysis/project-analysis.component';
 import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
 import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
+import { AllChatsComponent } from './components/Chats/all-chats/all-chats.component';
+import { PrivateChatComponent } from './components/Chats/private-chat/private-chat.component';
 
 // =================================================================
 //                          ROUTES CONFIGURATION
@@ -67,7 +69,10 @@ export const routes: Routes = [
   // --- SignUp is now an Admin-only route ---
   { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
-
+  // ----------------------chats  ROUTES --------------------
+  { path: 'chats', component: AllChatsComponent },
+  { path: 'chat/:id', component: PrivateChatComponent },
+  
   // ---------------------- PROTECTED USER ROUTES --------------------
   { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
   { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },

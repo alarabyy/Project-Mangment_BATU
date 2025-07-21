@@ -1,0 +1,94 @@
+<div class="private-chat-container" *ngIf="contact">
+  <header class="chat-header">
+    <button class="back-button btn btn-icon" (click)="goBack()" title="Back to Chats">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div class="chat-header-info">
+      <img [src]="contact.avatar" alt="{{ contact.name }}'s avatar" class="chat-header-avatar" />
+      <div class="chat-header-details">
+        <h2 class="chat-header-name">{{ contact.name }}</h2>
+        <span class="chat-status" [ngClass]="{'online': isUserOnline}">
+          <ng-container *ngIf="isTyping; else statusText">
+            Typing... <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+          </ng-container>
+          <ng-template #statusText>
+            <ng-container *ngIf="isUserOnline">Online</ng-container>
+            <ng-container *ngIf="!isUserOnline">{{ contact.lastSeen }}</ng-container>
+          </ng-template>
+        </span>
+      </div>
+    </div>
+    <div class="chat-header-actions">
+      <button class="btn btn-icon" title="Toggle Online Status" (click)="toggleContactOnlineStatus()">
+        <i class="fas fa-toggle-{{ isUserOnline ? 'on' : 'off' }}"></i>
+      </button>
+ 
+    </div>
+  </header>
+
+  <div class="message-list" #messageList>
+    <div *ngFor="let message of messages" class="message-bubble-wrapper animate__animated animate__fadeInUp">
+      <div class="message-bubble" [ngClass]="{'my-message': message.sender === 'me', 'other-message': message.sender === 'other'}">
+        <p *ngIf="message.type === 'text'" class="message-content">{{ message.content }}</p>
+
+        <div *ngIf="message.type === 'image'" class="message-media-container">
+            <img [src]="message.url" alt="Image" class="message-image" (load)="scrollToBottom()">
+            <span class="media-filename" *ngIf="message.fileName">{{ message.fileName }}</span>
+        </div>
+
+        <div *ngIf="message.type === 'audio'" class="message-media-container">
+            <audio controls [src]="message.url"></audio>
+            <span class="media-filename" *ngIf="message.fileName">{{ message.fileName }}</span>
+        </div>
+
+        <div *ngIf="message.type === 'video'" class="message-media-container">
+            <video controls [src]="message.url"></video>
+            <span class="media-filename" *ngIf="message.fileName">{{ message.fileName }}</span>
+        </div>
+
+        <div *ngIf="message.type === 'file'" class="message-file-container">
+            <i class="fas fa-file-alt file-icon"></i>
+            <a [href]="message.url" target="_blank" class="file-link" download="{{message.fileName}}">
+                <span class="file-name">{{ message.fileName || 'Unknown File' }}</span>
+                <i class="fas fa-download download-icon"></i>
+            </a>
+            <span class="message-content" *ngIf="message.content">{{message.content}}</span>
+        </div>
+
+
+        <span class="message-time">{{ message.time }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="message-input-area">
+    <div class="file-attachment-container">
+      <input type="file" id="fileInput" class="hidden-file-input" (change)="onFileSelected($event)" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt" />
+      <label for="fileInput" class="attach-button btn btn-icon" title="Attach File">
+        <i class="fas fa-paperclip"></i>
+      </label>
+      <div *ngIf="selectedFile" class="selected-file-info card">
+        <span><i class="fas fa-file"></i> {{ selectedFile.name }}</span>
+        <button class="btn-clear-file" (click)="clearSelectedFile()" title="Remove File">
+          <i class="fas fa-times-circle"></i>
+        </button>
+      </div>
+    </div>
+
+    <textarea
+      [(ngModel)]="newMessage"
+      (keydown.enter)="sendMessage()"
+      placeholder="Type a message..."
+      class="form-input message-textarea"
+      rows="1"
+    ></textarea>
+    <button class="send-button btn btn-primary" (click)="sendMessage()" [disabled]="!newMessage.trim() && !selectedFile">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="!contact" class="chat-not-found">
+  <p><i class="fas fa-exclamation-circle fa-2x"></i><br>Chat not found. Please go back to all chats.</p>
+  <button class="btn btn-primary" (click)="goBack()">Back to All Chats</button>
+</div>

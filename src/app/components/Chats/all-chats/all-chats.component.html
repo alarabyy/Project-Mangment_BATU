@@ -1,0 +1,62 @@
+<div class="chats-container">
+  <header class="chats-header">
+    <!-- <button class="menu-button btn btn-secondary" title="Open Menu">
+      <i class="fas fa-bars"></i>
+    </button> -->
+    <h1 class="chats-title">تحت الانشاء فقط للمعاينه.....</h1>
+    <h1 class="chats-title">Chats</h1>
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search chats by name..."
+        [(ngModel)]="searchTerm"
+        (input)="filterChats()"
+        class="form-input search-input"
+      />
+      <i class="fas fa-search search-icon"></i>
+    </div>
+    <!-- <button class="new-chat-button btn btn-primary" title="Start New Chat">
+      <i class="fas fa-plus"></i>
+    </button> -->
+  </header>
+
+  <div class="chat-list">
+    <div *ngIf="filteredChats.length === 0" class="no-chats-message">
+      <i class="fas fa-inbox fa-3x"></i>
+      <p>No chats matching your search.</p>
+    </div>
+
+    <div
+      *ngFor="let chat of filteredChats"
+      class="chat-item card animate__animated animate__fadeInUp"
+      (click)="goToChat(chat.id)"
+      [ngClass]="{'chat-item-pinned': chat.isPinned}"
+    >
+      <div class="chat-avatar">
+        <img [src]="chat.avatar" alt="{{ chat.name }}'s avatar" />
+        <span class="online-indicator"></span> </div>
+      <div class="chat-info">
+        <div class="chat-name-time">
+          <span class="chat-name">{{ chat.name }}</span>
+          <span class="chat-time">{{ chat.time }}</span>
+        </div>
+        <div class="chat-last-message">
+          <p>{{ chat.lastMessage }}</p>
+          <span *ngIf="chat.unreadCount" class="unread-count">{{ chat.unreadCount }}</span>
+        </div>
+      </div>
+      <div class="chat-actions-hover">
+        <button class="btn btn-icon" title="Mark as Read" (click)="markAsRead(chat, $event)">
+          <i class="fas fa-check-double"></i>
+        </button>
+        <button class="btn btn-icon btn-danger-icon" title="Delete Chat" (click)="deleteChat(chat, $event)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button class="btn btn-icon" title="{{ chat.isPinned ? 'Unpin Chat' : 'Pin Chat' }}" (click)="togglePin(chat, $event)">
+          <i class="fas fa-thumbtack" [ngClass]="{'pinned-active-icon': chat.isPinned}"></i>
+        </button>
+      </div>
+       <i *ngIf="chat.isPinned" class="fas fa-thumbtack pinned-icon" title="Pinned Chat"></i>
+    </div>
+  </div>
+</div>

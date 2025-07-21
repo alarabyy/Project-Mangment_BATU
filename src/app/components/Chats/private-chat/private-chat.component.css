@@ -1,0 +1,625 @@
+/* Import Animate.css for awesome animations */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+
+
+.private-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--navbar-height));
+  max-width: 900px;
+  margin: 0 auto;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow: hidden;
+  box-shadow: var(--box-shadow-lg); /* Add a subtle shadow to the whole chat window */
+  border-radius: var(--border-radius-large); /* Rounded corners for the container */
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+  flex-shrink: 0;
+  box-shadow: var(--box-shadow-sm); /* Shadow under the header */
+  z-index: 5; /* Ensure header is above messages when scrolling */
+}
+
+.back-button {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-speed-fast) ease;
+}
+.back-button:hover {
+  background-color: var(--primary-accent-translucent);
+  border-color: var(--primary-accent);
+  color: var(--primary-accent);
+  transform: translateX(-5px); /* Slide back effect */
+}
+
+
+.chat-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-grow: 1;
+}
+
+.chat-header-avatar {
+  width: 55px; /* Larger avatar */
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary-accent); /* Thicker green border */
+}
+
+.chat-header-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header-name {
+  font-size: 1.4rem; /* Larger name */
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  margin: 0;
+}
+
+.chat-status {
+    font-size: 0.85rem;
+    color: var(--subtle-text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+.chat-status.online {
+    color: var(--primary-accent); /* Green for online status */
+    font-weight: var(--font-weight-medium);
+}
+
+/* Typing Indicator Animation */
+.typing-dots {
+  display: inline-flex;
+  align-items: flex-end; /* Align dots to the bottom of the line */
+  height: 1em; /* Ensure consistent height */
+  overflow: hidden; /* Hide dots when not in use */
+}
+.typing-dots span {
+  animation: bounce 1.4s infinite ease-in-out;
+  font-size: 1.2em;
+  line-height: 1;
+  transform: translateY(0); /* Initial position */
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-0.3em); }
+  60% { transform: translateY(0); }
+}
+
+
+.chat-header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.chat-header-actions .btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid var(--border-color-translucent);
+    color: var(--subtle-text-color);
+    font-size: 1rem;
+    transition: all var(--transition-speed-fast) ease;
+}
+.chat-header-actions .btn-icon:hover {
+    background-color: var(--primary-accent-translucent);
+    border-color: var(--primary-accent);
+    color: var(--primary-accent);
+    transform: scale(1.1);
+}
+
+
+.message-list {
+  flex-grow: 1;
+  padding: 1.5rem; /* More padding */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* More space between messages */
+  scroll-behavior: smooth; /* Smooth scrolling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-accent) var(--bg-color);
+  background-image: url('https://w0.peakpx.com/wallpaper/406/339/HD-wallpaper-whatsapp-dark-android-black-chat-dark-mode-green-icon-logo.jpg'); /* WhatsApp-like background */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.message-list::-webkit-scrollbar { width: 10px; }
+.message-list::-webkit-scrollbar-track { background: transparent; } /* Make track transparent over background image */
+.message-list::-webkit-scrollbar-thumb {
+  background-color: var(--primary-accent);
+  border-radius: var(--border-radius-pill);
+  border: 2px solid var(--bg-color); /* Border matches body background */
+}
+.message-list::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-hover); }
+
+
+.message-bubble-wrapper {
+  display: flex;
+  width: 100%;
+  animation: slideInFromSide 0.3s ease-out; /* Animation for new messages */
+}
+
+/* Specific animations based on sender */
+.message-bubble-wrapper.animate__animated.animate__fadeInUp {
+  animation-name: fadeInUp; /* Ensure this is used by default as in HTML */
+  animation-duration: 0.5s;
+}
+/* No longer need these, animate__fadeInUp is applied universally */
+/* .my-message-wrapper.animate__animated.animate__fadeInUp {
+  animation-name: fadeInRight;
+}
+.other-message-wrapper.animate__animated.animate__fadeInUp {
+  animation-name: fadeInLeft;
+} */
+
+
+.message-bubble {
+  max-width: 70%; /* Slightly less width for better readability */
+  padding: 0.85rem 1.15rem; /* More padding */
+  border-radius: var(--border-radius-large);
+  margin-bottom: 0.25rem; /* Less margin between bubble and wrapper */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Softer shadow */
+  word-wrap: break-word;
+  position: relative; /* For the time positioning */
+  transition: transform 0.1s ease-out; /* Small pop effect on active */
+}
+.message-bubble:active {
+    transform: scale(0.99);
+}
+
+
+.my-message {
+  background-color: var(--primary-accent);
+  color: var(--bg-color);
+  align-self: flex-end;
+  border-bottom-right-radius: 10px; /* More subtle corner */
+  border-top-left-radius: var(--border-radius-sm); /* Pointed top-left corner (optional) */
+}
+
+.other-message {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color-translucent);
+  align-self: flex-start;
+  border-bottom-left-radius: 10px; /* More subtle corner */
+  border-top-right-radius: var(--border-radius-sm); /* Pointed top-right corner (optional) */
+}
+
+.message-content {
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
+}
+
+/* Media Message Styles (Image, Audio, Video) */
+.message-media-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem; /* Space before timestamp */
+}
+.message-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 250px; /* Limit image height */
+    border-radius: var(--border-radius-base);
+    object-fit: contain; /* Fit whole image */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.message-media-container audio, .message-media-container video {
+    width: 100%;
+    max-width: 300px;
+    border-radius: var(--border-radius-base);
+    background-color: var(--bg-color); /* Control background for media players */
+}
+.media-filename {
+    font-size: 0.8em;
+    color: var(--subtle-text-color);
+    word-break: break-all; /* Ensure long filenames break */
+}
+.my-message .media-filename {
+    color: rgba(var(--bg-color-rgb), 0.6); /* Lighter filename for my messages */
+}
+
+/* File Message Styles (e.g., PDF, DOCX) */
+.message-file-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(var(--secondary-accent-rgb), 0.1); /* Subtle background for files */
+    border: 1px solid var(--secondary-accent);
+    padding: 0.75rem;
+    border-radius: var(--border-radius-base);
+    margin-bottom: 0.5rem;
+    width: 100%; /* Take full width of bubble */
+}
+.message-file-container .file-icon {
+    font-size: 1.8rem;
+    color: var(--secondary-accent);
+    flex-shrink: 0;
+}
+.message-file-container .file-link {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    color: var(--text-color);
+    text-decoration: none;
+    overflow: hidden;
+}
+.message-file-container .file-name {
+    font-size: 0.95rem;
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--secondary-accent); /* Blue for filename */
+}
+.message-file-container .download-icon {
+    font-size: 0.8rem;
+    color: var(--subtle-text-color);
+    align-self: flex-start;
+    margin-top: 0.2rem;
+}
+.message-file-container .message-content { /* For any text content accompanying the file */
+    font-size: 0.9rem;
+    color: var(--subtle-text-color);
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+.my-message .message-file-container .file-name,
+.my-message .message-file-container .message-content,
+.my-message .message-file-container .download-icon {
+    color: var(--bg-color); /* Text on my-message should be light */
+    opacity: 0.8;
+}
+.my-message .message-file-container {
+    background-color: rgba(var(--secondary-accent-rgb), 0.3); /* Darker blue for files on my-message */
+    border-color: var(--secondary-accent);
+}
+.my-message .message-file-container .file-icon {
+    color: var(--bg-color);
+}
+
+
+
+.message-time {
+  font-size: 0.75rem;
+  align-self: flex-end;
+  opacity: 0.9;
+  color: inherit;
+  margin-top: 0.2rem;
+}
+.my-message .message-time {
+    color: rgba(var(--bg-color-rgb), 0.75);
+}
+.other-message .message-time {
+    color: var(--subtle-text-color);
+}
+
+
+.message-input-area {
+  display: flex;
+  align-items: flex-end; /* Align items to the bottom */
+  padding: 0.75rem 1.5rem; /* Less top padding to save space, more side padding */
+  background-color: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  gap: 0.75rem;
+  flex-shrink: 0;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.2); /* Shadow above the input area */
+}
+
+.file-attachment-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0; /* Don't let it shrink */
+}
+.hidden-file-input {
+    display: none; /* Hide the default file input */
+}
+.attach-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--subtle-text-color);
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all var(--transition-speed-fast) ease;
+}
+.attach-button:hover {
+    background-color: var(--primary-accent-translucent);
+    border-color: var(--primary-accent);
+    color: var(--primary-accent);
+    transform: translateY(-2px);
+}
+
+.selected-file-info {
+    font-size: 0.85rem;
+    color: var(--subtle-text-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-base);
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden; /* Hide overflow filename */
+    text-overflow: ellipsis; /* Show ellipsis for long names */
+    max-width: 150px; /* Limit width */
+    height: 40px; /* Make consistent with input height */
+    margin-bottom: 0.5rem; /* Space below if textarea expands */
+    animation: fadeIn 0.3s ease;
+}
+.selected-file-info .btn-clear-file {
+    font-size: 1rem;
+    color: var(--error-color);
+    margin-left: 0.5rem;
+}
+.selected-file-info .btn-clear-file:hover {
+    color: darken(var(--error-color), 10%);
+    transform: scale(1.1);
+}
+
+.message-textarea {
+  flex-grow: 1;
+  resize: none;
+  min-height: 45px; /* Consistent height with buttons */
+  max-height: 200px; /* Allow more height for typing */
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius-pill);
+  background-color: var(--bg-color);
+  border-color: var(--border-color);
+  font-size: 1rem;
+  line-height: 1.4;
+  overflow-y: auto;
+  transition: all var(--transition-speed-fast) ease;
+}
+
+.message-textarea:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px var(--primary-accent-translucent);
+  background-color: var(--bg-color);
+}
+
+.send-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; /* Circular send button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  transition: all var(--transition-speed-fast) ease;
+}
+.send-button:not(:disabled):hover {
+    transform: translateY(-2px) scale(1.05); /* Pop and lift */
+    box-shadow: 0 4px 10px var(--shadow-color-accent);
+}
+.send-button:active {
+    transform: scale(0.95);
+}
+
+.send-button:disabled {
+  background-color: var(--border-color);
+  border-color: var(--border-color);
+  color: var(--subtle-text-color);
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+
+.chat-not-found {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--subtle-text-color);
+  gap: 1.5rem;
+  height: calc(100vh - var(--navbar-height)); /* Fill available space */
+  background-color: var(--bg-color);
+}
+.chat-not-found i {
+    color: var(--error-color); /* Error icon in red */
+    margin-bottom: 0.5rem;
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .private-chat-container {
+    border-radius: 0; /* Full width on smaller screens */
+    border-left: none;
+    border-right: none;
+  }
+
+  .chat-header {
+    padding: 0.8rem 1rem;
+    gap: 0.8rem;
+  }
+
+  .chat-header-avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .chat-header-name {
+    font-size: 1.2rem;
+  }
+
+  .chat-status {
+    font-size: 0.8rem;
+  }
+
+  .chat-header-actions .btn-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 0.95rem;
+  }
+
+  .message-list {
+    padding: 1rem 1.2rem;
+    gap: 0.6rem;
+  }
+
+  .message-bubble {
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+    max-width: 80%; /* Allow more width on smaller screens */
+  }
+
+  .message-time {
+    font-size: 0.7rem;
+  }
+
+  .message-input-area {
+    padding: 0.6rem 1rem;
+    gap: 0.6rem;
+  }
+
+  .attach-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+   .selected-file-info {
+        max-width: 120px;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        height: 35px;
+   }
+   .selected-file-info .btn-clear-file {
+       font-size: 0.9rem;
+   }
+
+  .message-textarea {
+    min-height: 40px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .send-button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-header {
+    padding: 0.6rem 0.8rem;
+    gap: 0.6rem;
+  }
+
+  .chat-header-avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .chat-header-name {
+    font-size: 1.1rem;
+  }
+
+  .chat-status {
+    font-size: 0.75rem;
+  }
+
+  .back-button {
+    font-size: 0.9rem;
+    width: 38px;
+    height: 38px;
+  }
+
+  .chat-header-actions .btn-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+
+  .message-list {
+    padding: 0.8rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .message-bubble {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    max-width: 85%;
+  }
+
+  .message-time {
+    font-size: 0.65rem;
+  }
+
+  .message-input-area {
+    padding: 0.5rem 0.8rem;
+    gap: 0.5rem;
+  }
+  .attach-button {
+    width: 38px;
+    height: 38px;
+    font-size: 0.95rem;
+  }
+    .selected-file-info {
+        max-width: 100px;
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        height: 32px;
+   }
+
+  .message-textarea {
+    min-height: 38px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .send-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}
