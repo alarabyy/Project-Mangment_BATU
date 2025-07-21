@@ -1,3 +1,4 @@
+// KEEP ONLY ONE SET OF IMPORTS
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -5,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../Services/auth.service';
 import { PopupService } from '../../../Services/popup.service';
 
+// KEEP ONLY ONE @Component DECORATOR AND CLASS DEFINITION
 @Component({
   selector: 'app-sign-up',
   standalone: true,
@@ -34,11 +36,13 @@ export class SignUpComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
-        Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$') // Letters + numbers
+        // Password must contain at least one letter (upper or lower case) and one digit, and be at least 8 characters long.
+        Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$')
       ]]
     });
   }
 
+  // Helper getter for easy access to form controls in the template
   get f() {
     return this.signupForm.controls;
   }
@@ -48,15 +52,18 @@ export class SignUpComponent implements OnInit {
   }
 
   submitSignup(): void {
+    // Mark all fields as touched to display validation errors immediately on submit attempt
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
+      this.popupService.showError('Validation Error', 'Please correct the errors in the form.');
       return;
     }
 
     const payload = {
       ...this.signupForm.value,
+      // Ensure gender and role are sent as numbers, not strings
       gender: Number(this.signupForm.value.gender),
-      role: Number(this.signupForm.value.role) // ✅ تأكد أن الرقم يتبعت
+      role: Number(this.signupForm.value.role)
     };
 
     console.log("📤 Payload to Register:", payload); // Debug
@@ -69,12 +76,12 @@ export class SignUpComponent implements OnInit {
         this.popupService.showSuccess(
           'Account Created!',
           'Your account has been created successfully. You can now log in.',
-          () => this.router.navigate(['/home'])
+          () => this.router.navigate(['/home']) // Navigate to home or login page
         );
       },
       error: (err) => {
         this.isSubmitting = false;
-        const errorMessage = err.error?.message || err.error?.title || 'Registration failed.';
+        const errorMessage = err.error?.message || err.error?.title || 'Registration failed due to an unexpected error.';
         this.popupService.showError('Registration Failed', errorMessage);
       }
     });
