@@ -70,9 +70,9 @@ export const routes: Routes = [
   { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
   // ----------------------chats  ROUTES --------------------
-  { path: 'chats', component: AllChatsComponent },
-  { path: 'chat/:id', component: PrivateChatComponent },
-  
+  { path: 'chats', component: AllChatsComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'chat/:id', component: PrivateChatComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+
   // ---------------------- PROTECTED USER ROUTES --------------------
   { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
   { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
