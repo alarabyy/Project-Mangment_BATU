@@ -1,208 +1,261 @@
-/* Import Animate.css for awesome animations */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+/* src/app/all-chats/all-chats.component.css */
 
+/* Import a modern font like Inter with more weights */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap'); */ /* Cairo can be a fallback or for specific elements if needed */
+
+/* Import Font Awesome (if you are using it for icons) */
+/* Make sure Font Awesome is installed: npm install @fortawesome/fontawesome-free */
+/* @import "~@fortawesome/fontawesome-free/css/all.css"; */
+
+
+:root {
+  /* DARK MODE Variables are NOW DEFAULT */
+  --bg-color: #000000;              /* Pure Black */
+  --text-color: #c9d1d9;            /* Light grey text (good contrast) */
+  --surface-color: #101010;         /* Very dark grey, slightly off-black for cards, sections */
+  --border-color: #2a3038;          /* Darker borders */
+  --border-color-translucent: rgba(180, 200, 230, 0.1); /* Subtle, slightly cool translucent border */
+
+  --primary-accent: #23d160;        /* Vibrant Green (your preferred green) */
+  --primary-accent-hover: #20c997;  /* Slightly different green for hover */
+  --primary-accent-active: #1db451; /* Green for active/pressed states */
+  --primary-accent-translucent: rgba(35, 209, 96, 0.15); /* For subtle backgrounds or glows */
+  --primary-accent-rgb: 35, 209, 96; /* RGB format for rgba() calculations */
+
+
+  /* Specific variable for the mandated green text on HomeComponent */
+  --home-component-text-color: var(--primary-accent);
+
+  --secondary-accent: #00b4d8;      /* A cool blue as secondary accent for contrast */
+  --secondary-accent-hover: #00a2c6;
+  --secondary-accent-rgb: 0, 180, 216; /* RGB format for rgba() calculations */
+
+
+  --subtle-text-color: #848d97;     /* For less important text */
+  --link-hover-color: var(--primary-accent-hover); /* Keep links consistent with green theme */
+  --error-color: #f85149;           /* For error messages */
+  --error-color-rgb: 248, 81, 73; /* RGB format for rgba() */
+
+
+  --navbar-height: 75px;            /* Slightly taller navbar */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Inter first for English */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;         /* For impactful headings */
+
+  --border-radius-sm: 6px;
+  --border-radius-base: 10px;
+  --border-radius-large: 18px;
+  --border-radius-xl: 24px;
+  --border-radius-pill: 50px;
+
+  --shadow-color: rgba(0,0,0, 0.5); /* Darker shadow for dark theme */
+  --shadow-color-accent: rgba(35, 209, 96, 0.2); /* Greenish shadow for accents */
+  --box-shadow-sm: 0 2px 5px var(--shadow-color);
+  --box-shadow-md: 0 6px 15px var(--shadow-color);
+  --box-shadow-lg: 0 10px 30px var(--shadow-color);
+  --box-shadow-inset: inset 0 2px 4px 0 rgba(0,0,0,0.5);
+
+  --transition-speed-fast: 0.2s;
+  --transition-speed-normal: 0.35s;
+  --transition-speed-slow: 0.6s;
+  --easing-curve-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55); /* For bouncy effects */
+  --easing-curve-elegant: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* For smooth, elegant transitions */
+  --easing-curve-sharp: cubic-bezier(0.4, 0, 0.2, 1); /* Material Design like sharp curve */
+
+  --pinned-color: #ffd700; /* Gold color for pinned chats */
+}
+
+/* Optional: Light Theme Variables (if you implement a toggle) */
+body.light-theme-active {
+  --bg-color: #ffffff; /* Pure White */
+  --text-color: #1c1e21; /* Dark grey, not pure black */
+  --surface-color: #f8f9fa; /* Light grey for surface in light mode, not pure white */
+  --border-color: #dce1e6;
+  --border-color-translucent: rgba(0,0,0,0.07);
+  --home-component-text-color: var(--primary-accent); /* Ensures HomeComponent text remains green */
+  --secondary-accent: #007bff; /* Standard blue for light theme */
+  --secondary-accent-hover: #0069d9;
+  --secondary-accent-rgb: 0, 123, 255; /* For rgba() in light theme */
+  --subtle-text-color: #56595c;
+  --link-hover-color: var(--primary-accent-hover);
+  --shadow-color: rgba(0,0,0, 0.1); /* Lighter shadow for light theme */
+  --shadow-color-accent: rgba(35, 209, 96, 0.15);
+  --pinned-color: #ffc107; /* Slightly warmer gold for light mode pinned */
+}
+
+/* Global Resets and Base Styles - Ensure these are in your global styles.css */
+/* For this component, we will apply the variables directly */
+
+/* Base Styles for Chats Component */
 .chats-container {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - var(--navbar-height));
-  max-width: 850px; /* Slightly wider container */
-  margin: 0 auto;
-  padding: 1.5rem;
-  background-color: var(--bg-color);
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: var(--bg-color); /* Use bg-color for main container */
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--box-shadow-md); /* Use md shadow */
+  font-family: var(--font-family-base);
   color: var(--text-color);
-  overflow: hidden; /* Hide overflow from animations */
+  transition: background-color var(--transition-speed-normal) var(--easing-curve-elegant),
+              color var(--transition-speed-normal) var(--easing-curve-elegant);
 }
 
 .chats-header {
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 1.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  position: sticky; /* Make header sticky */
-  top: 0;
-  z-index: 10;
-  background-color: var(--bg-color); /* Ensure header background matches body */
-  padding-top: 0.5rem; /* Small padding for sticky header */
+  margin-bottom: 20px;
+  position: relative;
+  background-color: var(--surface-color); /* Use surface-color for header background */
+  padding: 15px;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--box-shadow-sm);
+  border: 1px solid var(--border-color-translucent); /* Subtle border */
 }
 
 .chats-title {
-  font-size: 2.2rem; /* Larger title */
-  font-weight: var(--font-weight-black); /* Bolder title */
-  color: var(--primary-accent); /* Green title */
-  text-align: center;
-  flex-grow: 1; /* Center the title by taking available space */
-  margin-left: -2rem; /* Adjust for button space */
+  color: var(--text-color);
+  margin-bottom: 15px;
+  font-size: 1.8em;
+  font-weight: var(--font-weight-bold);
 }
 
-.menu-button, .new-chat-button {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%; /* Circular buttons */
+.search-mode-toggle {
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  flex-shrink: 0; /* Prevent shrinking */
+  margin-bottom: 20px;
+  width: 100%;
+  gap: 10px; /* Space between buttons */
 }
 
-.menu-button {
-    background-color: var(--surface-color);
-    color: var(--text-color);
-    border-color: var(--border-color);
-}
-.menu-button:hover {
-    background-color: var(--border-color);
+.search-mode-toggle .btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: var(--border-radius-base);
+  background-color: var(--surface-color); /* Use surface for non-active */
+  color: var(--subtle-text-color);
+  border: 1px solid var(--border-color);
+  font-weight: var(--font-weight-medium);
 }
 
-.new-chat-button {
-    background-color: var(--primary-accent);
-    color: var(--bg-color);
+.search-mode-toggle .btn.active {
+  background-color: var(--primary-accent);
+  color: var(--bg-color); /* Dark text on primary accent */
+  border-color: var(--primary-accent);
+  font-weight: var(--font-weight-semibold);
 }
-.new-chat-button:hover {
-    background-color: var(--primary-accent-hover);
-    transform: rotate(90deg); /* Spin effect on hover */
+
+.search-mode-toggle .btn:hover {
+  background-color: var(--primary-accent-translucent); /* Subtle hover for non-active */
+  color: var(--primary-accent); /* Text changes to accent */
+  border-color: var(--primary-accent);
+}
+.search-mode-toggle .btn.active:hover {
+  background-color: var(--primary-accent-hover); /* Darker hover for active */
+  color: var(--bg-color);
 }
 
 
 .search-bar {
+  width: 100%;
   position: relative;
-  flex-grow: 2; /* Allow search bar to grow more */
 }
 
 .search-input {
-  padding-left: 3rem; /* More space for the icon and a potential larger icon */
-  border-radius: var(--border-radius-pill);
-  background-color: var(--surface-color);
-  border-color: var(--border-color);
-  transition: all var(--transition-speed-fast) ease;
+  width: calc(100% - 40px);
+  padding: 12px 15px 12px 40px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-pill); /* Pill shape for search input */
+  font-size: 1em;
+  box-shadow: var(--box-shadow-inset); /* Subtle inner shadow */
+  transition: all var(--transition-speed-fast) var(--easing-curve-elegant);
+  background-color: var(--bg-color); /* Use bg-color for input field */
+  color: var(--text-color);
+}
+
+.search-input::placeholder {
+  color: var(--subtle-text-color);
 }
 
 .search-input:focus {
   border-color: var(--primary-accent);
-  box-shadow: 0 0 0 4px var(--primary-accent-translucent); /* Larger glow */
-  background-color: var(--bg-color); /* Darker on focus */
+  box-shadow: 0 0 0 3px var(--primary-accent-translucent);
+  outline: none;
 }
 
 .search-icon {
   position: absolute;
-  left: 1rem;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--subtle-text-color);
-  font-size: 1.2rem; /* Larger icon */
-  transition: color var(--transition-speed-fast) ease;
-}
-.search-input:focus + .search-icon {
-    color: var(--primary-accent); /* Green icon on focus */
 }
 
-.chat-list {
-  flex-grow: 1;
-  overflow-y: auto;
-  padding-right: 8px; /* More space for scrollbar */
-  padding-bottom: 1rem; /* Space at the bottom of the list */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
-
-/* Custom scrollbar for chat list */
-.chat-list::-webkit-scrollbar { width: 10px; }
-.chat-list::-webkit-scrollbar-track { background: var(--surface-color); border-radius: var(--border-radius-pill); }
-.chat-list::-webkit-scrollbar-thumb {
-  background-color: var(--primary-accent);
-  border-radius: var(--border-radius-pill);
-  border: 2px solid var(--surface-color);
-}
-.chat-list::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-hover); }
-
-
-.no-chats-message {
-  text-align: center;
-  color: var(--subtle-text-color);
-  margin-top: 4rem; /* More margin */
-  font-size: 1.2rem;
+.chat-list, .user-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-.no-chats-message i {
-    color: var(--border-color); /* Grey icon */
-    font-size: 5rem; /* Larger icon */
+  gap: 10px;
+  margin-top: 20px;
 }
 
-
-.chat-item {
+.chat-item, .user-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  margin-bottom: 0.75rem;
-  cursor: pointer;
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color-translucent);
+  padding: 15px;
+  background-color: var(--surface-color); /* Use surface-color for cards */
   border-radius: var(--border-radius-large);
-  transition: all var(--transition-speed-normal) var(--easing-curve-elegant); /* Smoother transition */
   box-shadow: var(--box-shadow-sm);
-  position: relative; /* For actions on hover and pinned icon */
-  overflow: hidden; /* Hide overflow content from action buttons initially */
+  transition: transform var(--transition-speed-fast) var(--easing-curve-elegant),
+              box-shadow var(--transition-speed-fast) var(--easing-curve-elegant);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-color-translucent); /* Subtle border */
 }
 
-.chat-item:hover {
-  background-color: rgba(var(--primary-accent-rgb), 0.08); /* More prominent hover effect */
-  border-color: var(--primary-accent); /* Green border on hover */
-  transform: translateY(-5px) scale(1.01); /* Subtle lift and slightly larger */
-  box-shadow: 0 8px 20px var(--shadow-color-accent); /* Enhanced shadow */
+.chat-item:hover, .user-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--box-shadow-md);
+  border-color: var(--border-color); /* Make border more prominent on hover */
 }
 
-.chat-item-pinned {
-    background-color: rgba(var(--primary-accent-rgb), 0.15); /* Distinct background for pinned */
-    border-color: var(--primary-accent);
-    padding-right: 3rem; /* Space for the pinned icon */
-}
-.chat-item-pinned:hover {
-    background-color: rgba(var(--primary-accent-rgb), 0.2);
-}
-
-
-.chat-avatar {
+.chat-avatar, .user-avatar-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
   flex-shrink: 0;
-  position: relative; /* For online indicator */
+  position: relative;
+  background-color: var(--border-color); /* Placeholder background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em; /* For placeholder text/icon */
+  color: var(--subtle-text-color);
 }
 
 .chat-avatar img {
-  width: 65px; /* Slightly larger avatars */
-  height: 65px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 3px solid var(--primary-accent); /* Thicker green border */
-  transition: all var(--transition-speed-fast) ease;
-}
-.chat-item:hover .chat-avatar img {
-    transform: scale(1.05); /* Grow avatar on chat item hover */
-    border-color: var(--primary-accent-hover);
 }
 
 .online-indicator {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 15px;
-    height: 15px;
-    background-color: #39FF14; /* Neon Green for online */
-    border-radius: 50%;
-    border: 3px solid var(--surface-color); /* Border matches card background */
-    box-shadow: 0 0 0 1px var(--primary-accent); /* Green glow */
-    animation: pulse 1.5s infinite ease-out; /* Pulsing animation */
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background-color: var(--primary-accent); /* Green for online */
+  border-radius: 50%;
+  border: 2px solid var(--surface-color); /* Border matches card background */
 }
-/* Animation for online indicator */
-@keyframes pulse {
-    0% { transform: scale(0.8); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(0.8); opacity: 0.8; }
-}
-
 
 .chat-info {
   flex-grow: 1;
@@ -215,34 +268,34 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.25rem;
+  margin-bottom: 5px;
 }
 
-.chat-name {
-  font-size: 1.25rem; /* Larger name */
-  font-weight: var(--font-weight-bold); /* Bolder name */
+.chat-name, .user-name {
+  font-weight: var(--font-weight-semibold);
   color: var(--text-color);
+  font-size: 1.1em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .chat-time {
-  font-size: 0.9rem; /* Slightly larger time */
+  font-size: 0.85em;
   color: var(--subtle-text-color);
   flex-shrink: 0;
-  margin-left: 0.75rem; /* More space */
+  margin-left: 10px;
 }
 
 .chat-last-message {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem; /* More space */
 }
 
 .chat-last-message p {
-  font-size: 1rem; /* Base font size */
+  margin: 0;
+  font-size: 0.95em;
   color: var(--subtle-text-color);
   white-space: nowrap;
   overflow: hidden;
@@ -252,237 +305,273 @@
 
 .unread-count {
   background-color: var(--primary-accent);
-  color: var(--bg-color);
-  font-size: 0.85rem; /* Slightly larger count */
-  font-weight: var(--font-weight-extrabold); /* Extra bold */
+  color: var(--bg-color); /* Dark text on green */
+  font-size: 0.75em;
+  font-weight: var(--font-weight-bold);
+  padding: 3px 8px;
   border-radius: var(--border-radius-pill);
-  padding: 0.25rem 0.7rem; /* More padding */
+  margin-left: 10px;
   flex-shrink: 0;
-  animation: bounceIn 0.6s var(--easing-curve-bounce) both; /* Bouncy animation on appearance */
 }
 
 .chat-actions-hover {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 0; /* Initially hidden */
-    background-color: rgba(var(--primary-accent-rgb), 0.1); /* Subtle green background */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.25rem;
-    overflow: hidden;
-    transition: width var(--transition-speed-fast) ease-out, background-color var(--transition-speed-fast) ease-out;
-    border-left: 1px solid var(--border-color-translucent);
-    border-top-right-radius: var(--border-radius-large);
-    border-bottom-right-radius: var(--border-radius-large);
+  position: absolute;
+  right: -100px; /* Hidden by default */
+  top: 0;
+  bottom: 0;
+  /* Use rgba with surface-color to create a fade effect */
+  /* Note: surface-color-rgb is not defined in your provided CSS.
+     If you want a true gradient with opacity, you'd need to add:
+     --surface-color-rgb: 16, 16, 16; (for #101010) to your :root variables. */
+  background: linear-gradient(to left, var(--surface-color) 50%, rgba(16, 16, 16, 0) 100%);
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  transition: right var(--transition-speed-normal) var(--easing-curve-elegant);
 }
+
+
 .chat-item:hover .chat-actions-hover {
-    width: 50px; /* Expand on hover */
-}
-/* No longer forcing width on pinned, rely on hover */
-
-.chat-actions-hover .btn-icon {
-    background: none;
-    border: none;
-    color: var(--subtle-text-color);
-    font-size: 1rem;
-    padding: 0.5rem;
-    cursor: pointer;
-    transition: color var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px; /* Consistent size */
-    height: 40px;
-    border-radius: 50%; /* Circular buttons */
-}
-.chat-actions-hover .btn-icon:hover {
-    color: var(--primary-accent);
-    transform: scale(1.1); /* Pop effect */
-    background-color: rgba(var(--primary-accent-rgb), 0.1);
-}
-.chat-actions-hover .btn-icon:active {
-    transform: scale(0.9);
-}
-.chat-actions-hover .btn-danger-icon { /* Specific style for delete button */
-    color: var(--error-color);
-}
-.chat-actions-hover .btn-danger-icon:hover {
-    color: darken(var(--error-color), 10%);
-    background-color: rgba(var(--error-color-rgb), 0.1);
+  right: 0; /* Show on hover */
 }
 
-.pinned-active-icon { /* Style for the pin icon when active (pinned) */
-    color: var(--primary-accent);
-    transform: rotate(45deg); /* Slight rotation when active */
+/* Reusing .btn styles from your provided CSS */
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--subtle-text-color);
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: color var(--transition-speed-fast) ease, background-color var(--transition-speed-fast) ease;
 }
 
-.pinned-icon { /* For the static pinned icon on the chat item */
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: var(--primary-accent); /* Green for pinned icon */
-    font-size: 1rem;
-    transform: rotate(45deg); /* Slight rotation */
+.btn-icon:hover {
+  color: var(--primary-accent);
+  background-color: var(--primary-accent-translucent);
 }
 
+.btn-danger-icon {
+  color: var(--error-color);
+}
 
-/* --- Responsive Adjustments --- */
+.btn-danger-icon:hover {
+  background-color: rgba(var(--error-color-rgb), 0.15); /* Translucent error background */
+}
+
+.pinned-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--pinned-color); /* Gold color for pinned */
+  font-size: 0.9em;
+}
+
+.pinned-active-icon {
+  color: var(--pinned-color); /* Gold color when actively pinned */
+}
+
+.chat-item-pinned {
+  border-left: 5px solid var(--pinned-color);
+  background-color: var(--surface-color); /* Keep surface color, only change border */
+}
+
+.no-chats-message, .no-results-message {
+  text-align: center;
+  color: var(--subtle-text-color);
+  padding: 30px;
+  font-size: 1.1em;
+}
+
+.no-chats-message i, .no-results-message i {
+  margin-bottom: 15px;
+  color: var(--border-color);
+}
+
+/* New styles for search results */
+.search-results-section {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--surface-color); /* Use surface-color for this section */
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--box-shadow-sm);
+  border: 1px solid var(--border-color-translucent);
+}
+
+.section-title {
+  font-size: 1.3em;
+  color: var(--primary-accent); /* Use primary accent for section title */
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.user-item {
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-color); /* Slightly darker background for user items */
+  margin-bottom: 8px;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-accent); /* Color for the checkbox */
+}
+
+.create-chat-button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  font-size: 1.1em;
+  border-radius: var(--border-radius-pill);
+  background-color: var(--primary-accent); /* Use primary accent for create button */
+  color: var(--bg-color); /* Dark text on green */
+  font-weight: var(--font-weight-bold);
+  border: none; /* No border for primary button */
+}
+
+.create-chat-button:hover {
+  background-color: var(--primary-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px var(--shadow-color-accent);
+}
+
+/* Animation styles */
+.animate__animated {
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate__fadeInUp {
+  animation-name: fadeInUp;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .chats-container {
-    padding: 1rem;
+    padding: 15px;
   }
-
-  .chats-header {
-    flex-wrap: wrap; /* Allow header items to wrap */
-    justify-content: center;
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-  }
-
   .chats-title {
-    font-size: 1.8rem;
-    flex-basis: 100%; /* Take full width */
-    text-align: center;
-    margin-left: 0;
+    font-size: 1.6em;
   }
-
-  .menu-button, .new-chat-button {
+  .search-input {
+    padding: 10px 15px 10px 40px;
+  }
+  .chat-item, .user-item {
+    padding: 12px;
+  }
+  .chat-avatar, .user-avatar-placeholder {
     width: 45px;
     height: 45px;
-    font-size: 1.2rem;
+    margin-right: 10px;
   }
-
-  .search-bar {
-    flex-basis: 100%; /* Take full width */
-    order: 3; /* Move search bar to the bottom row of header */
+  .chat-name, .user-name {
+    font-size: 1em;
   }
-
-  .search-input {
-    padding-left: 2.5rem;
-  }
-
-  .search-icon {
-    font-size: 1.1rem;
-    left: 0.8rem;
-  }
-
-  .chat-item {
-    padding: 0.8rem 1rem;
-    gap: 0.8rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .chat-item:hover {
-    transform: translateY(-3px) scale(1.005);
-    box-shadow: 0 6px 15px var(--shadow-color-accent);
-  }
-
-  .chat-avatar img {
-    width: 55px;
-    height: 55px;
-    border-width: 2px;
-  }
-   .online-indicator {
-    width: 12px;
-    height: 12px;
-    border-width: 2px;
-  }
-
-  .chat-name {
-    font-size: 1.1rem;
-  }
-
   .chat-time {
-    font-size: 0.85rem;
+    font-size: 0.8em;
   }
-
   .chat-last-message p {
-    font-size: 0.95rem;
+    font-size: 0.9em;
   }
-
   .unread-count {
-    font-size: 0.8rem;
-    padding: 0.18rem 0.6rem;
+    font-size: 0.7em;
+    padding: 2px 6px;
   }
-
-  .chat-actions-hover {
-    width: 0; /* Keep hidden on small screens by default */
-    background-color: transparent; /* No background on small screens */
+  .btn-icon {
+    font-size: 1.1em;
+    padding: 6px;
   }
-  .chat-item:hover .chat-actions-hover {
-    width: 0; /* Explicitly keep hidden on hover for mobile */
+  .section-title {
+    font-size: 1.2em;
   }
-  .pinned-icon {
-    font-size: 0.9rem;
-    top: 8px;
-    right: 8px;
+  .create-chat-button {
+    padding: 10px;
+    font-size: 1em;
   }
 }
 
 @media (max-width: 480px) {
   .chats-container {
-    padding: 0.8rem;
+    padding: 10px;
+    margin: 10px auto;
   }
-
   .chats-title {
-    font-size: 1.6rem;
+    font-size: 1.4em;
   }
-
-  .menu-button, .new-chat-button {
+  .search-mode-toggle {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .search-mode-toggle .btn {
+    padding: 8px 0;
+    font-size: 0.9em;
+  }
+  .search-input {
+    padding: 8px 12px 8px 35px;
+    font-size: 0.9em;
+  }
+  .search-icon {
+    left: 12px;
+    font-size: 0.9em;
+  }
+  .chat-item, .user-item {
+    padding: 10px;
+  }
+  .chat-avatar, .user-avatar-placeholder {
     width: 40px;
     height: 40px;
-    font-size: 1.1rem;
+    margin-right: 8px;
   }
-
-  .search-input {
-    padding-left: 2.2rem;
-    font-size: 0.9rem;
+  .chat-name, .user-name {
+    font-size: 0.95em;
   }
-
-  .search-icon {
-    font-size: 1rem;
-    left: 0.7rem;
-  }
-
-  .chat-item {
-    padding: 0.7rem 0.8rem;
-    gap: 0.7rem;
-    margin-bottom: 0.5rem;
-  }
-  .chat-item:hover {
-    transform: translateY(-2px) scale(1.005);
-    box-shadow: 0 4px 10px var(--shadow-color-accent);
-  }
-
-  .chat-avatar img {
-    width: 48px;
-    height: 48px;
-    border-width: 2px;
-  }
-   .online-indicator {
-    width: 10px;
-    height: 10px;
-    border-width: 2px;
-  }
-
-  .chat-name {
-    font-size: 1rem;
-  }
-
   .chat-time {
-    font-size: 0.8rem;
+    font-size: 0.75em;
   }
-
   .chat-last-message p {
-    font-size: 0.9rem;
+    font-size: 0.85em;
   }
-
   .unread-count {
-    font-size: 0.75rem;
-    padding: 0.15rem 0.5rem;
+    font-size: 0.65em;
+    padding: 2px 5px;
+  }
+  .btn-icon {
+    font-size: 1em;
+    padding: 5px;
+  }
+  .section-title {
+    font-size: 1.1em;
+  }
+  .create-chat-button {
+    padding: 8px;
+    font-size: 0.95em;
+  }
+  .no-chats-message, .no-results-message {
+    font-size: 1em;
+    padding: 20px;
   }
 }

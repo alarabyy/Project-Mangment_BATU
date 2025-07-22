@@ -1,29 +1,48 @@
 <div class="chats-container">
   <header class="chats-header">
-    <!-- <button class="menu-button btn btn-secondary" title="Open Menu">
-      <i class="fas fa-bars"></i>
-    </button> -->
     <h1 class="chats-title">تحت الانشاء فقط للمعاينه.....</h1>
     <h1 class="chats-title">Chats</h1>
-    <div class="search-bar">
+
+    <div class="search-mode-toggle">
+      <button class="btn" [class.active]="!showUserSearch" (click)="toggleUserSearchMode()">
+        Search Existing Chats
+      </button>
+      <button class="btn" [class.active]="showUserSearch" (click)="toggleUserSearchMode()">
+        New Chat (Search Users)
+      </button>
+    </div>
+
+    <div class="search-bar" *ngIf="!showUserSearch">
       <input
         type="text"
-        placeholder="Search chats by name..."
-        [(ngModel)]="searchTerm"
+        placeholder="Search your conversations..."
+        [(ngModel)]="chatSearchTerm"
         (input)="filterChats()"
         class="form-input search-input"
       />
       <i class="fas fa-search search-icon"></i>
     </div>
-    <!-- <button class="new-chat-button btn btn-primary" title="Start New Chat">
-      <i class="fas fa-plus"></i>
-    </button> -->
+
+    <div class="search-bar" *ngIf="showUserSearch">
+      <input
+        type="text"
+        placeholder="Search users to start a new chat..."
+        [(ngModel)]="userSearchTerm"
+        (input)="searchUsers()"
+        class="form-input search-input"
+      />
+      <i class="fas fa-search search-icon"></i>
+    </div>
   </header>
 
-  <div class="chat-list">
-    <div *ngIf="filteredChats.length === 0" class="no-chats-message">
+  <div *ngIf="!showUserSearch" class="chat-list">
+    <div *ngIf="filteredChats.length === 0 && chatSearchTerm.trim() === ''" class="no-chats-message">
       <i class="fas fa-inbox fa-3x"></i>
-      <p>No chats matching your search.</p>
+      <p>No chats found.</p>
+    </div>
+    <div *ngIf="filteredChats.length === 0 && chatSearchTerm.trim() !== ''" class="no-chats-message">
+      <i class="fas fa-search fa-3x"></i>
+      <p>No chats matching "{{ chatSearchTerm }}"</p>
     </div>
 
     <div
@@ -34,7 +53,8 @@
     >
       <div class="chat-avatar">
         <img [src]="chat.avatar" alt="{{ chat.name }}'s avatar" />
-        <span class="online-indicator"></span> </div>
+        <span class="online-indicator"></span>
+      </div>
       <div class="chat-info">
         <div class="chat-name-time">
           <span class="chat-name">{{ chat.name }}</span>
@@ -58,5 +78,39 @@
       </div>
        <i *ngIf="chat.isPinned" class="fas fa-thumbtack pinned-icon" title="Pinned Chat"></i>
     </div>
+  </div>
+
+  <div *ngIf="showUserSearch" class="search-results-section">
+    <h2 class="section-title">Search Results (Users to Chat With)</h2>
+    <div *ngIf="searchResults.length > 0; else noUserSearchResults" class="user-list">
+      <div *ngFor="let user of searchResults" class="user-item card animate__animated animate__fadeInUp">
+        <div class="user-info">
+          <img src="https://placehold.co/150x150/2a3038/c9d1d9?text=User" alt="User avatar" class="user-avatar-placeholder" />
+          <span class="user-name">{{ user.name }}</span>
+        </div>
+        <div class="user-actions">
+          <input
+            type="checkbox"
+            [checked]="isUserSelected(user)"
+            (change)="toggleUserSelection(user)"
+            class="user-checkbox"
+          />
+        </div>
+      </div>
+    </div>
+    <ng-template #noUserSearchResults>
+      <div class="no-results-message">
+        <p *ngIf="userSearchTerm.trim() === ''">Start typing to search for users.</p>
+        <p *ngIf="userSearchTerm.trim() !== ''">No users found matching "{{ userSearchTerm }}"</p>
+      </div>
+    </ng-template>
+
+    <button
+      *ngIf="selectedUsers.length > 0"
+      class="btn btn-primary create-chat-button"
+      (click)="createChatWithSelectedUsers()"
+    >
+      Create Chat with Selected ({{ selectedUsers.length }})
+    </button>
   </div>
 </div>
