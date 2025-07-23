@@ -1,4 +1,5 @@
 <section id="home" class="hero">
+  <div class="hero-background-image"></div>
   <div class="hero-background-elements">
     <div class="tech-grid-pattern"></div>
     <div class="floating-shape shape-1"></div>
@@ -8,18 +9,18 @@
   </div>
   <div class="container hero-content">
     <div class="hero-text animate-fade-up">
-      <h1><i class="fas fa-graduation-cap hero-icon-inline"></i> {{ hero.titleMain }}</h1>
-      <p class="hero-subtitle">{{ hero.titleSub }}</p>
+      <h1><i class="fas fa-graduation-cap hero-icon-inline"></i> {{ homeContent.hero.titleMain }}</h1>
+      <p class="hero-subtitle">{{ homeContent.hero.titleSub }}</p>
       <p class="hero-description">
         <i class="fas fa-lightbulb"></i>
-        {{ hero.description }}
+        {{ homeContent.hero.description }}
       </p>
       <div class="cta-buttons">
         <a href="#features" class="btn btn-primary">
-          <i class="fas fa-cogs"></i> Explore Features
+          <i class="fas fa-cogs"></i> {{ homeContent.ctaButtons.exploreFeatures }}
         </a>
         <a href="#timeline" class="btn btn-secondary">
-          <i class="fas fa-calendar-alt"></i> Project Roadmap
+          <i class="fas fa-calendar-alt"></i> {{ homeContent.ctaButtons.projectRoadmap }}
         </a>
       </div>
     </div>
@@ -32,14 +33,13 @@
             </div>
             Graduation Project Overview
           </div>
-          <!-- <button class="btn-view-all"><i class="fas fa-arrow-right"></i> View All</button> -->
-        </div>
+          </div>
         <div class="project-cards">
-          <div class="project-card" *ngFor="let project of featuredProjects">
+          <div class="project-card" *ngFor="let project of homeContent.featuredProjects">
             <div class="project-header">
               <h4><i class="fas" [ngClass]="project.icon"></i> {{ project.title }}</h4>
               <span class="project-status" [ngClass]="'status-' + project.status">
-                <i class="fas fa-circle"></i> {{ project.status | titlecase }}
+                <i class="fas fa-circle"></i> {{ homeContent.statusLabels[project.status] }}
               </span>
             </div>
             <p>{{ project.abstract }}</p>
@@ -53,13 +53,13 @@
 <section id="features" class="core-features">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title"><i class="fas fa-cogs section-title-icon"></i> Core System Features</h2>
+      <h2 class="section-title"><i class="fas fa-cogs section-title-icon"></i> {{ homeContent.sections.features.title }}</h2>
       <p class="section-subtitle">
-        Our system is designed to streamline and facilitate the graduation project management process for students and faculty at Borg El Arab Technological University.
+        {{ homeContent.sections.features.subtitle }}
       </p>
     </div>
     <div class="features-grid">
-      <div class="feature-card card" *ngFor="let feature of coreFeatures">
+      <div class="feature-card card" *ngFor="let feature of homeContent.coreFeatures">
         <div class="feature-icon">
           <i class="fas" [ngClass]="feature.icon"></i>
         </div>
@@ -78,13 +78,13 @@
 <section id="skills-outcomes" class="skills-outcomes">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title"><i class="fas fa-brain section-title-icon"></i> Skills & Outcomes Gained</h2>
+      <h2 class="section-title"><i class="fas fa-brain section-title-icon"></i> {{ homeContent.sections.skillsOutcomes.title }}</h2>
       <p class="section-subtitle">
-        Beyond project completion, our platform fosters crucial skills essential for your future career and academic success.
+        {{ homeContent.sections.skillsOutcomes.subtitle }}
       </p>
     </div>
     <div class="skills-grid">
-      <div class="skill-card card" *ngFor="let skill of skillsOutcomes">
+      <div class="skill-card card" *ngFor="let skill of homeContent.skillsOutcomes">
         <div class="skill-icon">
           <i class="fas" [ngClass]="skill.icon"></i>
         </div>
@@ -98,13 +98,13 @@
 <section class="stats">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title"><i class="fas fa-chart-bar section-title-icon"></i> Our Achievements in Numbers</h2>
+      <h2 class="section-title"><i class="fas fa-chart-bar section-title-icon"></i> {{ homeContent.sections.stats.title }}</h2>
       <p class="section-subtitle">
-        Celebrating the milestones and accomplishments within our thriving graduation project community at our university.
+        {{ homeContent.sections.stats.subtitle }}
       </p>
     </div>
     <div class="stats-grid">
-      <div class="stat-card card" *ngFor="let stat of statistics">
+      <div class="stat-card card" *ngFor="let stat of homeContent.statistics">
         <div class="stat-icon">
           <i class="fas" [ngClass]="stat.icon"></i>
         </div>
@@ -119,13 +119,13 @@
 <section id="services" class="services">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title"><i class="fas fa-handshake section-title-icon"></i> Comprehensive Project Support</h2>
+      <h2 class="section-title"><i class="fas fa-handshake section-title-icon"></i> {{ homeContent.sections.services.title }}</h2>
       <p class="section-subtitle">
-        We offer a suite of services designed to empower students and faculty throughout the entire project lifecycle.
+        {{ homeContent.sections.services.subtitle }}
       </p>
     </div>
     <div class="services-grid">
-      <div class="service-card card" *ngFor="let service of services">
+      <div class="service-card card" *ngFor="let service of homeContent.services">
         <div class="service-icon">
           <i class="fas" [ngClass]="service.icon"></i>
         </div>
@@ -144,13 +144,13 @@
 <section id="timeline" class="timeline-section">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title"><i class="fas fa-calendar-alt section-title-icon"></i> Project Milestones & Important Dates</h2>
+      <h2 class="section-title"><i class="fas fa-calendar-alt section-title-icon"></i> {{ homeContent.sections.timeline.title }}</h2>
       <p class="section-subtitle">
-        Stay informed about critical deadlines, events, and phases of your graduation project journey.
+        {{ homeContent.sections.timeline.subtitle }}
       </p>
     </div>
     <div class="timeline">
-      <div class="timeline-item" *ngFor="let event of timelineEvents">
+      <div class="timeline-item" *ngFor="let event of homeContent.timelineEvents">
         <div class="timeline-icon">
           <i class="fas" [ngClass]="event.icon"></i>
         </div>
@@ -167,9 +167,9 @@
 <section id="contact" class="contact">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title"><i class="fas fa-envelope section-title-icon"></i> Get in Touch</h2>
+      <h2 class="section-title"><i class="fas fa-envelope section-title-icon"></i> {{ homeContent.sections.contact.title }}</h2>
       <p class="section-subtitle">
-        Have questions or need assistance? Reach out to the Graduation Projects Management Unit.
+        {{ homeContent.sections.contact.subtitle }}
       </p>
     </div>
     <div class="contact-grid">
@@ -177,48 +177,53 @@
         <div class="contact-item">
           <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
           <div class="contact-details">
-            <h4>Our Location</h4>
-            <p>{{ contactInfo.address }}</p>
+            <h4>{{ homeContent.contactInfo.addressTitle }}</h4>
+            <p>{{ homeContent.contactInfo.address }}</p>
           </div>
         </div>
         <div class="contact-item">
           <div class="contact-icon"><i class="fas fa-phone"></i></div>
           <div class="contact-details">
-            <h4>Phone Number</h4>
-            <p>{{ contactInfo.phone }}</p>
+            <h4>{{ homeContent.contactInfo.phoneTitle }}</h4>
+            <p>{{ homeContent.contactInfo.phone }}</p>
           </div>
         </div>
         <div class="contact-item">
           <div class="contact-icon"><i class="fas fa-envelope"></i></div>
           <div class="contact-details">
-            <h4>Email Address</h4>
-            <p>{{ contactInfo.email }}</p>
+            <h4>{{ homeContent.contactInfo.emailTitle }}</h4>
+            <p>{{ homeContent.contactInfo.email }}</p>
           </div>
         </div>
       </div>
       <div class="contact-form card">
         <form>
           <div class="form-group">
-            <label for="name">Your Name</label>
-            <input type="text" id="name" name="name" placeholder="Enter your name">
+            <label for="name">{{ homeContent.form.name }}</label>
+            <input type="text" id="name" name="name" [placeholder]="homeContent.form.name">
           </div>
           <div class="form-group">
-            <label for="email">Your Email</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email">
+            <label for="email">{{ homeContent.form.email }}</label>
+            <input type="email" id="email" name="email" [placeholder]="homeContent.form.email">
           </div>
           <div class="form-group">
-            <label for="subject">Subject</label>
-            <input type="text" id="subject" name="subject" placeholder="Enter the subject">
+            <label for="subject">{{ homeContent.form.subject }}</label>
+            <input type="text" id="subject" name="subject" [placeholder]="homeContent.form.subject">
           </div>
           <div class="form-group">
-            <label for="message">Your Message</label>
-            <textarea id="message" name="message" rows="5" placeholder="Your message"></textarea>
+            <label for="message">{{ homeContent.form.message }}</label>
+            <textarea id="message" name="message" rows="5" [placeholder]="homeContent.form.message"></textarea>
           </div>
           <button type="submit" class="btn btn-primary">
-            <i class="fas fa-paper-plane"></i> Send Message
+            <i class="fas fa-paper-plane"></i> {{ homeContent.form.sendButton }}
           </button>
         </form>
       </div>
     </div>
   </div>
 </section>
+
+<!-- Floating Language Toggle Button (Moved to top-right) -->
+<button class="language-toggle-button" (click)="toggleLanguage()">
+  {{ getCurrentLanguage() === 'en' ? 'العربية' : 'English' }}
+</button>
