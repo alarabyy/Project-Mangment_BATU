@@ -1,4 +1,4 @@
-/* Import a modern font like Inter with more weights */
+ /* Import a modern font like Inter with more weights */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 /* NEW: Import Google Fonts for Arabic (e.g., Cairo) - If you have a global styles.css, consider moving this there */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
@@ -8,22 +8,22 @@
   Global Variables & Base Styles (Commented out here, they should ideally be in your global styles.css)
   If this is your only CSS file, uncomment the :root and body.dark-theme-active blocks.
 */
-/*
+
 :root {
-  --primary-accent: #007bff; // Blue
+  --primary-accent: #007bff; /* Blue */
   --primary-accent-hover: #0056b3;
   --primary-accent-rgb: 0, 123, 255;
   --primary-accent-translucent: rgba(0, 123, 255, 0.15);
 
-  --secondary-accent: #6c757d; // Gray
+  --secondary-accent: #6c757d; /* Gray */
   --secondary-accent-hover: #5a6268;
   --secondary-accent-rgb: 108, 117, 125;
   --secondary-accent-translucent: rgba(108, 117, 125, 0.15);
 
-  --bg-color: #f8f9fa; // Light background for light theme
-  --surface-color: #ffffff; // Card/element background for light theme
-  --text-color: #343a40; // Dark text for light theme
-  --subtle-text-color: #6c757d; // Subtler text for light theme
+  --bg-color: #f8f9fa; /* Light background for light theme */
+  --surface-color: #ffffff; /* Card/element background for light theme */
+  --text-color: #343a40; /* Dark text for light theme */
+  --subtle-text-color: #6c757d; /* Subtler text for light theme
 
   --border-color: #dee2e6;
   --border-color-translucent: rgba(222, 226, 230, 0.5);
@@ -50,14 +50,14 @@
   --transition-speed-normal: 0.3s;
   --transition-speed-slow: 0.5s;
 
-  --button-text-color: #ffffff; // Text color for primary buttons
+  --button-text-color: #ffffff; /* Text color for primary buttons */
 }
 
 body.dark-theme-active {
-  --bg-color: #1a1a2e; // Dark background
-  --surface-color: #2e2e4a; // Darker surface/card background
-  --text-color: #e0e0e0; // Light text
-  --subtle-text-color: #a0a0b0; // Lighter subtle text
+  --bg-color: #1a1a2e; /* Dark background */
+  --surface-color: #2e2e4a; /* Darker surface/card background */
+  --text-color: #e0e0e0; /* Light text */
+  --subtle-text-color: #a0a0b0; /* Lighter subtle text */
 
   --border-color: #4a4a60;
   --border-color-translucent: rgba(74, 74, 96, 0.5);
@@ -199,7 +199,7 @@ section {
   background-color: var(--primary-accent-translucent);
   text-decoration: none;
 }
-*/
+
 
 /* Hero Section */
 .hero {
@@ -920,7 +920,7 @@ section {
 /* --- NEW: Floating Language Toggle Button (Position Adjusted) --- */
 .language-toggle-button {
   position: fixed;
-  top: 80px;   /* Adjusted from 20px to 80px */
+  top: 90px;   /* Adjusted from 20px to 80px */
   right: 20px;
   z-index: 1000;
   background-color: var(--primary-accent);
@@ -1046,6 +1046,7 @@ body.rtl-active .service-features li .fas {
   margin-right: 0;
 }
 
+/* Timeline specific RTL adjustment remains at the end for mobile */
 body.rtl-active .timeline::before {
   left: auto;
   right: 50%;
@@ -1053,11 +1054,11 @@ body.rtl-active .timeline::before {
 }
 
 body.rtl-active .timeline-item {
-  flex-direction: row-reverse;
+  flex-direction: row-reverse; /* Default for desktop RTL */
 }
 
 body.rtl-active .timeline-item:nth-child(even) {
-  flex-direction: row;
+  flex-direction: row; /* Correct for desktop RTL (items alternate sides) */
 }
 
 body.rtl-active .timeline-item:nth-child(odd) .timeline-content {
@@ -1107,32 +1108,426 @@ body.rtl-active .language-toggle-button {
   right: auto;
 }
 
-/* Responsive adjustments for RTL */
+/* --- Responsive Adjustments (Media Queries) --- */
+
+/* Laptops / Tablets Landscape (max-width: 992px) */
 @media (max-width: 992px) {
-  body.rtl-active .hero-text h1 {
-    justify-content: center;
+  section {
+    padding: 60px 0; /* Reduce section padding */
   }
 
-  body.rtl-active .hero-description {
-    justify-content: center;
+  .container {
+    padding: 0 15px; /* Adjust container padding */
   }
 
-  body.rtl-active .cta-buttons {
-    justify-content: center;
+  .section-header {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-size: 2.2rem;
+    gap: 10px;
+  }
+
+  .section-title-icon {
+    font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: 90px 0;
+    min-height: auto; /* Allow height to adjust */
+  }
+
+  .hero-content {
+    grid-template-columns: 1fr; /* Stack columns */
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .hero-text h1 {
+    font-size: 3rem;
+    justify-content: center; /* Center icon and text */
+  }
+
+  .hero-icon-inline {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.4rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+    justify-content: center; /* Center icon and text */
+    text-align: center; /* Center description text */
+  }
+
+  .cta-buttons {
+    justify-content: center; /* Center buttons */
+  }
+
+  .project-dashboard {
+    max-width: 400px; /* Adjust max width */
+    margin: 0 auto; /* Center it */
+  }
+
+  /* Grids (Features, Skills, Stats, Services) */
+  .features-grid,
+  .skills-grid,
+  .stats-grid,
+  .services-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Allow 2 columns */
+    gap: 2rem;
+  }
+
+  /* Timeline Section - Mobile optimized single column */
+  .timeline::before {
+    left: 20px; /* Move line to the left for LTR */
+    right: auto;
+    transform: none;
   }
 
   body.rtl-active .timeline::before {
-    right: 20px;
+    right: 20px; /* Move line to the right for RTL */
     left: auto;
     transform: none;
   }
 
+  .timeline-item {
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-start; /* Align content to the left (LTR) / right (RTL) */
+    padding-left: 40px; /* Space for the icon */
+    margin-bottom: 2.5rem;
+  }
+
   body.rtl-active .timeline-item {
-    align-items: flex-end;
+    align-items: flex-end; /* Align content to the right for RTL */
+    padding-left: 0;
+    padding-right: 40px; /* Space for the icon */
+  }
+
+  .timeline-item:nth-child(even) {
+    flex-direction: column; /* Ensure even items also stack */
+  }
+
+  .timeline-icon {
+    left: 20px; /* Align icon with the line for LTR */
+    top: 0;
+    transform: translate(-50%, 0); /* Adjust icon position */
+    margin-top: 1.5rem; /* Vertically align icon with card */
   }
 
   body.rtl-active .timeline-icon {
-    margin-right: 1rem;
+    right: 20px; /* Align icon with the line for RTL */
+    left: auto;
+    transform: translate(50%, 0); /* Adjust icon position for RTL */
+  }
+
+  .timeline-content {
+    width: 100%; /* Full width */
     margin-left: 0;
+    margin-right: 0;
+    padding: 1.2rem;
+  }
+
+  .timeline-item:nth-child(odd) .timeline-content,
+  .timeline-item:nth-child(even) .timeline-content {
+    margin: 0; /* Remove specific margins */
+  }
+
+  /* Contact Section */
+  .contact-grid {
+    grid-template-columns: 1fr; /* Stack columns */
+    gap: 2.5rem;
+  }
+
+  .contact-info {
+    align-items: center; /* Center contact items */
+    text-align: center;
+  }
+  .contact-item {
+    flex-direction: column; /* Stack icon and details */
+    align-items: center;
+    text-align: center;
+  }
+  .contact-item .contact-icon {
+    margin-bottom: 10px; /* Space between icon and text */
+    margin-right: 0;
+    margin-left: 0;
+  }
+  body.rtl-active .contact-item .contact-icon {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* Tablets Portrait / Large Phones (max-width: 768px) */
+@media (max-width: 768px) {
+  section {
+    padding: 50px 0;
+  }
+
+  .section-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .hero-text h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-icon-inline {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .btn {
+    width: 80%; /* Make buttons wider */
+    max-width: 300px;
+    padding: 0.8rem 1.5rem;
+  }
+
+  .project-dashboard {
+    padding: 1.5rem;
+  }
+
+  .dashboard-title {
+    font-size: 1.2rem;
+  }
+
+  .project-card {
+    padding: 0.8rem 1rem;
+  }
+
+  .project-card h4 {
+    font-size: 1rem;
+  }
+
+  .project-card p {
+    font-size: 0.9rem;
+  }
+
+  .project-status {
+    font-size: 0.8rem;
+  }
+
+  .feature-icon, .skill-icon, .stat-icon, .service-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+
+  .feature-card h3, .skill-card h3, .service-card h3 {
+    font-size: 1.3rem;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+  }
+
+  .timeline-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
+  }
+
+  .timeline-content {
+    padding: 1.2rem;
+  }
+
+  .timeline-content h3 {
+    font-size: 1.15rem;
+  }
+
+  .timeline-content p {
+    font-size: 0.9rem;
+  }
+
+  .contact-form {
+    padding: 2rem;
+  }
+
+  .language-toggle-button {
+    top: 80px; /* Move back to top-right on smaller screens */
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  body.rtl-active .language-toggle-button {
+    left: 20px;
+    right: auto;
+  }
+}
+
+/* Small Phones (max-width: 576px) */
+@media (max-width: 576px) {
+  section {
+    padding: 40px 0;
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    gap: 8px;
+  }
+
+  .section-title-icon {
+    font-size: 1.6rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .hero {
+    padding: 60px 0;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+    gap: 10px;
+  }
+
+  .hero-icon-inline {
+    font-size: 1.8rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-description {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    width: 100%; /* Full width buttons */
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .project-dashboard {
+    padding: 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 1rem;
+  }
+
+  .dashboard-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .project-card h4 {
+    font-size: 0.9rem;
+  }
+
+  .project-card p {
+    font-size: 0.85rem;
+  }
+
+  .project-status {
+    font-size: 0.75rem;
+    padding: 0.2em 0.5em;
+  }
+
+  .features-grid,
+  .skills-grid,
+  .stats-grid,
+  .services-grid {
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 1.5rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .feature-card h3, .skill-card h3, .service-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .feature-card p, .skill-card p, .stat-description, .service-card p {
+    font-size: 0.85rem;
+  }
+
+  .feature-benefits li, .service-features li {
+    font-size: 0.8rem;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.8rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+
+  .timeline-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .timeline-content {
+    padding: 1rem;
+  }
+
+  .timeline-content h3 {
+    font-size: 1rem;
+  }
+
+  .timeline-content p {
+    font-size: 0.85rem;
+  }
+
+  .contact-form {
+    padding: 1.5rem;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 0.8rem;
+    font-size: 0.9rem;
   }
 }
