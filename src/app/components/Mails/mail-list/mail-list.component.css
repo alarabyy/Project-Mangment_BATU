@@ -1,0 +1,473 @@
+/* src/app/components/mail/mail-list/mail-list.component.css */
+/* Ensure Font Awesome is present in your project: npm install @fortawesome/fontawesome-free */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+
+/* CSS Variables for better maintainability and theming */
+:root {
+  --primary-accent: #007bff; /* A vibrant blue for primary actions and highlights */
+  --primary-accent-hover: #0056b3; /* Darker blue on hover */
+  --primary-accent-rgb: 0, 123, 255; /* RGB for primary-accent for rgba backgrounds */
+
+  --secondary-accent: #6c757d; /* A subtle grey for secondary elements */
+  --secondary-accent-rgb: 108, 117, 125; /* RGB for secondary-accent for rgba backgrounds */
+
+  --text-color: #343a40; /* Dark text for readability */
+  --subtle-text-color: #6f7478; /* Lighter text for secondary info */
+  --subtle-text-color-darker: #495057; /* Slightly darker subtle text */
+
+  --surface-color: #ffffff; /* White background for cards/surfaces */
+  --border-color: #dee2e6; /* Light grey for borders */
+  --border-color-translucent: rgba(0, 0, 0, 0.1); /* Lighter, more subtle border */
+
+  --error-color: #dc3545; /* Red for error messages */
+  --error-color-rgb: 220, 53, 69; /* RGB for error color for rgba backgrounds */
+  --success-color: #28a745; /* Green for success messages */
+  --success-color-rgb: 40, 167, 69; /* RGB for success color for rgba backgrounds */
+
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Border Radii */
+  --border-radius-base: 0.25rem;
+  --border-radius-large: 0.5rem;
+  --border-radius-pill: 50rem;
+
+  /* Box Shadows */
+  --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --box-shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --transition-speed-fast: 0.15s;
+}
+
+/* RTL Global Styles (adjust as needed based on your global RTL setup) */
+/* This assumes a class 'rtl-active' is added to the body element when RTL is active */
+body.rtl-active {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Base Container */
+.mail-list-container {
+  padding: 5rem 1.5rem; /* Increased padding, using rem */
+  max-width: 1200px; /* Max width for content */
+  margin: 0 auto; /* Center the container */
+}
+
+/* Section Header */
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem; /* More space below header, using rem */
+}
+
+.section-title {
+  font-size: 3rem; /* Larger title, using rem */
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem; /* Using rem */
+  line-height: 1.2;
+  background: linear-gradient(45deg, var(--primary-accent), var(--primary-accent-hover));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-title-icon {
+  font-size: 2.8rem; /* Proportional icon size, using rem */
+  color: var(--primary-accent);
+  -webkit-text-fill-color: var(--primary-accent);
+}
+
+.section-subtitle {
+  font-size: 1.25rem; /* Using rem */
+  color: var(--subtle-text-color);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Actions Section */
+.mail-list-actions {
+  text-align: end; /* Align button to the right for LTR */
+  margin-bottom: 2.5rem; /* More space, using rem */
+}
+body.rtl-active .mail-list-actions {
+  text-align: start; /* Align button to the left for RTL */
+}
+
+/* General Status Messages (Loading, Error, No Mails) */
+.loading-spinner, .error-message, .no-mails-message {
+  text-align: center;
+  padding: 2rem; /* Using rem */
+  font-size: 1.15rem; /* Using rem */
+  color: var(--subtle-text-color);
+  border-radius: var(--border-radius-base);
+  background-color: var(--surface-color);
+  margin-top: 2rem; /* Using rem */
+  box-shadow: var(--box-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem; /* Using rem */
+}
+
+.loading-spinner i {
+  color: var(--primary-accent);
+  font-size: 3rem; /* Larger icon, using rem */
+}
+
+.error-message {
+  background-color: rgba(var(--error-color-rgb), 0.1);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+}
+.error-message .btn {
+    margin-top: 1rem; /* Using rem */
+}
+
+.no-mails-message {
+  color: var(--secondary-accent);
+}
+.no-mails-message i {
+  color: var(--secondary-accent);
+  font-size: 3rem; /* Consistent icon size, using rem */
+}
+.no-mails-message .btn {
+  margin-top: 1rem; /* Using rem */
+}
+
+/* Mail Items Grid */
+.mail-items-grid {
+  display: grid;
+  /* Adjust grid-template-columns to be more responsive */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Min width 300px, flexible, using px for minmax is common */
+  gap: 2rem; /* Using rem */
+}
+
+/* Individual Mail Item Card - Professional Design */
+.mail-item {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color-translucent); /* Softer border */
+  border-radius: var(--border-radius-large); /* Larger border radius */
+  padding: 2rem; /* More padding, using rem */
+  cursor: pointer;
+  transition: all var(--transition-speed-fast) ease;
+  box-shadow: var(--box-shadow-sm); /* Subtle shadow */
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
+  gap: 0.8rem; /* Adjusted gap to fit new elements, using rem */
+}
+
+.mail-item:hover {
+  transform: translateY(-0.3125rem); /* Using rem for translate */
+  box-shadow: var(--box-shadow-md); /* More pronounced shadow on hover */
+  border-color: var(--primary-accent); /* Highlight border on hover */
+}
+
+.mail-item.unread {
+  border-left: 0.3rem solid var(--primary-accent); /* Stronger unread indicator, using rem */
+  background-color: rgba(var(--primary-accent-rgb), 0.05); /* Subtle background for unread */
+}
+body.rtl-active .mail-item.unread {
+  border-left: none; /* Remove left border in RTL */
+  border-right: 0.3rem solid var(--primary-accent); /* Add right border in RTL, using rem */
+}
+
+
+/* Top Row (From & Status) */
+.mail-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem; /* Using rem */
+}
+body.rtl-active .mail-top-row {
+  flex-direction: row-reverse; /* Swap order for RTL */
+}
+
+.mail-from {
+  font-size: 1rem; /* Using rem */
+  color: var(--text-color);
+  font-weight: var(--font-weight-medium);
+  flex-basis: 70%;
+  word-break: break-word;
+}
+.mail-from strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.mail-status {
+  font-size: 0.75rem; /* Using rem */
+  font-weight: var(--font-weight-bold);
+  padding: 0.4em 0.8em; /* Using em for padding relative to font size */
+  border-radius: var(--border-radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem; /* Using rem */
+  white-space: nowrap;
+  min-width: 5rem; /* Using rem */
+  text-align: center;
+  justify-content: center;
+  text-transform: uppercase; /* Uppercase for status */
+}
+
+.mail-status.unread {
+  background-color: rgba(var(--primary-accent-rgb), 0.15);
+  color: var(--primary-accent);
+}
+
+.mail-status.read {
+  background-color: rgba(var(--secondary-accent-rgb), 0.1);
+  color: var(--secondary-accent);
+}
+
+/* Subject Line */
+.mail-subject {
+  font-size: 1.4rem; /* Larger and bolder subject, using rem */
+  font-weight: var(--font-weight-extrabold); /* Even bolder */
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.5rem; /* Using rem */
+}
+
+/* Message Preview */
+.mail-message-preview {
+  font-size: 0.95rem; /* Using rem */
+  color: var(--subtle-text-color-darker);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to 3 lines for better preview */
+  -webkit-box-orient: vertical;
+  margin-top: 0.5rem; /* Using rem */
+  flex-grow: 1; /* Allow message to take available space */
+}
+
+/* Mail Meta Data (ID and Sent At) */
+.mail-meta-data {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+  gap: 1rem; /* Space between ID and Sent At, using rem */
+  font-size: 0.8rem; /* Using rem */
+  color: var(--subtle-text-color);
+  padding-top: 0.8rem; /* Small padding from message preview, using rem */
+  border-top: 1px solid var(--border-color-translucent);
+  margin-top: 0.8rem; /* Space from message preview, using rem */
+}
+
+.mail-meta-data .mail-id,
+.mail-meta-data .mail-sent-at {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem; /* Using rem */
+}
+.mail-meta-data .mail-sent-at i {
+  color: var(--primary-accent);
+}
+body.rtl-active .mail-meta-data {
+  flex-direction: row-reverse; /* Reverse order for RTL */
+  justify-content: flex-end; /* Align right in RTL */
+}
+body.rtl-active .mail-meta-data .mail-sent-at i {
+  margin-right: 0.3rem; /* Adjust margin for RTL */
+  margin-left: 0;
+}
+
+
+/* Date and Actions at Bottom */
+.mail-actions-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem; /* Space between date and buttons, using rem */
+  margin-top: auto; /* Pushes to bottom */
+  padding-top: 1rem; /* More space from message preview, using rem */
+  border-top: 1px solid var(--border-color-translucent); /* Softer separator line */
+}
+body.rtl-active .mail-actions-bottom {
+  flex-direction: row-reverse; /* Reverse order for RTL */
+}
+
+.mail-date {
+  font-size: 0.85rem; /* Using rem */
+  color: var(--subtle-text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem; /* Using rem */
+  white-space: nowrap;
+}
+
+.mail-date i {
+  color: var(--primary-accent); /* Accent color for date icon */
+}
+body.rtl-active .mail-date {
+  flex-direction: row-reverse; /* Icons to the left of text in RTL */
+}
+body.rtl-active .mail-date i {
+  margin-left: 0.3rem; /* Adjust margin for RTL */
+  margin-right: 0;
+}
+
+.mail-actions {
+  display: flex;
+  gap: 0.6rem; /* Space between action buttons, using rem */
+}
+body.rtl-active .mail-actions {
+    flex-direction: row-reverse; /* Reverse button order for RTL */
+}
+.mail-actions .btn {
+  font-size: 0.8rem; /* Smaller buttons for card actions, using rem */
+  padding: 0.45rem 0.9rem; /* Using rem */
+}
+.mail-actions .btn i {
+  font-size: 0.85rem; /* Adjust icon size within buttons, using rem */
+}
+
+
+/* --- Responsive Adjustments using Media Queries --- */
+
+/* For screens smaller than 1200px (e.g., larger tablets in landscape, smaller laptops) */
+@media (max-width: 1200px) {
+  .mail-list-container {
+    max-width: 992px; /* Restrict max width slightly */
+  }
+  .section-title {
+    font-size: 2.8rem;
+  }
+  .section-title-icon {
+    font-size: 2.5rem;
+  }
+  .mail-items-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust min width for tablets/laptops */
+  }
+}
+
+/* For screens smaller than 991px (e.g., tablets in landscape, larger phones) */
+@media (max-width: 991px) {
+  .mail-list-container {
+    padding: 4rem 1.5rem; /* Adjust padding, using rem */
+  }
+  .section-title {
+    font-size: 2.4rem; /* Smaller title */
+  }
+  .section-title-icon {
+    font-size: 2.2rem;
+  }
+  .section-subtitle {
+    font-size: 1.1rem;
+  }
+  .mail-items-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* Adjust min width for tablets */
+    gap: 1.5rem; /* Adjust gap, using rem */
+  }
+  .mail-item {
+    padding: 1.5rem; /* Adjust padding, using rem */
+  }
+  .mail-subject {
+    font-size: 1.2rem;
+  }
+  .mail-message-preview {
+    font-size: 0.9rem;
+    -webkit-line-clamp: 4; /* Allow more lines for message preview */
+  }
+}
+
+/* For screens smaller than 767px (e.g., most tablets and larger phones in portrait) */
+@media (max-width: 767px) {
+  .mail-list-container {
+    padding: 3rem 1rem; /* Further adjust padding, using rem */
+  }
+  .section-title {
+    font-size: 2rem; /* Even smaller title */
+    gap: 0.6rem;
+  }
+  .section-title-icon {
+    font-size: 1.8rem;
+  }
+  .section-subtitle {
+    font-size: 1rem;
+  }
+  .mail-items-grid {
+    grid-template-columns: 1fr; /* Stack cards vertically on smaller screens */
+    gap: 1.2rem; /* Adjust gap, using rem */
+  }
+  .mail-item {
+    padding: 1.2rem; /* Adjust padding, using rem */
+  }
+  .mail-subject {
+    font-size: 1.1rem;
+  }
+  .mail-message-preview {
+    font-size: 0.88rem;
+    -webkit-line-clamp: 5; /* Allow more lines for message preview */
+  }
+  .mail-meta-data {
+    flex-direction: column; /* Stack ID and Sent At vertically */
+    align-items: flex-start; /* Align to start */
+    gap: 0.5rem; /* Adjust gap, using rem */
+  }
+  body.rtl-active .mail-meta-data {
+    align-items: flex-end; /* Align right in RTL when stacked */
+  }
+  .mail-actions-bottom {
+    flex-direction: column; /* Stack date and buttons vertically */
+    align-items: flex-start; /* Align date and buttons to the left */
+    gap: 0.8rem; /* Adjust gap, using rem */
+    padding-top: 0.8rem; /* Adjust padding, using rem */
+  }
+  body.rtl-active .mail-actions-bottom {
+    align-items: flex-end; /* Align right in RTL when stacked */
+  }
+  .mail-actions {
+    width: 100%; /* Make buttons take full width when stacked */
+    justify-content: stretch; /* Stretch buttons to fill width */
+  }
+  .mail-actions .btn {
+    flex-grow: 1; /* Allow buttons to grow and fill available space */
+  }
+}
+
+/* For screens smaller than 575px (e.g., small phones) */
+@media (max-width: 575px) {
+  .mail-list-container {
+    padding: 2rem 0.8rem; /* Even smaller padding, using rem */
+  }
+  .section-title {
+    font-size: 1.6rem; /* Smallest title */
+  }
+  .section-title-icon {
+    font-size: 1.4rem;
+  }
+  .section-subtitle {
+    font-size: 0.9rem;
+  }
+  .mail-item {
+    padding: 1rem; /* Adjust padding, using rem */
+  }
+  .mail-subject {
+    font-size: 1rem;
+  }
+  .mail-message-preview {
+    font-size: 0.85rem;
+    -webkit-line-clamp: 6; /* Even more lines for very small screens */
+  }
+  .mail-date {
+    font-size: 0.8rem;
+  }
+  .mail-actions .btn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+}

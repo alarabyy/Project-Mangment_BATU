@@ -1,0 +1,60 @@
+<div class="container mt-5">
+  <div *ngIf="isLoading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading mail details...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+
+  <div *ngIf="originalMail && !isLoading && !error" class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">Reply to Mail</h3>
+    </div>
+    <div class="card-body">
+      <div class="mb-3 p-3 bg-light border rounded">
+        <h4>Original Message Details:</h4>
+        <p><strong>From:</strong> {{ originalMail.name }} &lt;{{ originalMail.email }}&gt;</p>
+        <p><strong>Subject:</strong> {{ originalMail.subject }}</p>
+        <p><strong>Received:</strong> {{ originalMail.createdAt ? (originalMail.createdAt | date:'medium') : 'N/A' }}</p>
+        <hr>
+        <p><strong>Message:</strong></p>
+        <p class="text-muted">{{ originalMail.message }}</p>
+      </div>
+
+      <form #replyForm="ngForm" (ngSubmit)="onSubmitReply()">
+        <div class="mb-3">
+          <label for="replyTo" class="form-label">Replying to:</label>
+          <input type="text" id="replyTo" [value]="originalMail.email" class="form-control" readonly>
+        </div>
+        <div class="mb-3">
+          <label for="replySubject" class="form-label">Subject:</label>
+          <input type="text" id="replySubject" [value]="'Re: ' + originalMail.subject" class="form-control" readonly>
+        </div>
+        <div class="mb-3">
+          <label for="replyMessage" class="form-label">Your Message:</label>
+          <textarea
+            id="replyMessage"
+            name="replyMessage"
+            rows="8"
+            [(ngModel)]="replyMessage"
+            required
+            minlength="1"
+            class="form-control"
+            placeholder="Type your reply here..."
+          ></textarea>
+          <div *ngIf="replyForm.controls['replyMessage']?.invalid && (replyForm.controls['replyMessage']?.dirty || replyForm.controls['replyMessage']?.touched)" class="text-danger mt-1">
+            <div *ngIf="replyForm.controls['replyMessage']?.errors?.['required']">
+              Reply message is required.
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success" [disabled]="!replyForm.valid">Send Reply</button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="router.navigate(['/allMails'])">Cancel</button>
+      </form>
+    </div>
+  </div>
+</div>

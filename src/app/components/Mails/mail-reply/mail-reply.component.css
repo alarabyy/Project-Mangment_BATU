@@ -1,0 +1,84 @@
+/* src/app/components/mail-reply/mail-reply.component.css */
+/* إعادة استخدام المتغيرات من ملفات CSS الرئيسية */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+
+/* يجب أن تكون المتغيرات :root و body.dark-theme-active في ملف styles.css العام */
+/* ويفضل استيراد ملف CSS العام الذي يحتوي على الأنماط الأساسية هنا */
+
+.form-group label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-color);
+  margin-bottom: 0.6rem;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: border-color var(--transition-speed-fast) ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 2px rgba(var(--primary-accent-rgb), 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.8rem;
+  border-radius: var(--border-radius-base);
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: all var(--transition-speed-fast) ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  gap: 8px;
+}
+
+.btn-primary {
+  background-color: var(--primary-accent);
+  color: var(--button-text-color);
+  border-color: var(--primary-accent);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-accent-hover);
+  border-color: var(--primary-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-sm);
+}
+
+/* نمط خاص لمدخلات القراءة فقط */
+.form-control[readonly] {
+  background-color: var(--bg-color);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* تعديلات RTL للنموذج */
+body.rtl-active .form-group label {
+  text-align: right;
+}
+
+body.rtl-active .form-group input,
+body.rtl-active .form-group textarea {
+  text-align: right;
+}
