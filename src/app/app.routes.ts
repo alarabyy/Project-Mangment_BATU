@@ -1,4 +1,3 @@
-// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { RoleGuard } from './guards/role.guard'; // تأكد من المسار الصحيح للحارس
 
@@ -7,7 +6,6 @@ import { HomeComponent } from './components/home/home.component';
 import { PrivacyPolicyComponent } from './components/Components/privacy/privacy.component';
 import { documentaionComponent } from './components/Components/documentaion/documentaion.component';
 import { UnauthorizedComponent } from './components/Components/unauthorized/unauthorized.component';
-
 
 
 // --- User-Specific Protected Components ---
@@ -50,8 +48,12 @@ import { ResetPasswordComponent } from './components/auth/reset-password/reset-p
 import { AllChatsComponent } from './components/Chats/all-chats/all-chats.component';
 import { PrivateChatComponent } from './components/Chats/private-chat/private-chat.component';
 
+// NEW: Correct paths for Mail Components (assuming they are in src/app/components/Mails)
+import { MailListComponent } from './components/Mails/mail-list/mail-list.component';
+import { MailReplyComponent } from './components/Mails/mail-reply/mail-reply.component';
+
 // =================================================================
-//                          ROUTES CONFIGURATION
+//                 ROUTES CONFIGURATION
 // =================================================================
 export const routes: Routes = [
 
@@ -69,7 +71,13 @@ export const routes: Routes = [
   // --- SignUp is now an Admin-only route ---
   { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
-  // ----------------------chats  ROUTES --------------------
+  // ---------------------- MAIL ROUTES (Protected by RoleGuard) --------------------
+  // تم التأكيد على أن هذه المسارات محمية بواسطة RoleGuard للدور 'admin'
+  { path: 'allMails', component: MailListComponent , canActivate: [RoleGuard], data: { roles: ['admin']} },
+  { path: 'replayMails/:id', component: MailReplyComponent , canActivate: [RoleGuard], data: { roles: ['admin']} }, // المسار صحيح لتمرير الـ ID
+
+
+  // ---------------------- CHATS ROUTES --------------------
   { path: 'chats', component: AllChatsComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
   { path: 'chat/:id', component: PrivateChatComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
 

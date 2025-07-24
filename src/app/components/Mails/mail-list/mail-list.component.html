@@ -9,92 +9,6 @@
     </p>
   </header>
 
-  <!-- <div class="mail-list-actions">
-    <button class="btn btn-primary" (click)="navigateToAddMail()">
-      <i class="fas fa-plus-circle"></i> Add New Mail
-    </button>
-  </div> -->
-
-  <div *ngIf="isLoading" class="loading-spinner">
-    <i class="fas fa-spinner fa-spin"></i>
-    Loading mail messages...
-  </div>
-
-  <div *ngIf="error" class="error-message">
-    <i class="fas fa-exclamation-triangle"></i>
-    {{ error }}
-    <button class="btn btn-sm btn-secondary ms-2" (click)="fetchMails()">
-      Retry
-    </button>
-  </div>
-
-  <div *ngIf="!isLoading && mails.length === 0 && !error" class="no-mails-message">
-    <i class="fas fa-box-open fa-3x"></i>
-    <p>No mail messages in the inbox.</p>
-    <button class="btn btn-primary" (click)="navigateToAddMail()">
-      Send New Mail Now
-    </button>
-  </div>
-
-  <div class="mail-items-grid">
-    <div class="mail-item" *ngFor="let mail of mails" [class.unread]="!mail.isRead">
-      <div class="mail-top-row">
-        <span class="mail-from">
-          <strong>{{ mail.name }}</strong> &lt;{{ mail.email }}&gt;
-        </span>
-        <span class="mail-status" [class.unread]="!mail.isRead" [class.read]="mail.isRead">
-          <ng-container *ngIf="!mail.isRead">
-            <i class="fas fa-envelope"></i> New
-          </ng-container>
-          <ng-container *ngIf="mail.isRead">
-            <i class="fas fa-check-circle"></i> Read
-          </ng-container>
-        </span>
-      </div>
-      <h3 class="mail-subject">{{ mail.subject }}</h3>
-      <p class="mail-message-preview">{{ mail.message }}</p>
-      <div class="mail-meta-data">
-        <small class="mail-id">
-          <strong>ID:</strong> {{ mail.id }}
-        </small>
-        <small class="mail-sent-at">
-          <i class="fas fa-paper-plane"></i>
-          <strong>Sent At:</strong> {{ mail.sentAt ? (mail.sentAt | date:'short') : 'N/A' }}
-        </small>
-      </div>
-      <div class="mail-actions-bottom">
-        <small class="mail-date">
-          <i class="fas fa-clock"></i>
-          {{ mail.sentAt ? (mail.sentAt | date:'short') : 'N/A' }} </small>
-        <div class="mail-actions">
-          <button
-            class="btn btn-secondary btn-sm"
-            (click)="markAsRead(mail)"
-            [disabled]="mail.isRead"
-            [title]="mail.isRead ? 'Already Read' : 'Mark as Read'"
-          >
-            <i class="fas fa-eye" *ngIf="!mail.isRead"></i>
-            <i class="fas fa-check-double" *ngIf="mail.isRead"></i>
-            {{ mail.isRead ? 'Read' : 'Mark as Read' }}
-          </button>
-          <button class="btn btn-primary btn-sm" (click)="openReply(mail.id)">
-            <i class="fas fa-reply-all"></i> Reply
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div><div class="mail-list-container">
-  <header class="section-header">
-    <h2 class="section-title">
-      <i class="fas fa-inbox section-title-icon"></i>
-      Inbox
-    </h2>
-    <p class="section-subtitle">
-      Browse and easily manage your incoming messages.
-    </p>
-  </header>
-
   <div class="mail-list-actions">
     <button class="btn btn-primary" (click)="navigateToAddMail()">
       <i class="fas fa-plus-circle"></i> Add New Mail
@@ -154,7 +68,11 @@
           {{ mail.sentAt ? (mail.sentAt | date:'short') : 'N/A' }}
         </small>
         <div class="mail-actions">
-          <button
+
+        </div>
+
+      </div>
+                <button
             class="btn btn-secondary btn-sm"
             (click)="markAsRead(mail)"
             [disabled]="mail.isRead"
@@ -167,8 +85,26 @@
           <button class="btn btn-primary btn-sm" (click)="openReply(mail.id)">
             <i class="fas fa-reply-all"></i> Reply
           </button>
-        </div>
-      </div>
     </div>
   </div>
 </div>
+
+<!-- **هنا يبدأ HTML الخاص بالمودال المُحسّن (Modal Pop-up)** -->
+<div *ngIf="showReplyModal" class="modal-overlay" (click)="closeReplyModal()">
+  <div class="modal-content-pro" (click)="$event.stopPropagation()">
+    <div class="modal-header-pro">
+      <h3 class="modal-title-pro">Reply to Mail ID: <span class="highlight">{{ currentReplyMailId }}</span></h3>
+      <button class="close-button-pro" (click)="closeReplyModal()">×</button>
+    </div>
+    <div class="modal-body-pro">
+      <label for="replyMessage" class="modal-label-pro">Your Reply:</label>
+      <textarea id="replyMessage" class="modal-textarea-pro"
+                [(ngModel)]="replyMessage" rows="8" placeholder="Type your reply here..."></textarea>
+    </div>
+    <div class="modal-footer-pro">
+      <button class="btn btn-secondary" (click)="closeReplyModal()">Cancel</button>
+      <button class="btn btn-primary" (click)="sendReply()" [disabled]="!replyMessage.trim()">Send Reply</button>
+    </div>
+  </div>
+</div>
+<!-- **هنا ينتهي HTML الخاص بالمودال** -->

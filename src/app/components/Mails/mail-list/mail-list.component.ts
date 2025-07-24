@@ -1,39 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms'; // **أضف هذا الاستيراد**
+
 import { NotificationService } from '../../../Services/notification-proxy.service';
-import { Mail, MailService } from '../../../Services/mail.service.service'; // تأكد من استيراد Mail هنا
+import { Mail, MailService, MailReplyRequest } from '../../../Services/mail.service.service';
 
 @Component({
   selector: 'app-mail-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatePipe],
+  imports: [CommonModule, RouterModule, DatePipe, FormsModule], // **أضف FormsModule هنا**
   templateUrl: './mail-list.component.html',
   styleUrls: ['./mail-list.component.css']
 })
 export class MailListComponent implements OnInit {
-  // Array to hold mail objects
   mails: Mail[] = [];
-  // Flag to indicate if data is being loaded
   isLoading: boolean = true;
-  // Holds error messages if data fetching fails
   error: string | null = null;
+
+  // **متغيرات جديدة للتعامل مع المودال**
+  showReplyModal: boolean = false;
+  currentReplyMailId: number | null = null;
+  replyMessage: string = ''; // لربطها بـ textarea في المودال
 
   constructor(
     private mailService: MailService,
     private router: Router,
-    private notificationService: NotificationService // Inject NotificationService
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
-    // Fetch mails when the component initializes
     this.fetchMails();
   }
 
-  /**
-   * Fetches the list of mails from the mail service.
-   * Updates loading state, handles success and error notifications.
-   */
   fetchMails(): void {
     this.isLoading = true;
     this.error = null;
@@ -41,7 +40,7 @@ export class MailListComponent implements OnInit {
       next: (data) => {
         this.mails = data;
         this.isLoading = false;
-        this.notificationService.showInfo('Mails loaded successfully.'); // Info message on load
+        this.notificationService.showInfo('Mails loaded successfully.');
       },
       error: (err) => {
         console.error('Error fetching mails:', err);
@@ -52,17 +51,11 @@ export class MailListComponent implements OnInit {
     });
   }
 
-  /**
-   * Marks a specific mail as read.
-   * Only proceeds if the mail is not already marked as read.
-   * Updates local state and shows success/error notifications.
-   * @param mail The mail object to mark as read.
-   */
   markAsRead(mail: Mail): void {
-    if (!mail.isRead) { // Only mark if not already read
+    if (!mail.isRead) {
       this.mailService.markMailAsRead(mail.id).subscribe({
         next: () => {
-          mail.isRead = true; // Update local state
+          mail.isRead = true;
           this.notificationService.showSuccess('Message successfully marked as read.');
         },
         error: (err) => {
@@ -74,18 +67,54 @@ export class MailListComponent implements OnInit {
   }
 
   /**
-   * Navigates to the reply page for a specific mail.
-   * @param mailId The ID of the mail to reply to.
+   * يفتح المودال للرد على رسالة معينة.
+   * @param mailId معرف الرسالة للرد عليها.
    */
   openReply(mailId: number): void {
-    // **تم التصحيح هنا:** يجب أن يكون المسار بدون ':id' عند التوجيه البرمجي.
-    this.router.navigate(['/replayMails', mailId]);
+    this.currentReplyMailId = mailId;
+    this.replyMessage = ''; // مسح أي رسالة سابقة في textarea
+    this.showReplyModal = true;
   }
 
   /**
-   * Navigates to the Add Mail page.
+   * يغلق مودال الرد ويمسح البيانات المؤقتة.
    */
+  closeReplyModal(): void {
+    this.showReplyModal = false;
+    this.currentReplyMailId = null;
+    this.replyMessage = '';
+  }
+
+  /**
+   * يرسل الرد الفعلي باستخدام MailService.
+   */
+  sendReply(): void {
+    if (this.currentReplyMailId === null || !this.replyMessage.trim()) {
+      this.notificationService.showWarning('Please enter a reply message.');
+      return;
+    }
+
+    const replyData: MailReplyRequest = {
+      id: this.currentReplyMailId,
+      message: this.replyMessage.trim()
+    };
+
+    this.mailService.replyMail(replyData).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Reply sent successfully!');
+        this.closeReplyModal(); // إغلاق المودال بعد الإرسال بنجاح
+        // اختياري: إذا كنت تريد تحديث حالة الرسالة في القائمة بعد الرد (مثلاً وضع علامة "تم الرد")
+        // يمكنك إعادة جلب القائمة: this.fetchMails();
+      },
+      error: (err) => {
+        console.error('Error sending reply:', err);
+        this.notificationService.showError('Failed to send reply. Please try again.');
+        // قد ترغب في عدم إغلاق المودال في حالة الخطأ للسماح للمستخدم بالمحاولة مرة أخرى
+      }
+    });
+  }
+
   navigateToAddMail(): void {
-    this.router.navigate(['/mail/compose']); // Navigate to the '/mail/compose' path
+    this.router.navigate(['/mail/compose']);
   }
 }

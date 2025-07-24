@@ -1,11 +1,10 @@
-// src/app/pages/notifications-page/notifications-page.component.ts
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription, BehaviorSubject } from 'rxjs';
-import { AppNotification } from '../../../models/notification';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
-import { PopupService } from '../../../Services/popup.service';
 import { NotificationService } from '../../../Services/notification-proxy.service';
+import { PopupService } from '../../../Services/popup.service';
+import { AppNotification } from '../../../models/notification';
 
 @Component({
   selector: 'app-notifications-page',
@@ -21,7 +20,7 @@ export class NotificationsPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private popupService: PopupService,
+    private popupService: PopupService, // Assuming PopupService is available
     private cdr: ChangeDetectorRef
   ) {}
 

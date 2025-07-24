@@ -197,24 +197,59 @@
         </div>
       </div>
       <div class="contact-form card">
-        <form>
+        <form #contactForm="ngForm" (ngSubmit)="onSubmitContactForm(contactForm)">
           <div class="form-group">
             <label for="name">{{ homeContent.form.name }}</label>
-            <input type="text" id="name" name="name" [placeholder]="homeContent.form.name">
+            <input type="text" id="name" name="name" [(ngModel)]="contactFormModel.name" [placeholder]="homeContent.form.name" required #nameField="ngModel">
+            <!-- NEW: رسالة خطأ لحقل الاسم -->
+            <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)" class="validation-error">
+              <div *ngIf="nameField.errors?.['required']">
+                {{ homeContent.form.validation.required }}
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="email">{{ homeContent.form.email }}</label>
-            <input type="email" id="email" name="email" [placeholder]="homeContent.form.email">
+            <input type="email" id="email" name="email" [(ngModel)]="contactFormModel.email" [placeholder]="homeContent.form.email" required email #emailField="ngModel">
+            <!-- NEW: رسالة خطأ لحقل البريد الإلكتروني -->
+            <div *ngIf="emailField.invalid && (emailField.dirty || emailField.touched)" class="validation-error">
+              <div *ngIf="emailField.errors?.['required']">
+                {{ homeContent.form.validation.required }}
+              </div>
+              <div *ngIf="emailField.errors?.['email']">
+                {{ homeContent.form.validation.emailInvalid }}
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="subject">{{ homeContent.form.subject }}</label>
-            <input type="text" id="subject" name="subject" [placeholder]="homeContent.form.subject">
+            <!-- NEW: إضافة maxlength="30" -->
+            <input type="text" id="subject" name="subject" [(ngModel)]="contactFormModel.subject" [placeholder]="homeContent.form.subject" required maxlength="30" #subjectField="ngModel">
+            <!-- NEW: رسالة خطأ لحقل الموضوع -->
+            <div *ngIf="subjectField.invalid && (subjectField.dirty || subjectField.touched)" class="validation-error">
+              <div *ngIf="subjectField.errors?.['required']">
+                {{ homeContent.form.validation.required }}
+              </div>
+              <div *ngIf="subjectField.errors?.['maxlength']">
+                {{ homeContent.form.validation.subjectMaxLength.replace('{{max}}', '30') }}
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="message">{{ homeContent.form.message }}</label>
-            <textarea id="message" name="message" rows="5" [placeholder]="homeContent.form.message"></textarea>
+            <!-- NEW: إضافة minlength="10" -->
+            <textarea id="message" name="message" rows="5" [(ngModel)]="contactFormModel.message" [placeholder]="homeContent.form.message" required minlength="10" #messageField="ngModel"></textarea>
+            <!-- NEW: رسالة خطأ لحقل الرسالة -->
+            <div *ngIf="messageField.invalid && (messageField.dirty || messageField.touched)" class="validation-error">
+              <div *ngIf="messageField.errors?.['required']">
+                {{ homeContent.form.validation.required }}
+              </div>
+              <div *ngIf="messageField.errors?.['minlength']">
+                {{ homeContent.form.validation.messageMinLength.replace('{{min}}', '10') }}
+              </div>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary" [disabled]="!contactForm.valid">
             <i class="fas fa-paper-plane"></i> {{ homeContent.form.sendButton }}
           </button>
         </form>
@@ -222,6 +257,12 @@
     </div>
   </div>
 </section>
+
+<!-- NEW: رسالة التغذية الراجعة (Success/Error Message) -->
+<div *ngIf="formMessage" [ngClass]="{'success-message': isSuccessMessage, 'error-message': !isSuccessMessage}" class="form-feedback-message">
+  {{ formMessage }}
+  <button (click)="clearFormMessage()" class="close-message-btn">×</button>
+</div>
 
 <!-- Floating Language Toggle Button (Moved to top-right) -->
 <button class="language-toggle-button" (click)="toggleLanguage()">

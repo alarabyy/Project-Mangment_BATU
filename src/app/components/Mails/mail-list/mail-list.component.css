@@ -4,25 +4,30 @@
 
 /* CSS Variables for better maintainability and theming */
 :root {
-  --primary-accent: #007bff; /* A vibrant blue for primary actions and highlights */
-  --primary-accent-hover: #0056b3; /* Darker blue on hover */
-  --primary-accent-rgb: 0, 123, 255; /* RGB for primary-accent for rgba backgrounds */
+  /* Dark Theme Colors based on image */
+  --primary-accent: #00CC44; /* Vibrant green from image */
+  --primary-accent-rgb: 0, 204, 68;
+  --primary-accent-hover: #00A336; /* Darker green for hover */
 
-  --secondary-accent: #6c757d; /* A subtle grey for secondary elements */
-  --secondary-accent-rgb: 108, 117, 125; /* RGB for secondary-accent for rgba backgrounds */
+  --secondary-accent: #6c757d; /* Standard grey for secondary actions */
+  --secondary-accent-rgb: 108, 117, 125;
 
-  --text-color: #343a40; /* Dark text for readability */
-  --subtle-text-color: #6f7478; /* Lighter text for secondary info */
-  --subtle-text-color-darker: #495057; /* Slightly darker subtle text */
+  --page-background: #000000; /* Pure black for overall page background */
+  --surface-color: #1A1A1A; /* Dark background for cards/surfaces */
+  --surface-color-light: #2c2c2c; /* Slightly lighter dark for active states/hover */
 
-  --surface-color: #ffffff; /* White background for cards/surfaces */
-  --border-color: #dee2e6; /* Light grey for borders */
-  --border-color-translucent: rgba(0, 0, 0, 0.1); /* Lighter, more subtle border */
+  --text-color: #E0E0E0; /* Light text for readability */
+  --subtle-text-color: #B0B0B0; /* Lighter text for secondary info */
+  --subtle-text-color-darker: #C0C0C0; /* Slightly darker subtle text, for contrast on dark background */
 
-  --error-color: #dc3545; /* Red for error messages */
-  --error-color-rgb: 220, 53, 69; /* RGB for error color for rgba backgrounds */
-  --success-color: #28a745; /* Green for success messages */
-  --success-color-rgb: 40, 167, 69; /* RGB for success color for rgba backgrounds */
+  --border-color: #333333; /* Dark grey for borders */
+  --border-color-darker: #454545; /* Slightly darker border for inputs */
+  --border-color-translucent: rgba(255, 255, 255, 0.1); /* Light, subtle border for dark mode */
+
+  --error-color: #dc3545; /* Red */
+  --error-color-rgb: 220, 53, 69;
+  --success-color: #28a745; /* Green */
+  --success-color-rgb: 40, 167, 69;
 
   /* Font Weights */
   --font-weight-light: 300;
@@ -35,18 +40,31 @@
   /* Border Radii */
   --border-radius-base: 0.25rem;
   --border-radius-large: 0.5rem;
+  --border-radius-xl: 0.75rem; /* Larger radius for modals */
   --border-radius-pill: 50rem;
 
-  /* Box Shadows */
-  --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --box-shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  /* Box Shadows (adjusted for dark background visibility) */
+  --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
+  --box-shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+  --box-shadow-lg: 0 1rem 2rem rgba(0, 0, 0, 0.6); /* For modal - prominent on dark */
+  --box-shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.3); /* For input fields on dark */
 
   /* Transitions */
   --transition-speed-fast: 0.15s;
+  --transition-speed-normal: 0.3s;
 }
 
-/* RTL Global Styles (adjust as needed based on your global RTL setup) */
-/* This assumes a class 'rtl-active' is added to the body element when RTL is active */
+/* Global Body Styling for dark background */
+html, body {
+  background-color: var(--page-background);
+  color: var(--text-color); /* Default text color */
+  font-family: Arial, sans-serif; /* Example font, adjust as needed */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* RTL Global Styles */
 body.rtl-active {
   direction: rtl;
   text-align: right;
@@ -54,27 +72,28 @@ body.rtl-active {
 
 /* Base Container */
 .mail-list-container {
-  padding: 5rem 1.5rem; /* Increased padding, using rem */
-  max-width: 1200px; /* Max width for content */
-  margin: 0 auto; /* Center the container */
+  padding: 5rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Section Header */
 .section-header {
   text-align: center;
-  margin-bottom: 3rem; /* More space below header, using rem */
+  margin-bottom: 3rem;
 }
 
 .section-title {
-  font-size: 3rem; /* Larger title, using rem */
+  font-size: 3rem;
   font-weight: var(--font-weight-bold);
   color: var(--text-color);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.8rem; /* Using rem */
+  gap: 0.8rem;
   line-height: 1.2;
+  /* Use gradient with primary accent color for text */
   background: linear-gradient(45deg, var(--primary-accent), var(--primary-accent-hover));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -82,13 +101,13 @@ body.rtl-active {
 }
 
 .section-title-icon {
-  font-size: 2.8rem; /* Proportional icon size, using rem */
+  font-size: 2.8rem;
   color: var(--primary-accent);
-  -webkit-text-fill-color: var(--primary-accent);
+  -webkit-text-fill-color: var(--primary-accent); /* Ensure icon also gets accent color */
 }
 
 .section-subtitle {
-  font-size: 1.25rem; /* Using rem */
+  font-size: 1.25rem;
   color: var(--subtle-text-color);
   max-width: 800px;
   margin: 0 auto;
@@ -97,109 +116,149 @@ body.rtl-active {
 
 /* Actions Section */
 .mail-list-actions {
-  text-align: end; /* Align button to the right for LTR */
-  margin-bottom: 2.5rem; /* More space, using rem */
+  text-align: end;
+  margin-bottom: 2.5rem;
 }
 body.rtl-active .mail-list-actions {
-  text-align: start; /* Align button to the left for RTL */
+  text-align: start;
+}
+
+/* General Buttons (assuming you have a common btn class) */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-speed-fast) ease;
+  border: 1px solid transparent; /* Ensure consistent border */
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-accent);
+  color: var(--surface-color); /* Text color on primary button */
+  border-color: var(--primary-accent);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-accent-hover);
+  border-color: var(--primary-accent-hover);
+  box-shadow: 0 4px 8px rgba(var(--primary-accent-rgb), 0.3);
+}
+
+.btn-secondary {
+  background-color: transparent; /* Changed to transparent for a more subtle look */
+  color: var(--subtle-text-color);
+  border-color: var(--border-color-darker); /* Subtle border for secondary */
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-color-light); /* Slight background on hover */
+  color: var(--text-color);
+  border-color: var(--secondary-accent);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(50%); /* make it look more disabled */
 }
 
 /* General Status Messages (Loading, Error, No Mails) */
 .loading-spinner, .error-message, .no-mails-message {
   text-align: center;
-  padding: 2rem; /* Using rem */
-  font-size: 1.15rem; /* Using rem */
+  padding: 2.5rem; /* Increased padding */
+  font-size: 1.15rem;
   color: var(--subtle-text-color);
-  border-radius: var(--border-radius-base);
+  border-radius: var(--border-radius-large); /* More rounded */
   background-color: var(--surface-color);
-  margin-top: 2rem; /* Using rem */
-  box-shadow: var(--box-shadow-sm);
+  margin-top: 2rem;
+  box-shadow: var(--box-shadow-md); /* Consistent shadow */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem; /* Using rem */
+  gap: 1.5rem; /* More space */
 }
 
 .loading-spinner i {
   color: var(--primary-accent);
-  font-size: 3rem; /* Larger icon, using rem */
+  font-size: 3.5rem; /* Larger icon */
 }
 
 .error-message {
-  background-color: rgba(var(--error-color-rgb), 0.1);
+  background-color: rgba(var(--error-color-rgb), 0.15); /* Stronger tint */
   color: var(--error-color);
   border: 1px solid var(--error-color);
 }
 .error-message .btn {
-    margin-top: 1rem; /* Using rem */
+    margin-top: 1.5rem;
 }
 
 .no-mails-message {
-  color: var(--secondary-accent);
+  color: var(--subtle-text-color); /* Consistent subtle text */
 }
 .no-mails-message i {
-  color: var(--secondary-accent);
-  font-size: 3rem; /* Consistent icon size, using rem */
+  color: var(--subtle-text-color);
+  font-size: 3.5rem; /* Consistent icon size */
 }
 .no-mails-message .btn {
-  margin-top: 1rem; /* Using rem */
+  margin-top: 1.5rem;
 }
 
 /* Mail Items Grid */
 .mail-items-grid {
   display: grid;
-  /* Adjust grid-template-columns to be more responsive */
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Min width 300px, flexible, using px for minmax is common */
-  gap: 2rem; /* Using rem */
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Min width slightly larger */
+  gap: 2rem;
 }
 
 /* Individual Mail Item Card - Professional Design */
 .mail-item {
   background-color: var(--surface-color);
-  border: 1px solid var(--border-color-translucent); /* Softer border */
-  border-radius: var(--border-radius-large); /* Larger border radius */
-  padding: 2rem; /* More padding, using rem */
+  border: 1px solid var(--border-color); /* Firmer border */
+  border-radius: var(--border-radius-large);
+  padding: 2rem;
   cursor: pointer;
-  transition: all var(--transition-speed-fast) ease;
-  box-shadow: var(--box-shadow-sm); /* Subtle shadow */
+  transition: all var(--transition-speed-normal) ease; /* Slower transition for hover */
+  box-shadow: var(--box-shadow-sm);
   display: flex;
-  flex-direction: column; /* Stack content vertically */
-  gap: 0.8rem; /* Adjusted gap to fit new elements, using rem */
+  flex-direction: column;
+  gap: 1rem; /* Slightly larger gap */
 }
 
 .mail-item:hover {
-  transform: translateY(-0.3125rem); /* Using rem for translate */
-  box-shadow: var(--box-shadow-md); /* More pronounced shadow on hover */
+  transform: translateY(-0.4rem); /* More pronounced lift */
+  box-shadow: var(--box-shadow-md);
   border-color: var(--primary-accent); /* Highlight border on hover */
 }
 
 .mail-item.unread {
-  border-left: 0.3rem solid var(--primary-accent); /* Stronger unread indicator, using rem */
-  background-color: rgba(var(--primary-accent-rgb), 0.05); /* Subtle background for unread */
+  border-left: 0.4rem solid var(--primary-accent); /* Stronger unread indicator */
+  background-color: rgba(var(--primary-accent-rgb), 0.1); /* Subtle background for unread */
 }
 body.rtl-active .mail-item.unread {
-  border-left: none; /* Remove left border in RTL */
-  border-right: 0.3rem solid var(--primary-accent); /* Add right border in RTL, using rem */
+  border-left: none;
+  border-right: 0.4rem solid var(--primary-accent);
 }
-
 
 /* Top Row (From & Status) */
 .mail-top-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.5rem; /* Using rem */
+  margin-bottom: 0.8rem; /* More space */
 }
 body.rtl-active .mail-top-row {
-  flex-direction: row-reverse; /* Swap order for RTL */
+  flex-direction: row-reverse;
 }
 
 .mail-from {
-  font-size: 1rem; /* Using rem */
+  font-size: 1.05rem; /* Slightly larger */
   color: var(--text-color);
   font-weight: var(--font-weight-medium);
-  flex-basis: 70%;
+  flex-basis: 75%; /* More space for sender */
   word-break: break-word;
 }
 .mail-from strong {
@@ -207,267 +266,430 @@ body.rtl-active .mail-top-row {
 }
 
 .mail-status {
-  font-size: 0.75rem; /* Using rem */
+  font-size: 0.8rem; /* Slightly larger status text */
   font-weight: var(--font-weight-bold);
-  padding: 0.4em 0.8em; /* Using em for padding relative to font size */
+  padding: 0.5em 1em; /* More padding for a bolder tag */
   border-radius: var(--border-radius-pill);
   display: flex;
   align-items: center;
-  gap: 0.3rem; /* Using rem */
+  gap: 0.4rem; /* More space around icon */
   white-space: nowrap;
-  min-width: 5rem; /* Using rem */
+  min-width: 6rem; /* Wider tag */
   text-align: center;
   justify-content: center;
-  text-transform: uppercase; /* Uppercase for status */
+  text-transform: uppercase;
 }
 
 .mail-status.unread {
-  background-color: rgba(var(--primary-accent-rgb), 0.15);
+  background-color: rgba(var(--primary-accent-rgb), 0.25); /* More vibrant unread tag */
   color: var(--primary-accent);
 }
 
 .mail-status.read {
-  background-color: rgba(var(--secondary-accent-rgb), 0.1);
-  color: var(--secondary-accent);
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle greyish background for read */
+  color: var(--subtle-text-color);
 }
 
 /* Subject Line */
 .mail-subject {
-  font-size: 1.4rem; /* Larger and bolder subject, using rem */
-  font-weight: var(--font-weight-extrabold); /* Even bolder */
+  font-size: 1.55rem; /* Larger and bolder subject */
+  font-weight: var(--font-weight-extrabold);
   color: var(--text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: 0.5rem; /* Using rem */
+  margin-top: 0.6rem;
 }
 
 /* Message Preview */
 .mail-message-preview {
-  font-size: 0.95rem; /* Using rem */
+  font-size: 0.98rem; /* Slightly larger */
   color: var(--subtle-text-color-darker);
-  line-height: 1.5;
+  line-height: 1.6; /* Better line height for readability */
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Limit to 3 lines for better preview */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  margin-top: 0.5rem; /* Using rem */
-  flex-grow: 1; /* Allow message to take available space */
+  margin-top: 0.8rem;
+  flex-grow: 1;
 }
 
 /* Mail Meta Data (ID and Sent At) */
 .mail-meta-data {
   display: flex;
-  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-  gap: 1rem; /* Space between ID and Sent At, using rem */
-  font-size: 0.8rem; /* Using rem */
+  flex-wrap: wrap;
+  gap: 1.2rem; /* More space */
+  font-size: 0.85rem; /* Slightly larger */
   color: var(--subtle-text-color);
-  padding-top: 0.8rem; /* Small padding from message preview, using rem */
-  border-top: 1px solid var(--border-color-translucent);
-  margin-top: 0.8rem; /* Space from message preview, using rem */
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color); /* Firmer separator */
+  margin-top: 1rem;
 }
 
 .mail-meta-data .mail-id,
 .mail-meta-data .mail-sent-at {
   display: flex;
   align-items: center;
-  gap: 0.3rem; /* Using rem */
+  gap: 0.4rem;
 }
 .mail-meta-data .mail-sent-at i {
   color: var(--primary-accent);
 }
 body.rtl-active .mail-meta-data {
-  flex-direction: row-reverse; /* Reverse order for RTL */
-  justify-content: flex-end; /* Align right in RTL */
+  flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 body.rtl-active .mail-meta-data .mail-sent-at i {
-  margin-right: 0.3rem; /* Adjust margin for RTL */
+  margin-right: 0.4rem;
   margin-left: 0;
 }
-
 
 /* Date and Actions at Bottom */
 .mail-actions-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem; /* Space between date and buttons, using rem */
-  margin-top: auto; /* Pushes to bottom */
-  padding-top: 1rem; /* More space from message preview, using rem */
-  border-top: 1px solid var(--border-color-translucent); /* Softer separator line */
+  gap: 1.2rem;
+  margin-top: auto;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border-color);
 }
 body.rtl-active .mail-actions-bottom {
-  flex-direction: row-reverse; /* Reverse order for RTL */
+  flex-direction: row-reverse;
 }
 
 .mail-date {
-  font-size: 0.85rem; /* Using rem */
+  font-size: 0.9rem;
   color: var(--subtle-text-color);
   display: flex;
   align-items: center;
-  gap: 0.3rem; /* Using rem */
+  gap: 0.4rem;
   white-space: nowrap;
 }
 
 .mail-date i {
-  color: var(--primary-accent); /* Accent color for date icon */
+  color: var(--primary-accent);
 }
 body.rtl-active .mail-date {
-  flex-direction: row-reverse; /* Icons to the left of text in RTL */
+  flex-direction: row-reverse;
 }
 body.rtl-active .mail-date i {
-  margin-left: 0.3rem; /* Adjust margin for RTL */
+  margin-left: 0.4rem;
   margin-right: 0;
 }
 
 .mail-actions {
   display: flex;
-  gap: 0.6rem; /* Space between action buttons, using rem */
+  gap: 0.8rem; /* More space between action buttons */
 }
 body.rtl-active .mail-actions {
-    flex-direction: row-reverse; /* Reverse button order for RTL */
+    flex-direction: row-reverse;
 }
 .mail-actions .btn {
-  font-size: 0.8rem; /* Smaller buttons for card actions, using rem */
-  padding: 0.45rem 0.9rem; /* Using rem */
+  font-size: 0.9rem; /* Larger buttons for card actions */
+  padding: 0.6rem 1.2rem; /* More padding */
+  border-radius: var(--border-radius-large); /* Slightly more rounded */
 }
 .mail-actions .btn i {
-  font-size: 0.85rem; /* Adjust icon size within buttons, using rem */
+  font-size: 0.95rem; /* Adjust icon size within buttons */
 }
 
+/* --- Responsive Adjustments for Main Layout --- */
 
-/* --- Responsive Adjustments using Media Queries --- */
-
-/* For screens smaller than 1200px (e.g., larger tablets in landscape, smaller laptops) */
 @media (max-width: 1200px) {
-  .mail-list-container {
-    max-width: 992px; /* Restrict max width slightly */
-  }
-  .section-title {
-    font-size: 2.8rem;
-  }
-  .section-title-icon {
-    font-size: 2.5rem;
-  }
-  .mail-items-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust min width for tablets/laptops */
-  }
+  .mail-list-container { max-width: 992px; }
+  .section-title { font-size: 2.8rem; }
+  .section-title-icon { font-size: 2.5rem; }
+  .mail-items-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 }
 
-/* For screens smaller than 991px (e.g., tablets in landscape, larger phones) */
 @media (max-width: 991px) {
-  .mail-list-container {
-    padding: 4rem 1.5rem; /* Adjust padding, using rem */
-  }
-  .section-title {
-    font-size: 2.4rem; /* Smaller title */
-  }
-  .section-title-icon {
-    font-size: 2.2rem;
-  }
-  .section-subtitle {
-    font-size: 1.1rem;
-  }
-  .mail-items-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* Adjust min width for tablets */
-    gap: 1.5rem; /* Adjust gap, using rem */
-  }
-  .mail-item {
-    padding: 1.5rem; /* Adjust padding, using rem */
-  }
-  .mail-subject {
-    font-size: 1.2rem;
-  }
-  .mail-message-preview {
-    font-size: 0.9rem;
-    -webkit-line-clamp: 4; /* Allow more lines for message preview */
-  }
+  .mail-list-container { padding: 4rem 1.5rem; }
+  .section-title { font-size: 2.4rem; }
+  .section-title-icon { font-size: 2.2rem; }
+  .section-subtitle { font-size: 1.1rem; }
+  .mail-items-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+  .mail-item { padding: 1.5rem; }
+  .mail-subject { font-size: 1.2rem; }
+  .mail-message-preview { font-size: 0.9rem; -webkit-line-clamp: 4; }
 }
 
-/* For screens smaller than 767px (e.g., most tablets and larger phones in portrait) */
 @media (max-width: 767px) {
-  .mail-list-container {
-    padding: 3rem 1rem; /* Further adjust padding, using rem */
+  .mail-list-container { padding: 3rem 1rem; }
+  .section-title { font-size: 2rem; gap: 0.6rem; }
+  .section-title-icon { font-size: 1.8rem; }
+  .section-subtitle { font-size: 1rem; }
+  .mail-items-grid { grid-template-columns: 1fr; gap: 1.2rem; }
+  .mail-item { padding: 1.2rem; }
+  .mail-subject { font-size: 1.1rem; }
+  .mail-message-preview { font-size: 0.88rem; -webkit-line-clamp: 5; }
+  .mail-meta-data { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  body.rtl-active .mail-meta-data { align-items: flex-end; }
+  .mail-actions-bottom { flex-direction: column; align-items: flex-start; gap: 0.8rem; padding-top: 0.8rem; }
+  body.rtl-active .mail-actions-bottom { align-items: flex-end; }
+  .mail-actions { width: 100%; justify-content: stretch; }
+  .mail-actions .btn { flex-grow: 1; } /* Buttons stretch to fill width */
+}
+
+@media (max-width: 575px) {
+  .mail-list-container { padding: 2rem 0.8rem; }
+  .section-title { font-size: 1.6rem; }
+  .section-title-icon { font-size: 1.4rem; }
+  .section-subtitle { font-size: 0.9rem; }
+  .mail-item { padding: 1rem; }
+  .mail-subject { font-size: 1rem; }
+  .mail-message-preview { font-size: 0.85rem; -webkit-line-clamp: 6; }
+  .mail-date { font-size: 0.8rem; }
+  .mail-actions .btn { font-size: 0.75rem; padding: 0.35rem 0.7rem; }
+}
+
+
+/* --- Professional & Responsive Modal Pop-up Styles --- */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* خلفية أغمق جداً لتركيز كامل */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(12px); /* تأثير ضبابي قوي جداً */
+  transition: background-color var(--transition-speed-normal) ease, backdrop-filter var(--transition-speed-normal) ease;
+}
+
+.modal-content-pro {
+  background-color: var(--surface-color);
+  padding: 2.8rem 3.2rem; /* مساحة داخلية أوسع وأكثر تميزًا */
+  border-radius: var(--border-radius-xl); /* حواف أكثر استدارة ومظهر حديث */
+  box-shadow: var(--box-shadow-lg); /* ظل أكثر بروزاً لإحساس "الرفع" عن الخلفية */
+  max-width: 650px; /* أقصى عرض أكبر للراحة في الكتابة والقراءة */
+  width: 90%; /* عرض نسبي ليناسب الشاشات الصغيرة */
+  z-index: 1001;
+  position: relative;
+  animation: fadeInPopUp var(--transition-speed-normal) cubic-bezier(0.68, -0.55, 0.27, 1.55); /* حركة ظهور "قفزية" مميزة */
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem; /* مسافات أكبر بين الأجزاء المختلفة للمودال */
+  border: 1px solid var(--primary-accent); /* إطار رقيق بلون مميز */
+}
+
+/* حركة ظهور المودال "القفزية" */
+@keyframes fadeInPopUp {
+  0% { opacity: 0; transform: translateY(-100px) scale(0.8); }
+  70% { opacity: 1; transform: translateY(10px) scale(1.05); } /* قفزة خفيفة للأعلى */
+  100% { transform: translateY(0) scale(1); }
+}
+
+.modal-header-pro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border-color-darker); /* خط فاصل أكثر بروزاً ووضوحاً */
+  padding-bottom: 1.8rem; /* مسافة كافية تحت الخط */
+  margin-bottom: 1rem; /* مسافة قبل الـ body */
+}
+
+.modal-title-pro {
+  margin: 0;
+  font-size: 2.2rem; /* حجم أكبر للعنوان */
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  letter-spacing: -0.04em; /* تباعد أحرف طفيف جداً لمظهر عصري */
+}
+
+.modal-title-pro .highlight {
+  color: var(--primary-accent); /* لون مميز للـ ID */
+  font-weight: var(--font-weight-extrabold);
+}
+
+.close-button-pro {
+  background: none;
+  border: none;
+  font-size: 2.8rem; /* حجم أكبر لزر الإغلاق لسهولة النقر */
+  color: var(--subtle-text-color);
+  cursor: pointer;
+  transition: color var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease;
+  padding: 0.1rem 0.4rem; /* لزيادة منطقة النقر دون إضافة حجم مرئي كبير */
+  border-radius: var(--border-radius-base);
+}
+
+.close-button-pro:hover {
+  color: var(--error-color);
+  transform: rotate(270deg); /* تأثير دوران كامل عند التحويم */
+}
+
+.modal-body-pro {
+  flex-grow: 1;
+}
+
+.modal-label-pro {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+  font-size: 1.15rem; /* حجم أكبر لل label */
+}
+
+.modal-textarea-pro {
+  width: 100%;
+  padding: 1.4rem; /* مساحة داخلية أكبر لحقل النص */
+  border: 1px solid var(--border-color-darker); /* حدود أوضح قليلاً */
+  border-radius: var(--border-radius-base);
+  font-size: 1.05rem; /* حجم خط مريح للكتابة */
+  resize: vertical; /* السماح بتغيير حجم النص رأسياً */
+  min-height: 250px; /* ارتفاع أدنى أكبر لراحة الكتابة */
+  box-sizing: border-box; /* لضمان أن العرض 100% يشمل ال padding وال border */
+  font-family: inherit; /* لضمان استخدام نفس خط الجسم */
+  color: var(--text-color);
+  background-color: var(--surface-color-light); /* خلفية أفتح قليلا من المودال لتمييز الحقل */
+  transition: border-color var(--transition-speed-fast) ease, box-shadow var(--transition-speed-fast) ease;
+  box-shadow: var(--box-shadow-inset); /* ظل داخلي خفيف لعمق أكثر */
+}
+
+.modal-textarea-pro::placeholder {
+  color: var(--subtle-text-color);
+  opacity: 0.8;
+}
+
+.modal-textarea-pro:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 0.4rem rgba(var(--primary-accent-rgb), 0.5); /* ظل تركيز أوسع وأكثر وضوحاً وقوة */
+}
+
+.modal-footer-pro {
+  display: flex;
+  justify-content: flex-end; /* الأزرار إلى اليمين في LTR */
+  gap: 1.2rem; /* مسافة بين الأزرار */
+  padding-top: 2rem; /* مسافة كافية قبل الأزرار */
+  border-top: 1px solid var(--border-color-darker); /* خط فاصل */
+  margin-top: 0.8rem;
+}
+
+/* --- Responsive Adjustments for Modal --- */
+
+/* Laptops & larger tablets (max-width: 991px) */
+@media (max-width: 991px) {
+  .modal-content-pro {
+    padding: 2rem 2.5rem;
+    gap: 1.8rem;
+    max-width: 550px;
   }
-  .section-title {
-    font-size: 2rem; /* Even smaller title */
-    gap: 0.6rem;
+  .modal-header-pro {
+    padding-bottom: 1.5rem;
+    margin-bottom: 0.8rem;
   }
-  .section-title-icon {
+  .modal-title-pro {
     font-size: 1.8rem;
   }
-  .section-subtitle {
+  .close-button-pro {
+    font-size: 2.2rem;
+  }
+  .modal-textarea-pro {
+    min-height: 200px;
+    padding: 1.2rem;
     font-size: 1rem;
   }
-  .mail-items-grid {
-    grid-template-columns: 1fr; /* Stack cards vertically on smaller screens */
-    gap: 1.2rem; /* Adjust gap, using rem */
-  }
-  .mail-item {
-    padding: 1.2rem; /* Adjust padding, using rem */
-  }
-  .mail-subject {
-    font-size: 1.1rem;
-  }
-  .mail-message-preview {
-    font-size: 0.88rem;
-    -webkit-line-clamp: 5; /* Allow more lines for message preview */
-  }
-  .mail-meta-data {
-    flex-direction: column; /* Stack ID and Sent At vertically */
-    align-items: flex-start; /* Align to start */
-    gap: 0.5rem; /* Adjust gap, using rem */
-  }
-  body.rtl-active .mail-meta-data {
-    align-items: flex-end; /* Align right in RTL when stacked */
-  }
-  .mail-actions-bottom {
-    flex-direction: column; /* Stack date and buttons vertically */
-    align-items: flex-start; /* Align date and buttons to the left */
-    gap: 0.8rem; /* Adjust gap, using rem */
-    padding-top: 0.8rem; /* Adjust padding, using rem */
-  }
-  body.rtl-active .mail-actions-bottom {
-    align-items: flex-end; /* Align right in RTL when stacked */
-  }
-  .mail-actions {
-    width: 100%; /* Make buttons take full width when stacked */
-    justify-content: stretch; /* Stretch buttons to fill width */
-  }
-  .mail-actions .btn {
-    flex-grow: 1; /* Allow buttons to grow and fill available space */
+  .modal-footer-pro {
+    padding-top: 1.5rem;
+    margin-top: 0.5rem;
+    gap: 1rem;
   }
 }
 
-/* For screens smaller than 575px (e.g., small phones) */
+/* Tablets (max-width: 767px) */
+@media (max-width: 767px) {
+  .modal-content-pro {
+    padding: 1.5rem 2rem;
+    gap: 1.5rem;
+    width: 92%; /* Small adjustment for tablet width */
+  }
+  .modal-header-pro {
+    padding-bottom: 1.2rem;
+    margin-bottom: 0.6rem;
+  }
+  .modal-title-pro {
+    font-size: 1.6rem;
+  }
+  .close-button-pro {
+    font-size: 2rem;
+  }
+  .modal-label-pro {
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+  }
+  .modal-textarea-pro {
+    min-height: 180px;
+    padding: 1rem;
+  }
+  .modal-footer-pro {
+    padding-top: 1.2rem;
+    margin-top: 0.6rem;
+    gap: 0.8rem;
+  }
+}
+
+/* Mobile phones (max-width: 575px) */
 @media (max-width: 575px) {
-  .mail-list-container {
-    padding: 2rem 0.8rem; /* Even smaller padding, using rem */
+  .modal-content-pro {
+    padding: 1.2rem 1.5rem;
+    gap: 1.2rem;
+    width: 95%; /* Maximum width on small phones */
+    margin: 1rem; /* Add some margin from screen edges */
   }
-  .section-title {
-    font-size: 1.6rem; /* Smallest title */
+  .modal-header-pro {
+    padding-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
-  .section-title-icon {
+  .modal-title-pro {
     font-size: 1.4rem;
   }
-  .section-subtitle {
-    font-size: 0.9rem;
+  .close-button-pro {
+    font-size: 1.8rem;
   }
-  .mail-item {
-    padding: 1rem; /* Adjust padding, using rem */
+  .modal-label-pro {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
   }
-  .mail-subject {
-    font-size: 1rem;
+  .modal-textarea-pro {
+    min-height: 150px; /* Comfortable height for mobile */
+    padding: 0.8rem;
+    font-size: 0.95rem; /* Slightly smaller font on mobile */
   }
-  .mail-message-preview {
-    font-size: 0.85rem;
-    -webkit-line-clamp: 6; /* Even more lines for very small screens */
+  .modal-footer-pro {
+    flex-direction: column-reverse; /* Stack buttons (Send then Cancel) */
+    gap: 0.6rem; /* Less space between stacked buttons */
+    padding-top: 1rem;
   }
-  .mail-date {
-    font-size: 0.8rem;
+  .modal-footer-pro .btn {
+    width: 100%; /* Buttons take full width */
+    padding: 0.7rem 1rem; /* More padding for easier tapping */
   }
-  .mail-actions .btn {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.7rem;
+}
+
+/* RTL adjustments for modal */
+body.rtl-active .modal-header-pro {
+  flex-direction: row-reverse;
+}
+body.rtl-active .modal-title-pro {
+  /* No specific RTL adjustment needed for font styling */
+}
+body.rtl-active .modal-label-pro {
+  text-align: right; /* Ensure label is right-aligned in RTL */
+}
+body.rtl-active .modal-textarea-pro {
+  text-align: right; /* Ensure textarea is right-aligned in RTL */
+}
+body.rtl-active .modal-footer-pro {
+  justify-content: flex-start; /* Buttons to the left in RTL */
+}
+@media (max-width: 575px) {
+  body.rtl-active .modal-footer-pro {
+    flex-direction: column-reverse; /* Stays vertical */
+    align-items: flex-end; /* Buttons align right when stacked */
   }
 }

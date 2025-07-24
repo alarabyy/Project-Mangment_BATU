@@ -1,4 +1,3 @@
-// src/app/Services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -119,7 +118,8 @@ export class AuthService {
     return localStorage.getItem(this.authTokenKey);
   }
 
-  private getDecodedToken(): any | null {
+  // **** تم تغييرها إلى public هنا ****
+  public getDecodedToken(): any | null {
     const token = this.getToken();
     if (!token) {
       console.warn('[AuthService] No token found when trying to decode.');
