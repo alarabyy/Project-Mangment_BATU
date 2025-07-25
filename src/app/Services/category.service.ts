@@ -1,3 +1,4 @@
+// src/app/services/category.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -8,7 +9,8 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class CategoryService {
-  private baseUrl = `${environment.apiUrl}/category`;
+  // ***** التعديل هنا: إضافة '/api/' *****
+  private baseUrl = `${environment.apiUrl}/api/category`;
 
   constructor(private http: HttpClient) { }
 

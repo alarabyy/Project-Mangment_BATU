@@ -1,18 +1,28 @@
+// src/app/services/blog.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, throwError, ObservableInput } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { environment } from '../environments/environment';
 import { Blog, BlogDetails } from '../models/Blog';
 import { AuthService } from './auth.service';
+import { environment } from '../environments/environment';
+// إذا كنت تستخدم NotificationService للعرض، قم باستيراده
+// import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BlogService {
-  private apiUrl = `${environment.apiUrl}/blogs`;
+  // ***** التعديل الرئيسي هنا: إضافة '/api/' *****
+  // يجب أن يتطابق 'blogs' مع اسم الـ Controller في الـ Backend (مثال: BlogsController -> /api/Blogs)
+  private apiUrl = `${environment.apiUrl}/api/blogs`;
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    // إذا كنت تستخدم NotificationService:
+    // private notificationService: NotificationService
+  ) { }
 
   private getAuthHeaders(): HttpHeaders {
     return this.authService.getAuthHeaders();
@@ -57,12 +67,16 @@ export class BlogService {
            }
       }
     }
-     console.error('Formatted Error Message:', errorMessage);
+    console.error('Formatted Error Message:', errorMessage);
+    // يمكنك استخدام خدمة التنبيهات هنا:
+    // this.notificationService.showError(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
 
 
   getAllBlogs(): Observable<Blog[]> {
+    // بناءً على السجل: `GET https://batuprojects.runasp.net/blogs/get/all 404`
+    // هذا يعني أن الـ Backend يتوقع: https://batuprojects.runasp.net/api/blogs/get/all
     return this.http.get<Blog[]>(`${this.apiUrl}/get/all`).pipe(
       catchError(this.handleError)
     );

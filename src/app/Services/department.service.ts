@@ -1,3 +1,4 @@
+// src/app/services/department.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
@@ -9,7 +10,8 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class DepartmentService {
-  private apiUrl = `${environment.apiUrl}/department`;
+  // ***** التعديل هنا: إضافة '/api/' *****
+  private apiUrl = `${environment.apiUrl}/api/department`;
 
   constructor(private http: HttpClient) { }
 

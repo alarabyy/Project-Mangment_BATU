@@ -1,68 +1,84 @@
+// src/app/Services/faculty.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http'; // 1. تأكد من استيراد HttpParams
-import { Observable } from 'rxjs';
-import { Faculty, FacultyCreatePayload } from '../models/faculty'; // تأكد من وجود وتحديد هذه الـ Interfaces في ملف faculty.ts
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Faculty } from '../models/faculty';
 import { environment } from '../environments/environment';
+// import { NotificationService } from './notification.service'; // إذا كنت تستخدم NotificationService
 
 @Injectable({
   providedIn: 'root'
 })
 export class FacultyService {
-  private baseUrl = `${environment.apiUrl}/faculty`;
+  private apiUrl = `${environment.apiUrl}/api/faculty`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    // private notificationService: NotificationService
+  ) { }
 
-  /**
-   * @method getFaculties
-   * @description يجلب جميع الكليات من الـ API.
-   * @returns Observable يرسل مصفوفة من كائنات Faculty.
-   */
-  getFaculties(): Observable<Faculty[]> {
-    return this.http.get<Faculty[]>(`${this.baseUrl}/get/all`);
+  // تم التأكيد على اسم الدالة: getAllFaculties
+  getAllFaculties(): Observable<Faculty[]> {
+    return this.http.get<Faculty[]>(`${this.apiUrl}/get/all`).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * @method getFacultyById
-   * @description يجلب كلية واحدة بواسطة ID الخاص بها.
-   * @param id - معرف الكلية.
-   * @returns Observable يرسل كائن Faculty.
-   */
   getFacultyById(id: number): Observable<Faculty> {
-    return this.http.get<Faculty>(`${this.baseUrl}/get/${id}`);
+    return this.http.get<Faculty>(`${this.apiUrl}/get/${id}`).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * @method createFaculty
-   * @description ينشئ كلية جديدة.
-   * @param facultyData - بيانات الكلية المراد إنشاؤها.
-   * @returns Observable يرسل الكلية التي تم إنشاؤها.
-   */
-  createFaculty(facultyData: FacultyCreatePayload): Observable<Faculty> {
-    return this.http.post<Faculty>(`${this.baseUrl}/create`, facultyData);
+  createFaculty(facultyData: any): Observable<Faculty> {
+    return this.http.post<Faculty>(`${this.apiUrl}/create`, facultyData).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * @method updateFaculty
-   * @description يحدث بيانات كلية موجودة.
-   * @param facultyData - بيانات الكلية المحدثة (يجب أن تحتوي على ID).
-   * @returns Observable يرسل استجابة الـ API.
-   */
   updateFaculty(facultyData: Faculty): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/update`, facultyData);
+    return this.http.put(`${this.apiUrl}/update`, facultyData).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * @method deleteFaculty
-   * @description يرسل طلب حذف كلية باستخدام ID الخاص بها بالطريقة الصحيحة (كـ Query Parameter).
-   * @param id - معرف الكلية المراد حذفها.
-   * @returns Observable يرسل إشارة اكتمال الحذف (void).
-   */
-  deleteFaculty(id: number): Observable<void> {
-    // إنشاء HttpParams لإرسال الـ ID كرابط استعلام (query parameter)
+  deleteFaculty(id: number): Observable<any> {
     const params = new HttpParams().set('id', id.toString());
+    return this.http.delete(`${this.apiUrl}/delete`, { params }).pipe(
+      catchError(this.handleError)
+    );
+  }
 
-    // إرسال الطلب مع الرابط الصحيح والمعلمات
-    // الرابط النهائي الذي سيتم إرساله سيكون: .../api/faculty/delete?id=10
-    return this.http.delete<void>(`${this.baseUrl}/delete`, { params });
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.error('Faculty Service Error:', error);
+    let errorMessage = 'An unknown error occurred!';
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = `Client Error: ${error.error.message}`;
+    } else {
+      errorMessage = `Server returned status code: ${error.status}`;
+      if (error.status === 401) {
+          errorMessage = 'Authentication Required: You are not authorized. Please log in.';
+      } else if (error.status === 403) {
+          errorMessage = 'Forbidden: You do not have permission.';
+      } else if (error.error) {
+           if (typeof error.error === 'string' && error.error.length > 0) {
+               errorMessage += ` - Details: ${error.error}`;
+           } else if (error.error.message) {
+                errorMessage += `\nMessage: ${error.error.message}`;
+           } else if (error.error.title) {
+               errorMessage += `\nTitle: ${error.error.title}`;
+               if (error.error.detail) {
+                  errorMessage += `\nDetail: ${error.error.detail}`;
+               }
+           } else {
+                errorMessage += `\nDetails: ${JSON.stringify(error.error)}`;
+           }
+      }
+    }
+    console.error('Formatted Error Message:', errorMessage);
+    // يمكنك استخدام خدمة التنبيهات هنا:
+    // this.notificationService.showError(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }

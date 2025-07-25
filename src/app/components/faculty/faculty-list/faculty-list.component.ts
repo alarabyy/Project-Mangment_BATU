@@ -32,7 +32,8 @@ export class FacultyListComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
     try {
-      this.faculties = await firstValueFrom(this.facultyService.getFaculties());
+      // ***** التعديل هنا: استخدام getAllFaculties بدلاً من getFaculties *****
+      this.faculties = await firstValueFrom(this.facultyService.getAllFaculties());
     } catch (error) {
       console.error('API Error:', error);
       this.errorMessage = 'Failed to load faculties. Server might be unavailable.';
@@ -49,7 +50,7 @@ export class FacultyListComponent implements OnInit {
     this.deletingFacultyIds.add(facultyId);
     this.errorMessage = null;
 
-    setTimeout(() => {
+    setTimeout(() => { // استخدام setTimeout اختياري، يمكن إزالته
       this.facultyService.deleteFaculty(facultyId).pipe(
         finalize(() => this.deletingFacultyIds.delete(facultyId))
       ).subscribe({

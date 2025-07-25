@@ -1,15 +1,16 @@
+// src/app/components/admin/mail-list/mail-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // **أضف هذا الاستيراد**
+import { FormsModule } from '@angular/forms';
 
-import { NotificationService } from '../../../Services/notification-proxy.service';
-import { Mail, MailService, MailReplyRequest } from '../../../Services/mail.service.service';
+import { NotificationService } from '../../../Services/notification-proxy.service'; // تأكد أن هذا المسار صحيح
+import { Mail, MailService, MailReplyRequest } from '../../../Services/mail.service.service'; // تأكد أن هذا المسار صحيح
 
 @Component({
   selector: 'app-mail-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatePipe, FormsModule], // **أضف FormsModule هنا**
+  imports: [CommonModule, RouterModule, DatePipe, FormsModule],
   templateUrl: './mail-list.component.html',
   styleUrls: ['./mail-list.component.css']
 })
@@ -18,10 +19,9 @@ export class MailListComponent implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
-  // **متغيرات جديدة للتعامل مع المودال**
   showReplyModal: boolean = false;
   currentReplyMailId: number | null = null;
-  replyMessage: string = ''; // لربطها بـ textarea في المودال
+  replyMessage: string = '';
 
   constructor(
     private mailService: MailService,
@@ -66,28 +66,18 @@ export class MailListComponent implements OnInit {
     }
   }
 
-  /**
-   * يفتح المودال للرد على رسالة معينة.
-   * @param mailId معرف الرسالة للرد عليها.
-   */
   openReply(mailId: number): void {
     this.currentReplyMailId = mailId;
-    this.replyMessage = ''; // مسح أي رسالة سابقة في textarea
+    this.replyMessage = '';
     this.showReplyModal = true;
   }
 
-  /**
-   * يغلق مودال الرد ويمسح البيانات المؤقتة.
-   */
   closeReplyModal(): void {
     this.showReplyModal = false;
     this.currentReplyMailId = null;
     this.replyMessage = '';
   }
 
-  /**
-   * يرسل الرد الفعلي باستخدام MailService.
-   */
   sendReply(): void {
     if (this.currentReplyMailId === null || !this.replyMessage.trim()) {
       this.notificationService.showWarning('Please enter a reply message.');
@@ -102,14 +92,13 @@ export class MailListComponent implements OnInit {
     this.mailService.replyMail(replyData).subscribe({
       next: () => {
         this.notificationService.showSuccess('Reply sent successfully!');
-        this.closeReplyModal(); // إغلاق المودال بعد الإرسال بنجاح
+        this.closeReplyModal();
         // اختياري: إذا كنت تريد تحديث حالة الرسالة في القائمة بعد الرد (مثلاً وضع علامة "تم الرد")
         // يمكنك إعادة جلب القائمة: this.fetchMails();
       },
       error: (err) => {
         console.error('Error sending reply:', err);
         this.notificationService.showError('Failed to send reply. Please try again.');
-        // قد ترغب في عدم إغلاق المودال في حالة الخطأ للسماح للمستخدم بالمحاولة مرة أخرى
       }
     });
   }

@@ -2,13 +2,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { Project } from '../models/project'; // تم تحديث هذه الواجهة
+import { Project } from '../models/project';
 import { AuthService } from './auth.service';
 import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
-  private apiUrl = `${environment.apiUrl}/project`;
+  // ***** التعديل هنا: إضافة '/api/' إلى المسار الأساسي *****
+  // بناءً على رسائل الخطأ وكود AuthService، يبدو أن الـ Backend يتوقع مسارًا يبدأ بـ /api/
+  private apiUrl = `${environment.apiUrl}/api/project`;
 
   constructor(
     private http: HttpClient,
@@ -16,8 +18,7 @@ export class ProjectService {
   ) {}
 
   getProjects(): Observable<Project[]> {
-    // هذا الاستدعاء يجب أن يرجع البيانات بالهيكل المحدد في واجهة Project الجديدة.
-    // إذا كان بطيئاً، فإن هذا هو المكان الذي يجب أن تبدأ فيه بالبحث عن التحسينات في الـ Backend.
+    // الآن سيبني هذا الـ URL: https://batuprojects.runasp.net/api/project/get/all
     return this.http.get<Project[]>(`${this.apiUrl}/get/all`);
   }
 
@@ -34,7 +35,6 @@ export class ProjectService {
     return this.http.get<Project>(`${this.apiUrl}/get/${id}`);
   }
 
-  // projectData: 'any' for flexibility as payload structure might differ slightly from retrieved Project model
   createProject(projectData: any): Observable<string> {
     const headers = this.getAuthHeaders();
     return this.http.post(`${this.apiUrl}/create`, projectData, {
@@ -49,6 +49,8 @@ export class ProjectService {
   }
 
   deleteProject(id: number): Observable<any> {
+    // لاحظ: إذا كان الـ Backend يتوقع الـ ID في الـ URL (مثل /delete/id) بدلاً من Query Parameter،
+    // فستحتاج إلى تغيير هذا أيضاً: return this.http.delete(`${this.apiUrl}/delete/${id}`, { headers: headers });
     const params = new HttpParams().set('id', id.toString());
     const headers = this.getAuthHeaders();
     return this.http.delete(`${this.apiUrl}/delete`, { headers: headers, params });
@@ -60,7 +62,7 @@ export class ProjectService {
     files.forEach(file => {
       formData.append('Files', file, file.name);
     });
-    const headers = this.getAuthHeaders().delete('Content-Type');
+    const headers = this.getAuthHeaders().delete('Content-Type'); // حذف Content-Type مهم لـ FormData
     return this.http.post(`${this.apiUrl}/images/upload`, formData, { headers: headers });
   }
 

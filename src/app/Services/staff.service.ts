@@ -2,20 +2,30 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError, of } from 'rxjs';
+import { Observable, throwError, of, ObservableInput } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../environments/environment';
 import { Staff, StaffCreatePayload, StaffUpdatePayload } from '../models/staff';
 import { AuthService } from './auth.service';
+import { environment } from '../environments/environment';
+// إذا كنت تستخدم NotificationService للعرض، قم باستيراده
+// import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StaffService {
-  private apiUrl = `${environment.apiUrl}/staff`;
-  private imageServeUrl = environment.imageBaseUrl;
+  // ***** التعديل الرئيسي هنا: إضافة '/api/' *****
+  // بناءً على السجل: `GET https://batuprojects.runasp.net/staff 404 (Not Found)`
+  // هذا يعني أن الـ Backend يتوقع: https://batuprojects.runasp.net/api/staff
+  private apiUrl = `${environment.apiUrl}/api/staff`;
+  private imageServeUrl = environment.imageBaseUrl; // تأكد أن environment.imageBaseUrl معرف بشكل صحيح
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    // إذا كنت تستخدم NotificationService:
+    // private notificationService: NotificationService
+  ) { }
 
   /**
    * دالة مساعدة لبناء HttpHeaders مع رمز المصادقة.
@@ -36,7 +46,7 @@ export class StaffService {
    * @param error The HttpErrorResponse received from the API.
    * @returns An observable that throws a new Error with a user-friendly message.
    */
-  private handleError(error: HttpErrorResponse): Observable<never> {
+  private handleError(error: HttpErrorResponse): ObservableInput<any> {
     console.error('Staff Service Error:', error);
 
     let errorMessage = 'An unknown error occurred!';
@@ -75,22 +85,23 @@ export class StaffService {
            }
       }
     }
-     console.error('Formatted Error Message:', errorMessage);
-    return throwError(() => new Error(errorMessage)); // يجب أن تعيد ObservableInput
+    console.error('Formatted Error Message:', errorMessage);
+    // يمكنك استخدام خدمة التنبيهات هنا:
+    // this.notificationService.showError(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 
   getAllStaff(): Observable<Staff[]> {
-    // عادةً، طلبات GET لا تتطلب مصادقة، لذا لا نرسل الـ headers هنا افتراضياً.
-    // إذا كان Backend يتطلب مصادقة لـ GET أيضاً، يمكنك استخدام:
-    // return this.http.get<Staff[]>(this.apiUrl, { headers: this.getHeadersWithAuth() }).pipe(...);
+    // بناءً على السجل: `GET https://batuprojects.runasp.net/staff 404 (Not Found)`
+    // هذا يعني أن الـ Backend يتوقع `GET https://batuprojects.runasp.net/api/staff` مباشرة لجلب الكل.
+    // لذا، نستخدم `this.apiUrl` فقط هنا.
     return this.http.get<Staff[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
   }
 
   getStaffById(id: number): Observable<Staff> {
-     // إضافة headers للطلب GET إذا كان هذا الـ endpoint يتطلب مصادقة (التحقق من Backend)
-     // إذا كان هذا الـ endpoint عاماً، يمكن حذفه. افتراضياً، يتم إضافته لـ CRUD في الـ admin.
+     // افترض أن الـ Backend يتوقع `/api/staff/{id}`
      return this.http.get<Staff>(`${this.apiUrl}/${id}`, { headers: this.getHeadersWithAuth() }).pipe(
          catchError(this.handleError)
      );
