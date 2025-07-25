@@ -4,8 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { UserProfile } from '../../../Services/auth.service'; // Ensure UserProfile is correctly defined here
+import { UserProfile } from '../../../Services/auth.service';
 import { UserService } from '../../../Services/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-user-profile',
@@ -29,8 +30,13 @@ export class UserProfileComponent implements OnInit {
       switchMap(params => {
         const userId = params.get('id');
         if (userId) {
-          return this.userService.getUserProfile(parseInt(userId, 10)).pipe(
-            catchError(err => {
+          const parsedUserId = parseInt(userId, 10);
+          if (isNaN(parsedUserId)) {
+            this.loadingError = 'Invalid user ID provided in the URL.';
+            return of(undefined);
+          }
+          return this.userService.getUserProfile(parsedUserId).pipe(
+            catchError((err: HttpErrorResponse) => {
               console.error("Error fetching user profile:", err);
               this.loadingError = 'Failed to load user profile. It might not exist or you lack permissions.';
               if (err.status === 401 || err.status === 403) {

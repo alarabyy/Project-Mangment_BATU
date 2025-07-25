@@ -11,7 +11,9 @@ import {
 import { User } from '../../../models/user';
 import { AuthService } from '../../../Services/auth.service';
 import { UserService } from '../../../Services/user.service';
-interface UserManagementState {
+import { HttpErrorResponse } from '@angular/common/http'; // Added for error typing
+
+interface UserManagementState { // هذا التعريف موجود بالفعل في الملف
   users: User[];
   isLoading: boolean;
   error: string | null;
@@ -26,13 +28,11 @@ interface UserManagementState {
 })
 export class UserManagementComponent implements OnInit {
 
-  /* ---------- STATE ---------- */
   public state$!: Observable<UserManagementState>;
   public filteredUsers$!: Observable<User[]>;
   private searchTerm$   = new BehaviorSubject<string>('');
   private refreshUsers$ = new BehaviorSubject<void>(undefined);
 
-  /* ---------- EDIT MODE ---------- */
   public editingUserId: number | null = null;
   public editedUser: Partial<User> | null = null;
 
@@ -41,16 +41,14 @@ export class UserManagementComponent implements OnInit {
     private authService: AuthService
   ) {}
 
-  /* ---------- INIT ---------- */
   ngOnInit(): void {
 
-    /* 1) تحميل المستخدمين */
     const usersSource$ = this.refreshUsers$.pipe(
       startWith(undefined),
       switchMap(() => this.userService.getUsers().pipe(
-        map(users => ({ isLoading: false, users, error: null })),
+        map((users: User[]) => ({ isLoading: false, users, error: null })),
         startWith({ isLoading: true, users: [], error: null }),
-        catchError(err => {
+        catchError((err: HttpErrorResponse) => {
           console.error('Error fetching users:', err);
           const msg = err.status === 401
             ? 'You are not authorized to view this data. Please log in.'
@@ -62,28 +60,25 @@ export class UserManagementComponent implements OnInit {
 
     this.state$ = usersSource$;
 
-    /* 2) فلترة المستخدمين حسب البحث */
     this.filteredUsers$ = combineLatest([
-      usersSource$.pipe(map(s => s.users)),
+      // التغيير هنا: استخدام UserManagementState بدلاً من AnalyticsState
+      usersSource$.pipe(map((s: UserManagementState) => s.users)), // تم تصحيح AnalyticsState
       this.searchTerm$.pipe(debounceTime(300), distinctUntilChanged())
     ]).pipe(
-      map(([users, term]) => this.filterUsers(users, term))
+      map(([users, term]: [User[], string]) => this.filterUsers(users, term))
     );
   }
 
-  /* ---------- SEARCH ---------- */
   private filterUsers(users: User[], term: string): User[] {
     if (!users?.length) return [];
     if (!term) return users;
 
     term = term.toLowerCase();
     return users.filter(u =>
-      // تمت إضافة فحوصات Nullish coalescing (?? false) و Optional chaining (?.)
       (u.firstName?.toLowerCase().includes(term) ?? false) ||
       (u.lastname?.toLowerCase().includes(term) ?? false) ||
       (u.email?.toLowerCase().includes(term) ?? false) ||
       (u.id?.toString().includes(term) ?? false) ||
-      // تأكد من أن u.role موجود قبل استخدامه
       (u.role != null && this.getRoleInfo(u.role).name.toLowerCase().includes(term))
     );
   }
@@ -92,26 +87,15 @@ export class UserManagementComponent implements OnInit {
     this.searchTerm$.next((e.target as HTMLInputElement).value);
   }
 
-  /* ---------- ROLE MAPPING (fixed) ---------- */
-  // [التعديل هنا] لجعلها تتعامل مع الأرقام أو الـ strings أو مصفوفة من الـ strings
   getRoleInfo(roleValue: number | string | string[] | undefined): { name: string; icon: string } {
-    /* تعتمد هذه القيم على الـ Enum فى الـ Back‑End:
-       Student = 0, Doctor = 1, Admin = 2
-    */
-
     let normalizedRole: string | number | undefined;
 
-    // First, handle if roleValue is an array
     if (Array.isArray(roleValue)) {
-      // If it's an array, take the first element. If the array is empty, it will be undefined.
       normalizedRole = roleValue.length > 0 ? roleValue[0] : undefined;
     } else {
-      // Otherwise, use the value as is (string, number, or undefined).
       normalizedRole = roleValue;
     }
 
-    // Now, normalizedRole is guaranteed to be string | number | undefined.
-    // We can proceed to parse it to a numeric ID.
     const numericRoleId = typeof normalizedRole === 'string' ? parseInt(normalizedRole, 10) : normalizedRole;
 
     switch (numericRoleId) {
@@ -122,26 +106,23 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  /* ---------- TEMPLATE HELPERS ---------- */
   trackById(_: number, item: User): number { return item.id; }
 
   isAdmin(): boolean { return this.authService.getUserRole() === 'admin'; }
 
-  /* ---------- CRUD ---------- */
   deleteUser(userId: number): void {
     if (!confirm('Are you sure you want to delete this user?')) return;
     this.userService.deleteUser(userId).pipe(
-      catchError(err => {
+      catchError((err: HttpErrorResponse) => {
         console.error('Error deleting user:', err);
         alert(err.error?.message || 'Failed to delete user.');
         return of(null);
       })
-    ).subscribe(ok => ok !== null && this.refreshUsers$.next());
+    ).subscribe((ok: any) => ok !== null && this.refreshUsers$.next()); // تم تصحيح (ok: any)
   }
 
   startEdit(user: User): void {
     this.editingUserId = user.id;
-    // يجب عمل نسخة عميقة إذا كانت User تحتوي على كائنات متداخلة
     this.editedUser    = { ...user };
   }
 
@@ -156,15 +137,15 @@ export class UserManagementComponent implements OnInit {
       return;
     }
     this.userService.updateUser(this.editedUser).pipe(
-      catchError(err => {
+      catchError((err: HttpErrorResponse) => {
         console.error('Error updating user:', err);
         alert(err.error?.message || 'Failed to update user.');
         return of(null);
       })
-    ).subscribe(ok => {
+    ).subscribe((ok: any) => { // تم تصحيح (ok: any)
       if (ok !== null) {
         this.cancelEdit();
-        this.refreshUsers$.next(); // إعادة تحميل قائمة المستخدمين
+        this.refreshUsers$.next();
       }
     });
   }

@@ -1,4 +1,4 @@
-// src/app/my-profile/my-profile.component.ts
+// src/app/components/my-profile/my-profile.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs';
@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { User } from '../../models/user';
 import { AuthService, ChangePasswordRequest, UserProfile } from '../../Services/auth.service';
 import { UserService } from '../../Services/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-my-profile',
@@ -40,8 +41,8 @@ export class MyProfileComponent implements OnInit {
   initForms(): void {
     this.editProfileForm = this.fb.group({
       firstName: ['', Validators.required],
-      lastName: [''], // Form control name remains 'lastName'
-      middleName: [''], // This control can still exist for editing, even if not displayed by getFullName
+      lastName: [''],
+      middleName: [''],
       email: ['', [Validators.required, Validators.email]],
       gender: ['']
     });
@@ -74,40 +75,32 @@ export class MyProfileComponent implements OnInit {
         this.isLoading = false;
       })
     ).subscribe({
-      next: (profile) => {
+      next: (profile: UserProfile) => {
         console.log('Profile data received from API:', profile);
         this.userProfile = profile;
-        // Populate edit profile form with all user data
         this.editProfileForm.patchValue({
           firstName: profile.firstName,
-          lastName: profile.lastname, // **تم التعديل: profile.lastName -> profile.lastname**
+          lastName: profile.lastname,
           middleName: profile.middleName || '',
           email: profile.email,
           gender: this.getGenderString(profile.gender)
         });
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Failed to load user profile', err);
         this.errorMessage = err.message || 'Could not retrieve user profile. Please try again later.';
       }
     });
   }
 
-  /**
-   * دالة مخصصة لدمج الاسم الأول والأخير للمستخدم.
-   * تُستخدم لعرض الاسم الكامل في الواجهة وفقًا لبيانات الـ API المتاحة.
-   * @returns الاسم الكامل (First Name Last Name)
-   */
   getFullName(): string {
     if (!this.userProfile) {
       return '';
     }
-    // **تم التعديل: تقتصر على الاسم الأول والأخير فقط**
     const parts = [this.userProfile.firstName, this.userProfile.lastname];
     return parts.filter(Boolean).join(' ');
   }
 
-  // --- Gender Conversion Helpers ---
   getGenderString(genderNum: number | undefined | null): string {
     if (genderNum === undefined || genderNum === null) return '';
     switch (genderNum) {
@@ -128,7 +121,6 @@ export class MyProfileComponent implements OnInit {
     }
   }
 
-  // --- Change Password Methods ---
   toggleChangePasswordForm(): void {
     this.showChangePasswordForm = !this.showChangePasswordForm;
     this.showEditProfileForm = false;
@@ -156,22 +148,20 @@ export class MyProfileComponent implements OnInit {
         this.changePasswordForm.reset();
         this.showChangePasswordForm = false;
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Password change failed:', err);
         this.errorMessage = err.error?.message || 'Failed to change password. Please check your current password.';
       }
     });
   }
 
-  // --- Update Profile Methods ---
   toggleEditProfileForm(): void {
     this.showEditProfileForm = !this.showEditProfileForm;
     this.showChangePasswordForm = false;
     if (this.userProfile) {
-      // Reset form to current profile data including new fields
       this.editProfileForm.patchValue({
         firstName: this.userProfile.firstName,
-        lastName: this.userProfile.lastname, // **تم التعديل: userProfile.lastName -> userProfile.lastname**
+        lastName: this.userProfile.lastname,
         middleName: this.userProfile.middleName || '',
         email: this.userProfile.email,
         gender: this.getGenderString(this.userProfile.gender)
@@ -191,8 +181,8 @@ export class MyProfileComponent implements OnInit {
       return;
     }
 
-    if (!this.userProfile?.id) {
-      this.errorMessage = 'User ID not found for profile update.';
+    if (!this.userProfile?.id || isNaN(parseInt(this.userProfile.id))) {
+      this.errorMessage = 'User ID not found or invalid for profile update.';
       return;
     }
 
@@ -201,7 +191,7 @@ export class MyProfileComponent implements OnInit {
       id: parseInt(this.userProfile.id),
       firstName: updatedData.firstName,
       middleName: updatedData.middleName || null,
-      lastname: updatedData.lastName,     // **مهم: هنا نستخدم updatedData.lastName (من form control) الذي سيتوافق مع user.lastname في UserService**
+      lastname: updatedData.lastName,
       email: updatedData.email,
       gender: this.getGenderNumber(updatedData.gender)
     };
@@ -212,7 +202,7 @@ export class MyProfileComponent implements OnInit {
         this.loadUserProfile();
         this.showEditProfileForm = false;
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Profile update failed:', err);
         this.errorMessage = err.error?.message || 'Failed to update profile. Please try again.';
       }

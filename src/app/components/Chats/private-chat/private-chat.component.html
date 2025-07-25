@@ -22,7 +22,6 @@
       <button class="btn btn-icon" title="Toggle Online Status" (click)="toggleContactOnlineStatus()">
         <i class="fas fa-toggle-{{ isUserOnline ? 'on' : 'off' }}"></i>
       </button>
- 
     </div>
   </header>
 
@@ -54,7 +53,6 @@
             </a>
             <span class="message-content" *ngIf="message.content">{{message.content}}</span>
         </div>
-
 
         <span class="message-time">{{ message.time }}</span>
       </div>

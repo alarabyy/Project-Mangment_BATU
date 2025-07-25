@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, BehaviorSubject, tap, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, tap, throwError, catchError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../environments/environment';
 
@@ -14,6 +14,11 @@ export interface UserProfile {
   imageUrl: string | null;
   role: string | number;
   gender?: number;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
@@ -34,8 +39,8 @@ export interface ChangePasswordRequest {
   providedIn: 'root'
 })
 export class AuthService {
-  private authApiUrl = `${environment.apiUrl}/auth`;
-  private userApiUrl = `${environment.apiUrl}/user`;
+  private authApiUrl = `${environment.apiUrl}/api/auth`;
+  private userApiUrl = `${environment.apiUrl}/api/user`;
   private authTokenKey = 'authToken';
 
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
@@ -46,10 +51,12 @@ export class AuthService {
   }
 
   public register(userData: any): Observable<any> {
-    return this.http.post(`${this.authApiUrl}/register`, userData);
+    return this.http.post(`${this.authApiUrl}/register`, userData).pipe(
+      catchError((error: HttpErrorResponse) => this.handleError(error))
+    );
   }
 
-  public login(credentials: any): Observable<LoginResponse> {
+  public login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.authApiUrl}/login`, credentials).pipe(
       tap(response => {
         if (response && response.token) {
@@ -58,23 +65,30 @@ export class AuthService {
           console.log('[AuthService] Login successful, token stored, isAuthenticated = true.');
           this.redirectToDashboard();
         }
-      })
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error))
     );
   }
 
   public forgotPassword(email: string): Observable<any> {
     console.log(`[AuthService] Sending forgot password request for email: ${email}`);
-    return this.http.post(`${this.authApiUrl}/forgot-password?email=${encodeURIComponent(email)}`, null);
+    return this.http.post(`${this.authApiUrl}/forgot-password?email=${encodeURIComponent(email)}`, null).pipe(
+      catchError((error: HttpErrorResponse) => this.handleError(error))
+    );
   }
 
   public resetPassword(request: PasswordResetRequest): Observable<any> {
     console.log('[AuthService] Sending reset password request with token and new password.');
-    return this.http.post(`${this.authApiUrl}/reset-password`, request);
+    return this.http.post(`${this.authApiUrl}/reset-password`, request).pipe(
+      catchError((error: HttpErrorResponse) => this.handleError(error))
+    );
   }
 
   public changePassword(request: ChangePasswordRequest): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.post(`${this.authApiUrl}/change-password`, request, { headers });
+    return this.http.post(`${this.authApiUrl}/change-password`, request, { headers }).pipe(
+      catchError((error: HttpErrorResponse) => this.handleError(error))
+    );
   }
 
   public logout(): void {
@@ -95,7 +109,9 @@ export class AuthService {
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
     const headers = this.getAuthHeaders();
     console.log(`[AuthService] Fetching user profile for ID: ${userId}`);
-    return this.http.get<UserProfile>(profileUrl, { headers });
+    return this.http.get<UserProfile>(profileUrl, { headers }).pipe(
+      catchError((error: HttpErrorResponse) => this.handleError(error))
+    );
   }
 
   private checkInitialAuthState(): void {
@@ -118,16 +134,13 @@ export class AuthService {
     return localStorage.getItem(this.authTokenKey);
   }
 
-  // **** تم تغييرها إلى public هنا ****
   public getDecodedToken(): any | null {
     const token = this.getToken();
     if (!token) {
-      console.warn('[AuthService] No token found when trying to decode.');
       return null;
     }
     try {
       const decoded = jwtDecode(token);
-      console.log('[AuthService] Token decoded successfully:', decoded);
       return decoded;
     } catch (error) {
       console.error("[AuthService] Error decoding token:", error, "Logging out.");
@@ -138,15 +151,13 @@ export class AuthService {
 
   public getUserId(): string | null {
     const decoded = this.getDecodedToken();
-    const userId = decoded ? (decoded.sub || decoded.nameid || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
-    console.log(`[AuthService] Extracted User ID: '${userId}'`);
+    const userId = decoded ? (decoded.nameid || decoded.sub || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
     return userId;
   }
 
   public getUserRole(): string | null {
     const decoded = this.getDecodedToken();
     if (!decoded) {
-      console.warn('[AuthService] No decoded token found in getUserRole.');
       return null;
     }
 
@@ -162,28 +173,23 @@ export class AuthService {
     for (const claim of potentialRoleClaims) {
         if (decoded[claim] !== undefined && decoded[claim] !== null) {
             roleValue = decoded[claim];
-            console.log(`[AuthService] Found raw role value for claim '${claim}':`, roleValue);
             break;
         }
     }
 
     if (roleValue === undefined || roleValue === null) {
-      console.warn('[AuthService] No role claim found in token for any checked property.');
       return null;
     }
 
     if (Array.isArray(roleValue)) {
       roleValue = roleValue.length > 0 ? roleValue[0] : null;
-      console.log(`[AuthService] Role was an array, using first element: '${roleValue}'`);
     }
 
     if (roleValue === null) {
-        console.warn('[AuthService] Role value became null after array processing.');
         return null;
     }
 
     const lowerCaseRole = (roleValue?.toString() || '').toLowerCase();
-    console.log(`[AuthService] Processed lowerCaseRole: '${lowerCaseRole}'`);
 
     if (!isNaN(Number(lowerCaseRole))) {
       const numericRole = Number(lowerCaseRole);
@@ -220,8 +226,6 @@ export class AuthService {
       const expired = expirationTime < currentTime;
       if (expired) {
           console.warn(`[AuthService] Token expired. Expiration: ${new Date(expirationTime).toLocaleString()}, Current: ${new Date(currentTime).toLocaleString()}`);
-      } else {
-          console.log(`[AuthService] Token is valid. Expires in ${Math.round((expirationTime - currentTime) / 1000 / 60)} minutes.`);
       }
       return expired;
     } catch (error) {
@@ -241,7 +245,6 @@ export class AuthService {
 
   private redirectToDashboard(): void {
     const role = this.getUserRole();
-    console.log(`[AuthService] Redirecting to dashboard based on role: '${role}'`);
     switch (role) {
       case 'admin':
       case 'doctor':
@@ -249,9 +252,26 @@ export class AuthService {
         this.router.navigate(['/Home']);
         break;
       default:
-        console.warn(`[AuthService] Unknown role '${role}' during dashboard redirection. Navigating to /Home.`);
         this.router.navigate(['/Home']);
         break;
     }
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.error(`[AuthService] Backend returned code ${error.status}, body was: `, error.error);
+    let errorMessage = 'An unknown error occurred!';
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = `A client-side error occurred: ${error.error.message}`;
+    } else {
+      if (typeof error.error === 'string') {
+        errorMessage = `Error: ${error.error}`;
+      } else if (error.error && error.error.message) {
+        errorMessage = `Error: ${error.error.message}`;
+      } else {
+        errorMessage = `Server returned code ${error.status}: ${error.statusText}`;
+      }
+    }
+    alert(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }

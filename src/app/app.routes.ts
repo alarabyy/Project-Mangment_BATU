@@ -1,3 +1,4 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { RoleGuard } from './guards/role.guard'; // تأكد من المسار الصحيح للحارس
 
@@ -10,7 +11,7 @@ import { UnauthorizedComponent } from './components/Components/unauthorized/unau
 
 // --- User-Specific Protected Components ---
 import { MyProfileComponent } from './components/my-profile/my-profile.component';
-import { ChatComponent } from './components/chat-AI/chat.component';
+import { ChatComponent } from './components/chat-AI/chat.component'; // هذا شات الـ AI، مختلف عن الشات العادي
 import { UserProfileComponent } from './components/User/user-profile/user-profile.component';
 
 // --- Project Management Components ---
@@ -45,12 +46,12 @@ import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
 import { ProjectAnalysisComponent } from './components/project/project-analysis/project-analysis.component';
 import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
 import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
-import { AllChatsComponent } from './components/Chats/all-chats/all-chats.component';
-import { PrivateChatComponent } from './components/Chats/private-chat/private-chat.component';
 
-// NEW: Correct paths for Mail Components (assuming they are in src/app/components/Mails)
+// NEW: Correct paths for Mail Components
 import { MailListComponent } from './components/Mails/mail-list/mail-list.component';
 import { MailReplyComponent } from './components/Mails/mail-reply/mail-reply.component';
+import { PrivateChatComponent } from './components/Chats/private-chat/private-chat.component';
+import { AllChatsComponent } from './components/Chats/all-chats/all-chats.component';
 
 // =================================================================
 //                 ROUTES CONFIGURATION
@@ -66,24 +67,25 @@ export const routes: Routes = [
   { path: 'blog/:id', component: DetailsBlogComponent },
   { path: 'AllBlogsUser', component: AllBlogsUserComponent },
   { path: 'staff', component: AllStaffComponent },
-  { path: 'reset-password', component: ResetPasswordComponent }, // <--- NEW ROUTE
+  { path: 'reset-password', component: ResetPasswordComponent },
 
   // --- SignUp is now an Admin-only route ---
   { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
 
   // ---------------------- MAIL ROUTES (Protected by RoleGuard) --------------------
-  // تم التأكيد على أن هذه المسارات محمية بواسطة RoleGuard للدور 'admin'
   { path: 'allMails', component: MailListComponent , canActivate: [RoleGuard], data: { roles: ['admin']} },
-  { path: 'replayMails/:id', component: MailReplyComponent , canActivate: [RoleGuard], data: { roles: ['admin']} }, // المسار صحيح لتمرير الـ ID
+  { path: 'replayMails/:id', component: MailReplyComponent , canActivate: [RoleGuard], data: { roles: ['admin']} },
 
 
+  // ---------------------- CHATS ROUTES (Managed by ChatLayoutComponent) --------------------
   // ---------------------- CHATS ROUTES --------------------
   { path: 'chats', component: AllChatsComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
   { path: 'chat/:id', component: PrivateChatComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
 
+
   // ---------------------- PROTECTED USER ROUTES --------------------
   { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
-  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } }, // هذا شات الـ AI
   { path: 'user/profile/:id', component: UserProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
 
 

@@ -4,7 +4,7 @@ export interface User {
   id: number;
   firstName: string;
   middleName?: string;
-  lastname: string | null; // **تأكيد: lastname**
+  lastname: string | null;
   email: string;
   gender?: number;
   role?: string | string[] | number;

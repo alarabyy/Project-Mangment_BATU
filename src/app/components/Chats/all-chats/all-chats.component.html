@@ -1,14 +1,13 @@
 <div class="chats-container">
   <header class="chats-header">
-    <h1 class="chats-title">تحت الانشاء فقط للمعاينه.....</h1>
     <h1 class="chats-title">Chats</h1>
 
     <div class="search-mode-toggle">
       <button class="btn" [class.active]="!showUserSearch" (click)="toggleUserSearchMode()">
-        Search Existing Chats
+        My Chats
       </button>
       <button class="btn" [class.active]="showUserSearch" (click)="toggleUserSearchMode()">
-        New Chat (Search Users)
+        New Chat
       </button>
     </div>
 
@@ -36,9 +35,10 @@
   </header>
 
   <div *ngIf="!showUserSearch" class="chat-list">
+    <h2 class="section-title">My Conversations</h2>
     <div *ngIf="filteredChats.length === 0 && chatSearchTerm.trim() === ''" class="no-chats-message">
       <i class="fas fa-inbox fa-3x"></i>
-      <p>No chats found.</p>
+      <p>No chats found. Start a new one!</p>
     </div>
     <div *ngIf="filteredChats.length === 0 && chatSearchTerm.trim() !== ''" class="no-chats-message">
       <i class="fas fa-search fa-3x"></i>
@@ -58,10 +58,10 @@
       <div class="chat-info">
         <div class="chat-name-time">
           <span class="chat-name">{{ chat.name }}</span>
-          <span class="chat-time">{{ chat.time }}</span>
+          <span class="chat-time">{{ chat.time || '' }}</span>
         </div>
         <div class="chat-last-message">
-          <p>{{ chat.lastMessage }}</p>
+          <p>{{ chat.lastMessage || 'No recent messages' }}</p>
           <span *ngIf="chat.unreadCount" class="unread-count">{{ chat.unreadCount }}</span>
         </div>
       </div>

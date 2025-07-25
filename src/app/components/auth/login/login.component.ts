@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../../Services/auth.service';
+import { AuthService } from '../../../Services/auth.service'; // Corrected path
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -13,16 +14,13 @@ import { AuthService } from '../../../Services/auth.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  // --- Form Groups ---
   loginForm!: FormGroup;
   forgotPasswordForm!: FormGroup;
 
-  // --- State Variables ---
   currentMode: 'login' | 'forgotPassword' = 'login';
   showPassword = false;
   isSubmitting = false;
 
-  // --- Message Variables ---
   loginErrorMessage: string | null = null;
   forgotPasswordSuccessMessage: string | null = null;
   forgotPasswordErrorMessage: string | null = null;
@@ -35,7 +33,6 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1. Initialize forms
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -45,17 +42,14 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]]
     });
 
-    // 2. Check if already logged in (redirect)
     if (this.authService.isLoggedIn()) {
       this.redirectToDashboard();
     }
   }
 
-  // --- Form Control Getters ---
   get loginF() { return this.loginForm.controls; }
   get forgotF() { return this.forgotPasswordForm.controls; }
 
-  // --- UI Toggle Functions ---
   togglePassword(): void { this.showPassword = !this.showPassword; }
   showForgotPasswordForm(): void {
     this.currentMode = 'forgotPassword';
@@ -71,7 +65,6 @@ export class LoginComponent implements OnInit {
     this.loginForm.reset();
   }
 
-  // --- Submission Handlers ---
   submitLogin(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -90,7 +83,7 @@ export class LoginComponent implements OnInit {
       next: () => {
         this.redirectToDashboard();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.loginErrorMessage = err.error?.message || 'Invalid credentials. Please check your email and password.';
         this.isSubmitting = false;
       },
@@ -115,7 +108,7 @@ export class LoginComponent implements OnInit {
         this.forgotPasswordSuccessMessage = 'If an account with that email exists, a password reset link has been sent to your inbox. Please check your email.';
         this.forgotPasswordForm.reset();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Forgot Password API error:', err);
         this.forgotPasswordErrorMessage = err.error?.message || 'Failed to send reset link. Please try again.';
       },
@@ -125,7 +118,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // --- Redirection after successful login ---
   private redirectToDashboard(): void {
     const role = this.authService.getUserRole();
     switch (role) {

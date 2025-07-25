@@ -319,10 +319,6 @@ body.light-theme-active {
   right: -100px; /* Hidden by default */
   top: 0;
   bottom: 0;
-  /* Use rgba with surface-color to create a fade effect */
-  /* Note: surface-color-rgb is not defined in your provided CSS.
-     If you want a true gradient with opacity, you'd need to add:
-     --surface-color-rgb: 16, 16, 16; (for #101010) to your :root variables. */
   background: linear-gradient(to left, var(--surface-color) 50%, rgba(16, 16, 16, 0) 100%);
   display: flex;
   align-items: center;
@@ -332,10 +328,9 @@ body.light-theme-active {
 
 
 .chat-item:hover .chat-actions-hover {
-  right: 0; /* Show on hover */
+  right: 0;
 }
 
-/* Reusing .btn styles from your provided CSS */
 .btn-icon {
   background: none;
   border: none;
@@ -357,24 +352,24 @@ body.light-theme-active {
 }
 
 .btn-danger-icon:hover {
-  background-color: rgba(var(--error-color-rgb), 0.15); /* Translucent error background */
+  background-color: rgba(var(--error-color-rgb), 0.15);
 }
 
 .pinned-icon {
   position: absolute;
   top: 8px;
   right: 8px;
-  color: var(--pinned-color); /* Gold color for pinned */
+  color: var(--pinned-color);
   font-size: 0.9em;
 }
 
 .pinned-active-icon {
-  color: var(--pinned-color); /* Gold color when actively pinned */
+  color: var(--pinned-color);
 }
 
 .chat-item-pinned {
   border-left: 5px solid var(--pinned-color);
-  background-color: var(--surface-color); /* Keep surface color, only change border */
+  background-color: var(--surface-color);
 }
 
 .no-chats-message, .no-results-message {
@@ -389,11 +384,10 @@ body.light-theme-active {
   color: var(--border-color);
 }
 
-/* New styles for search results */
 .search-results-section {
   margin-top: 20px;
   padding: 15px;
-  background-color: var(--surface-color); /* Use surface-color for this section */
+  background-color: var(--surface-color);
   border-radius: var(--border-radius-large);
   box-shadow: var(--box-shadow-sm);
   border: 1px solid var(--border-color-translucent);
@@ -401,7 +395,7 @@ body.light-theme-active {
 
 .section-title {
   font-size: 1.3em;
-  color: var(--primary-accent); /* Use primary accent for section title */
+  color: var(--primary-accent);
   margin-bottom: 15px;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 10px;
@@ -411,7 +405,7 @@ body.light-theme-active {
 .user-item {
   justify-content: space-between;
   align-items: center;
-  background-color: var(--bg-color); /* Slightly darker background for user items */
+  background-color: var(--bg-color);
   margin-bottom: 8px;
   padding: 12px 15px;
   border: 1px solid var(--border-color);
@@ -427,7 +421,7 @@ body.light-theme-active {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: var(--primary-accent); /* Color for the checkbox */
+  accent-color: var(--primary-accent);
 }
 
 .create-chat-button {
@@ -436,10 +430,10 @@ body.light-theme-active {
   padding: 12px;
   font-size: 1.1em;
   border-radius: var(--border-radius-pill);
-  background-color: var(--primary-accent); /* Use primary accent for create button */
-  color: var(--bg-color); /* Dark text on green */
+  background-color: var(--primary-accent);
+  color: var(--bg-color);
   font-weight: var(--font-weight-bold);
-  border: none; /* No border for primary button */
+  border: none;
 }
 
 .create-chat-button:hover {
@@ -448,7 +442,6 @@ body.light-theme-active {
   box-shadow: 0 4px 10px var(--shadow-color-accent);
 }
 
-/* Animation styles */
 .animate__animated {
   animation-duration: 0.5s;
   animation-fill-mode: both;
@@ -469,7 +462,6 @@ body.light-theme-active {
   animation-name: fadeInUp;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .chats-container {
     padding: 15px;

@@ -2,26 +2,29 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } fr
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, interval } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
+import { Subscription, firstValueFrom } from 'rxjs';
 
+import { PersonalChatApiService } from '../../../Services/personal-chats-api.service';
+import { SignalRService } from '../../../Services/signalr.service';
+import { AuthService } from '../../../Services/auth.service';
+import { ChatDto, ChatMessageDto } from '../../../models/dtos'; // **تم التصحيح هنا: من models/dtos إلى shared/dtos**
 
 interface Message {
   id: number;
   sender: 'me' | 'other';
   content: string;
   time: string;
-  type: 'text' | 'image' | 'audio' | 'video' | 'file'; // New: Message type
-  url?: string; // For image, audio, video messages
-  fileName?: string; // For file messages (e.g., PDF, DOCX)
+  type: 'text' | 'image' | 'audio' | 'video' | 'file';
+  url?: string;
+  fileName?: string;
 }
 
 interface ChatContact {
   id: number;
   name: string;
   avatar: string;
-  isOnline: boolean; // Online status
-  lastSeen?: string; // Last seen status
+  isOnline: boolean;
+  lastSeen?: string;
 }
 
 @Component({
@@ -29,44 +32,56 @@ interface ChatContact {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './private-chat.component.html',
-  styleUrls: ['./private-chat.component.css'] // Corrected to styleUrls
+  styleUrls: ['./private-chat.component.css']
 })
 export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('messageList') private messageListRef!: ElementRef;
 
   chatId: number | null = null;
+  chatDetails: ChatDto | null = null;
   contact: ChatContact | null = null;
   messages: Message[] = [];
   newMessage: string = '';
-  isTyping: boolean = false; // Typing indicator
-  isUserOnline: boolean = false; // User online status (for the contact)
-  selectedFile: File | null = null; // For file attachment
+  isTyping: boolean = false;
+  isUserOnline: boolean = false;
+  selectedFile: File | null = null;
 
+  private currentUserId: number | null = null;
   private routeSubscription?: Subscription;
+  private receiveMessageSubscription?: Subscription;
   private typingTimer?: any;
-  private onlineStatusChecker?: Subscription;
 
-  private dummyContacts: ChatContact[] = [
-    { id: 1, name: 'Alice Smith', avatar: 'https://i.pravatar.cc/150?img=1', isOnline: true, lastSeen: 'Online' },
-    { id: 2, name: 'Bob Johnson', avatar: 'https://i.pravatar.cc/150?img=2', isOnline: false, lastSeen: 'Last seen today at 3:45 PM' },
-    { id: 3, name: 'Charlie Brown', avatar: 'https://i.pravatar.cc/150?img=3', isOnline: true, lastSeen: 'Online' },
-    { id: 4, name: 'Diana Prince', avatar: 'https://i.pravatar.cc/150?img=4', isOnline: false, lastSeen: 'Last seen yesterday' },
-    { id: 5, name: 'Eve Adams', avatar: 'https://i.pravatar.cc/150?img=5', isOnline: true, lastSeen: 'Online' },
-    { id: 6, name: 'Frank White', avatar: 'https://i.pravatar.cc/150?img=6', isOnline: false, lastSeen: 'Last seen 2 days ago' },
-    { id: 7, name: 'Grace Lee', avatar: 'https://i.pravatar.cc/150?img=7', isOnline: true, lastSeen: 'Online' },
-    { id: 8, name: 'Harry Potter', avatar: 'https://i.pravatar.cc/150?img=8', isOnline: false, lastSeen: 'Last seen on Mon' },
-    { id: 9, name: 'Ivy Green', avatar: 'https://i.pravatar.cc/150?img=9', isOnline: true, lastSeen: 'Online' },
-    { id: 10, name: 'Jack Black', avatar: 'https://i.pravatar.cc/150?img=10', isOnline: false, lastSeen: 'Last seen 1/1/2025' },
-  ];
-
-  constructor(private route: ActivatedRoute, private router: Router) { }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private chatApiService: PersonalChatApiService,
+    private signalRService: SignalRService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
+    const userIdString = this.authService.getUserId();
+    if (userIdString) {
+      const parsedId = parseInt(userIdString, 10);
+      if (!isNaN(parsedId)) {
+        this.currentUserId = parsedId;
+      } else {
+        console.error('Parsed user ID from token is not a valid number. Redirecting to login.');
+        this.router.navigate(['/Login']);
+        return;
+      }
+    } else {
+      console.error('User ID not found in token. Redirecting to login.');
+      this.router.navigate(['/Login']);
+      return;
+    }
+
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.chatId = +id;
         this.loadChatData(this.chatId);
+        this.setupSignalR();
       } else {
         this.router.navigate(['/chats']);
       }
@@ -74,46 +89,108 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.scrollToBottom(); // Scroll to bottom on initial load
+    this.scrollToBottom();
   }
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
+    this.receiveMessageSubscription?.unsubscribe();
     if (this.typingTimer) clearTimeout(this.typingTimer);
-    this.onlineStatusChecker?.unsubscribe();
   }
 
-  loadChatData(id: number): void {
-    this.contact = this.dummyContacts.find(c => c.id === id) || null;
+  private async loadChatData(id: number): Promise<void> {
+    try {
+      const chatDetailsResponse = await firstValueFrom(this.chatApiService.getChatDetails(id)) as ChatDto;
 
-    if (this.contact) {
-      this.messages = [
-        { id: 1, sender: 'other', content: `Hello ${this.contact.name}, how are you today?`, time: '10:00 AM', type: 'text' },
-        { id: 2, sender: 'me', content: 'I\'m doing great, thank you! How about you?', time: '10:01 AM', type: 'text' },
-        { id: 3, sender: 'other', content: 'I\'m good too. Just finished up some work.', time: '10:03 AM', type: 'text' },
-        { id: 4, sender: 'me', content: 'Sounds busy! What are your plans for the weekend?', time: '10:05 AM', type: 'text' },
-        { id: 5, sender: 'other', content: 'Thinking of going for a hike if the weather permits. You?', time: '10:07 AM', type: 'text' },
-        { id: 6, sender: 'me', content: 'Maybe I\'ll just relax and read some books.', time: '10:08 AM', type: 'text' },
-        { id: 7, sender: 'other', content: 'That sounds nice and relaxing!', time: '10:09 AM', type: 'text' },
-        { id: 8, sender: 'other', content: '', time: '10:10 AM', type: 'image', url: 'https://picsum.photos/id/237/200/200' }, // Image message
-        { id: 9, sender: 'me', content: 'Cool picture! Where did you take it?', time: '10:11 AM', type: 'text' },
-        { id: 10, sender: 'me', content: 'By the way, did you get my email about the project?', time: '10:15 AM', type: 'text' },
-        { id: 11, sender: 'other', content: 'Ah, yes! I just saw it. I\'ll get back to you soon.', time: '10:16 AM', type: 'text' },
-        { id: 12, sender: 'me', content: 'Great, no rush!', time: '10:17 AM', type: 'text' },
-        { id: 13, sender: 'other', content: 'Here\'s a sample audio file.', time: '10:20 AM', type: 'audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', fileName: 'SoundHelix-Song-1.mp3' },
-        { id: 14, sender: 'me', content: 'Nice, checking it out.', time: '10:21 AM', type: 'text' },
-        { id: 15, sender: 'other', content: 'And a quick video.', time: '10:25 AM', type: 'video', url: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4', fileName: 'sample-mp4-file.mp4' },
-      ];
+      if (!chatDetailsResponse || Object.keys(chatDetailsResponse).length === 0) {
+        console.error('Chat details not found or user not authorized (response empty/malformed).');
+        this.contact = null;
+        return;
+      }
+      this.chatDetails = chatDetailsResponse;
 
-      this.isUserOnline = this.contact.isOnline; // Set initial online status
-      this.startOnlineStatusChecker(); // Start checking online status periodically
-      setTimeout(() => this.scrollToBottom(), 100); // Ensure scroll after messages load
-    } else {
-      this.messages = [];
+      if (this.chatDetails) {
+        this.contact = {
+          id: this.chatDetails.id,
+          name: this.chatDetails.name,
+          avatar: 'https://i.pravatar.cc/150?img=' + (id % 10 + 1),
+          isOnline: false,
+          lastSeen: 'Unknown'
+        };
+      }
+
+
+      const messagesDto = await firstValueFrom(this.chatApiService.getChatMessages(id)) as ChatMessageDto[];
+      this.messages = messagesDto.map((dto: ChatMessageDto) => this.mapChatMessageDtoToMessage(dto));
+
+      setTimeout(() => this.scrollToBottom(), 100);
+
+    } catch (error: any) {
+      console.error('Error loading chat data:', error);
+      this.contact = null;
+      if (error.status === 404) {
+        alert('Chat not found or you do not have access.');
+      } else {
+        alert('An error occurred while loading chat data.');
+      }
+      this.router.navigate(['/chats']);
     }
   }
 
-  // New: Toggle the contact's online status manually for testing
+  private async setupSignalR(): Promise<void> {
+    if (this.chatId === null || this.currentUserId === null) return;
+
+    try {
+      if (!this.signalRService.isConnected()) {
+        await this.signalRService.startConnection();
+      }
+    } catch (err: any) {
+      console.error('Failed to start SignalR connection:', err);
+      alert('Failed to connect to real-time chat service.');
+      return;
+    }
+
+    if (this.signalRService.isConnected()) {
+      try {
+        await this.signalRService.joinChat(this.chatId);
+        this.receiveMessageSubscription = this.signalRService.onReceiveMessage().subscribe({
+          next: (messageDto: ChatMessageDto) => {
+            if (messageDto.chatId === this.chatId) {
+              this.messages.push(this.mapChatMessageDtoToMessage(messageDto));
+              this.scrollToBottom();
+
+              if (messageDto.senderId !== this.currentUserId) {
+                  this.isTyping = true;
+                  if (this.typingTimer) clearTimeout(this.typingTimer);
+                  this.typingTimer = setTimeout(() => {
+                      this.isTyping = false;
+                  }, 1500 + Math.random() * 1000);
+              }
+            }
+          },
+          error: (err: any) => console.error('Error receiving message:', err)
+        });
+      } catch (err: any) {
+        console.error(`Failed to join chat ${this.chatId} via SignalR:`, err);
+        alert('Failed to join chat for real-time messages. You might need to refresh.');
+      }
+    }
+  }
+
+  private mapChatMessageDtoToMessage(dto: ChatMessageDto): Message {
+    const isMe = dto.senderId === this.currentUserId;
+    const date = new Date(dto.date);
+    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    return {
+      id: dto.id,
+      sender: isMe ? 'me' : 'other',
+      content: dto.message,
+      time: timeString,
+      type: 'text'
+    };
+  }
+
   toggleContactOnlineStatus(): void {
     if (this.contact) {
       this.contact.isOnline = !this.contact.isOnline;
@@ -123,30 +200,16 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  startOnlineStatusChecker(): void {
-    if (this.onlineStatusChecker) {
-      this.onlineStatusChecker.unsubscribe(); // Clear previous interval
-    }
-    // Simulate online/offline status change every 5-10 seconds
-    this.onlineStatusChecker = interval(Math.random() * 5000 + 5000).pipe(
-      takeWhile(() => !!this.contact) // Keep alive as long as contact exists
-    ).subscribe(() => {
-      // Commenting out automated toggle to allow manual control for testing
-      // if (this.contact) {
-      //   this.contact.isOnline = !this.contact.isOnline; // Toggle status
-      //   this.isUserOnline = this.contact.isOnline;
-      //   this.contact.lastSeen = this.contact.isOnline ? 'Online' : `Last seen ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      // }
-    });
-  }
-
   sendMessage(): void {
-    if (this.newMessage.trim() || this.selectedFile) {
-      const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (this.chatId === null || (!this.newMessage.trim() && !this.selectedFile)) {
+      return;
+    }
 
-      if (this.selectedFile) {
-        const fileType = this.selectedFile.type.split('/')[0]; // image, audio, video
-        let type: 'text' | 'image' | 'audio' | 'video' | 'file' = 'file'; // Default to generic file
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    if (this.selectedFile) {
+        const fileType = this.selectedFile.type.split('/')[0];
+        let type: 'text' | 'image' | 'audio' | 'video' | 'file' = 'file';
 
         let url = '';
         if (fileType === 'image') {
@@ -156,68 +219,32 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
         } else if (fileType === 'video') {
           type = 'video';
         }
-        // For actual files (like PDF, DOCX), type will remain 'file'
-        // For media, createObjectURL to display locally
         url = URL.createObjectURL(this.selectedFile);
 
         this.messages.push({
             id: this.messages.length + 1,
             sender: 'me',
-            content: (type === 'file' ? `Sent file: ${this.selectedFile.name}` : ''), // Only text for generic files
+            content: (type === 'file' ? `Sent file: ${this.selectedFile.name}` : ''),
             time: currentTime,
             type: type,
             url: url,
             fileName: this.selectedFile.name
         });
-
-        this.selectedFile = null; // Clear selected file
-      }
-
-      if (this.newMessage.trim()) {
-        this.messages.push({
-          id: this.messages.length + 1,
-          sender: 'me',
-          content: this.newMessage.trim(),
-          time: currentTime,
-          type: 'text'
-        });
-        this.newMessage = ''; // Clear input field
-      }
-
-      this.scrollToBottom();
-
-      // Simulate a reply from the other user after a short delay
-      this.isTyping = true;
-      if (this.typingTimer) clearTimeout(this.typingTimer);
-      this.typingTimer = setTimeout(() => {
-        this.isTyping = false;
-        const replyContent = this.getSimulatedReply();
-        this.messages.push({
-          id: this.messages.length + 1,
-          sender: 'other',
-          content: replyContent,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          type: 'text'
-        });
-        this.scrollToBottom();
-      }, 1500 + Math.random() * 1000); // Random delay for typing simulation
+        this.selectedFile = null;
     }
-  }
 
-  getSimulatedReply(): string {
-    const replies = [
-      'Okay, understood. Thank you.',
-      'That\'s interesting!',
-      'I\'ll get back to you soon.',
-      'How can I help you?',
-      'I completely agree.',
-      'Is there anything else?',
-      'Thanks for the info.',
-      'I need some time to think about this.',
-      'Alright, see you soon then.',
-      'I understand that.'
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
+    if (this.newMessage.trim()) {
+      this.signalRService.sendMessage(this.chatId, this.newMessage.trim())
+        .then(() => {
+          this.newMessage = '';
+        })
+        .catch((err: any) => {
+          console.error('Failed to send message:', err);
+          alert('Failed to send message. Please try again.');
+        });
+    }
+
+    this.scrollToBottom();
   }
 
   onFileSelected(event: Event): void {
@@ -232,7 +259,6 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   clearSelectedFile(): void {
     this.selectedFile = null;
-    // Reset file input value if needed (optional)
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -240,10 +266,11 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   scrollToBottom(): void {
-    // Small delay to ensure DOM updates before scrolling
     setTimeout(() => {
       try {
-        this.messageListRef.nativeElement.scrollTop = this.messageListRef.nativeElement.scrollHeight;
+        if (this.messageListRef) {
+            this.messageListRef.nativeElement.scrollTop = this.messageListRef.nativeElement.scrollHeight;
+        }
       } catch (err) { /* Handle error */ }
     }, 0);
   }
