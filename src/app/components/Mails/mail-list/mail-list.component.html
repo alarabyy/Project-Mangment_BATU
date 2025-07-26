@@ -68,11 +68,7 @@
           {{ mail.sentAt ? (mail.sentAt | date:'short') : 'N/A' }}
         </small>
         <div class="mail-actions">
-
-        </div>
-
-      </div>
-                <button
+          <button
             class="btn btn-secondary btn-sm"
             (click)="markAsRead(mail)"
             [disabled]="mail.isRead"
@@ -85,11 +81,21 @@
           <button class="btn btn-primary btn-sm" (click)="openReply(mail.id)">
             <i class="fas fa-reply-all"></i> Reply
           </button>
+          <!-- زر الحذف الجديد -->
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="openDeleteConfirm(mail.id)"
+            title="Delete Mail"
+          >
+            <i class="fas fa-trash-alt"></i> Delete
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- **هنا يبدأ HTML الخاص بالمودال المُحسّن (Modal Pop-up)** -->
+<!-- هنا يبدأ HTML الخاص بالمودال المُحسّن (Modal Pop-up) للرد -->
 <div *ngIf="showReplyModal" class="modal-overlay" (click)="closeReplyModal()">
   <div class="modal-content-pro" (click)="$event.stopPropagation()">
     <div class="modal-header-pro">
@@ -107,4 +113,23 @@
     </div>
   </div>
 </div>
-<!-- **هنا ينتهي HTML الخاص بالمودال** -->
+<!-- هنا ينتهي HTML الخاص بمودال الرد -->
+
+<!-- هنا يبدأ HTML الخاص بمودال تأكيد الحذف (جديد) -->
+<div *ngIf="showDeleteConfirmModal" class="modal-overlay" (click)="closeDeleteConfirmModal()">
+  <div class="modal-content-pro" (click)="$event.stopPropagation()">
+    <div class="modal-header-pro">
+      <h3 class="modal-title-pro">Confirm Deletion</h3>
+      <button class="close-button-pro" (click)="closeDeleteConfirmModal()">×</button>
+    </div>
+    <div class="modal-body-pro">
+      <p class="modal-confirm-text">Are you sure you want to delete mail ID: <span class="highlight-delete">{{ mailToDeleteId }}</span>?</p>
+      <p class="modal-warning-text">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer-pro">
+      <button class="btn btn-secondary" (click)="closeDeleteConfirmModal()">Cancel</button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+<!-- هنا ينتهي HTML الخاص بمودال تأكيد الحذف -->

@@ -23,6 +23,10 @@ export class MailListComponent implements OnInit {
   currentReplyMailId: number | null = null;
   replyMessage: string = '';
 
+  // متغيرات جديدة للحذف
+  showDeleteConfirmModal: boolean = false;
+  mailToDeleteId: number | null = null;
+
   constructor(
     private mailService: MailService,
     private router: Router,
@@ -99,6 +103,39 @@ export class MailListComponent implements OnInit {
       error: (err) => {
         console.error('Error sending reply:', err);
         this.notificationService.showError('Failed to send reply. Please try again.');
+      }
+    });
+  }
+
+  // دوال جديدة للتعامل مع الحذف
+  openDeleteConfirm(mailId: number): void {
+    this.mailToDeleteId = mailId;
+    this.showDeleteConfirmModal = true;
+  }
+
+  closeDeleteConfirmModal(): void {
+    this.showDeleteConfirmModal = false;
+    this.mailToDeleteId = null;
+  }
+
+  confirmDelete(): void {
+    if (this.mailToDeleteId === null) {
+      this.notificationService.showError('No mail selected for deletion.');
+      this.closeDeleteConfirmModal();
+      return;
+    }
+
+    this.mailService.deleteMail(this.mailToDeleteId).subscribe({
+      next: () => {
+        this.notificationService.showSuccess(`Mail ID ${this.mailToDeleteId} deleted successfully.`);
+        // إزالة الرسالة من القائمة محلياً لتحديث الواجهة
+        this.mails = this.mails.filter(m => m.id !== this.mailToDeleteId);
+        this.closeDeleteConfirmModal();
+      },
+      error: (err) => {
+        console.error('Error deleting mail:', err);
+        this.notificationService.showError('Failed to delete mail. Please try again.');
+        this.closeDeleteConfirmModal();
       }
     });
   }
