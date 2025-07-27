@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const noAuthRequiredEndpoints = [
     `${authApiUrl}/login`,
-    `${authApiUrl}/register`,
+    //`${authApiUrl}/register`,
     `${authApiUrl}/forgot-password`,
     `${authApiUrl}/reset-password`,
     'https://generativelanguage.googleapis.com/'
