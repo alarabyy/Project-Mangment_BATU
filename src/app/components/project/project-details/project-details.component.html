@@ -30,9 +30,9 @@
       <header class="details-header">
         <h1>{{ project.title }}</h1>
         <div class="header-actions">
-          <a routerLink="/ProjectList" class="btn btn-secondary">
+          <!-- <a routerLink="/ProjectList" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back
-          </a>
+          </a> -->
           <a [routerLink]="['/EditProject', project.id]" class="btn btn-primary">
             <i class="fas fa-edit"></i> Edit
           </a>

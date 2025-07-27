@@ -12,6 +12,11 @@
   --secondary-accent: #6c757d; /* Standard grey for secondary actions */
   --secondary-accent-rgb: 108, 117, 125;
 
+  --danger-color: #dc3545; /* Red for delete actions */
+  --danger-color-rgb: 220, 53, 69;
+  --danger-color-hover: #c82333; /* Darker red for hover */
+
+
   --page-background: #000000; /* Pure black for overall page background */
   --surface-color: #1A1A1A; /* Dark background for cards/surfaces */
   --surface-color-light: #2c2c2c; /* Slightly lighter dark for active states/hover */
@@ -62,6 +67,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll on small devices */
 }
 
 /* RTL Global Styles */
@@ -75,6 +81,7 @@ body.rtl-active {
   padding: 5rem 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 /* Section Header */
@@ -132,6 +139,13 @@ body.rtl-active .mail-list-actions {
   transition: all var(--transition-speed-fast) ease;
   border: 1px solid transparent; /* Ensure consistent border */
   font-size: 1rem;
+  display: inline-flex; /* Use flex for button content */
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* Space between icon and text */
+}
+.btn i {
+    font-size: 1.1rem; /* Slightly larger icon in general buttons */
 }
 
 .btn-primary {
@@ -159,6 +173,19 @@ body.rtl-active .mail-list-actions {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* New: Danger Button for Delete */
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white; /* White text for danger button */
+  border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-color-hover);
+  border-color: var(--danger-color-hover);
+  box-shadow: 0 4px 8px rgba(var(--danger-color-rgb), 0.3);
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -180,6 +207,7 @@ body.rtl-active .mail-list-actions {
   align-items: center;
   justify-content: center;
   gap: 1.5rem; /* More space */
+  box-sizing: border-box;
 }
 
 .loading-spinner i {
@@ -226,6 +254,7 @@ body.rtl-active .mail-list-actions {
   display: flex;
   flex-direction: column;
   gap: 1rem; /* Slightly larger gap */
+  box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 .mail-item:hover {
@@ -381,14 +410,18 @@ body.rtl-active .mail-date i {
 .mail-actions {
   display: flex;
   gap: 0.8rem; /* More space between action buttons */
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  justify-content: flex-end; /* Align buttons to the right by default */
 }
 body.rtl-active .mail-actions {
     flex-direction: row-reverse;
+    justify-content: flex-start; /* Align buttons to the left in RTL */
 }
 .mail-actions .btn {
   font-size: 0.9rem; /* Larger buttons for card actions */
   padding: 0.6rem 1.2rem; /* More padding */
   border-radius: var(--border-radius-large); /* Slightly more rounded */
+  flex-shrink: 0; /* Prevent buttons from shrinking too much */
 }
 .mail-actions .btn i {
   font-size: 0.95rem; /* Adjust icon size within buttons */
@@ -427,20 +460,124 @@ body.rtl-active .mail-actions {
   body.rtl-active .mail-meta-data { align-items: flex-end; }
   .mail-actions-bottom { flex-direction: column; align-items: flex-start; gap: 0.8rem; padding-top: 0.8rem; }
   body.rtl-active .mail-actions-bottom { align-items: flex-end; }
-  .mail-actions { width: 100%; justify-content: stretch; }
-  .mail-actions .btn { flex-grow: 1; } /* Buttons stretch to fill width */
+  /* Make mail actions stack vertically on small screens */
+  .mail-actions {
+    flex-direction: column; /* Stack buttons */
+    width: 100%; /* Make them take full width */
+    justify-content: center; /* Center buttons when stacked */
+  }
+  .mail-actions .btn {
+    width: 100%; /* Ensure full width when stacked */
+    margin-bottom: 0.6rem; /* Add spacing between stacked buttons */
+  }
+  .mail-actions .btn:last-child {
+    margin-bottom: 0; /* No margin after the last button */
+  }
 }
 
-@media (max-width: 575px) {
-  .mail-list-container { padding: 2rem 0.8rem; }
-  .section-title { font-size: 1.6rem; }
-  .section-title-icon { font-size: 1.4rem; }
-  .section-subtitle { font-size: 0.9rem; }
-  .mail-item { padding: 1rem; }
-  .mail-subject { font-size: 1rem; }
-  .mail-message-preview { font-size: 0.85rem; -webkit-line-clamp: 6; }
-  .mail-date { font-size: 0.8rem; }
-  .mail-actions .btn { font-size: 0.75rem; padding: 0.35rem 0.7rem; }
+/* Extra small mobile phones (e.g., iPhone 5/SE, smaller Androids) */
+@media (max-width: 480px) {
+  .mail-list-container {
+    padding: 1.5rem 0.8rem; /* Reduced padding for very small screens */
+  }
+  .section-header {
+    margin-bottom: 2rem;
+  }
+  .section-title {
+    font-size: 1.8rem; /* Smaller title */
+    gap: 0.5rem;
+  }
+  .section-title-icon {
+    font-size: 1.6rem; /* Smaller icon */
+  }
+  .section-subtitle {
+    font-size: 0.9rem; /* Smaller subtitle */
+    max-width: 95%;
+  }
+  .loading-spinner, .error-message, .no-mails-message {
+    padding: 1.5rem; /* Reduced padding */
+    font-size: 1rem; /* Smaller font size */
+    gap: 1rem;
+  }
+  .loading-spinner i, .no-mails-message i {
+    font-size: 2.5rem; /* Smaller icons */
+  }
+  .mail-item {
+    padding: 1rem; /* Reduced padding for mail items */
+    gap: 0.8rem;
+  }
+  .mail-top-row {
+    flex-wrap: wrap; /* Allow from and status to wrap if needed */
+    gap: 0.5rem;
+  }
+  .mail-from {
+    font-size: 0.95rem; /* Smaller font for sender */
+    flex-basis: 100%; /* Take full width if status wraps */
+  }
+  .mail-status {
+    font-size: 0.75rem; /* Smaller status tag */
+    padding: 0.4em 0.8em;
+    min-width: unset; /* Remove min-width to allow shrinking */
+  }
+  .mail-subject {
+    font-size: 1rem; /* Smaller subject */
+  }
+  .mail-message-preview {
+    font-size: 0.8rem; /* Smaller message preview */
+    -webkit-line-clamp: 7; /* Allow more lines */
+  }
+  .mail-meta-data {
+    font-size: 0.75rem; /* Smaller meta data */
+    gap: 0.8rem;
+    padding-top: 0.8rem;
+  }
+  .mail-actions-bottom {
+    gap: 0.6rem;
+    padding-top: 0.8rem;
+  }
+  .mail-date {
+    font-size: 0.8rem; /* Smaller date */
+  }
+  .mail-actions .btn {
+    font-size: 0.8rem; /* Smaller buttons in mail items */
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.4rem; /* Slightly less margin for stacked buttons */
+  }
+}
+
+/* Smallest mobile phones (e.g., widths around 320px) */
+@media (max-width: 375px) {
+  .mail-list-container {
+    padding: 1rem 0.5rem; /* Even smaller padding */
+  }
+  .section-title {
+    font-size: 1.5rem; /* Even smaller title */
+  }
+  .section-title-icon {
+    font-size: 1.3rem;
+  }
+  .section-subtitle {
+    font-size: 0.85rem;
+  }
+  .loading-spinner, .error-message, .no-mails-message {
+    padding: 1rem;
+  }
+  .mail-item {
+    padding: 0.8rem;
+  }
+  .mail-from {
+    font-size: 0.9rem;
+  }
+  .mail-subject {
+    font-size: 0.9rem;
+  }
+  .mail-message-preview {
+    font-size: 0.75rem;
+  }
+  .mail-actions .btn {
+    font-size: 0.7rem; /* Smallest buttons for smallest screens */
+    padding: 0.4rem 0.8rem;
+  }
 }
 
 
@@ -475,6 +612,7 @@ body.rtl-active .mail-actions {
   flex-direction: column;
   gap: 2.2rem; /* مسافات أكبر بين الأجزاء المختلفة للمودال */
   border: 1px solid var(--primary-accent); /* إطار رقيق بلون مميز */
+  box-sizing: border-box; /* Crucial for responsive padding */
 }
 
 /* حركة ظهور المودال "القفزية" */
@@ -502,9 +640,16 @@ body.rtl-active .mail-actions {
 }
 
 .modal-title-pro .highlight {
-  color: var(--primary-accent); /* لون مميز للـ ID */
+  color: var(--primary-accent); /* لون مميز للـ ID في مودال الرد */
   font-weight: var(--font-weight-extrabold);
 }
+
+/* New: Highlight for delete modal ID */
+.modal-body-pro .highlight-delete {
+    color: var(--danger-color); /* لون مميز للـ ID في مودال الحذف */
+    font-weight: var(--font-weight-extrabold);
+}
+
 
 .close-button-pro {
   background: none;
@@ -560,6 +705,23 @@ body.rtl-active .mail-actions {
   border-color: var(--primary-accent);
   box-shadow: 0 0 0 0.4rem rgba(var(--primary-accent-rgb), 0.5); /* ظل تركيز أوسع وأكثر وضوحاً وقوة */
 }
+
+/* New: Styles for confirmation text in delete modal */
+.modal-confirm-text {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  text-align: center; /* Center the text */
+}
+
+.modal-warning-text {
+  font-size: 0.95rem;
+  color: var(--subtle-text-color);
+  font-weight: var(--font-weight-medium);
+  margin-top: 0.5rem;
+  text-align: center; /* Center the text */
+}
+
 
 .modal-footer-pro {
   display: flex;
@@ -626,6 +788,11 @@ body.rtl-active .mail-actions {
     min-height: 180px;
     padding: 1rem;
   }
+  /* New: Center confirmation text on smaller screens */
+  .modal-confirm-text,
+  .modal-warning-text {
+      text-align: center;
+  }
   .modal-footer-pro {
     padding-top: 1.2rem;
     margin-top: 0.6rem;
@@ -668,6 +835,54 @@ body.rtl-active .mail-actions {
   .modal-footer-pro .btn {
     width: 100%; /* Buttons take full width */
     padding: 0.7rem 1rem; /* More padding for easier tapping */
+  }
+  /* New: Order buttons specifically for delete modal on mobile for better UX */
+  .modal-footer-pro .btn-danger {
+      order: 1; /* Puts the Delete button on top when stacked */
+  }
+  .modal-footer-pro .btn-secondary {
+      order: 2; /* Puts the Cancel button below when stacked */
+  }
+}
+
+/* Very small mobile phones (e.g., iPhone 5/SE, widths around 320px) */
+@media (max-width: 375px) {
+  .modal-content-pro {
+    padding: 1rem 1rem; /* Even smaller padding for content */
+    gap: 1rem;
+    width: 97%; /* Maximise width usage */
+    margin: 0.5rem; /* Tiny margin from edges */
+  }
+  .modal-header-pro {
+    padding-bottom: 0.8rem;
+  }
+  .modal-title-pro {
+    font-size: 1.2rem; /* Smallest title size */
+  }
+  .close-button-pro {
+    font-size: 1.5rem; /* Smallest close button */
+    padding: 0; /* Remove padding */
+  }
+  .modal-label-pro {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+  .modal-textarea-pro {
+    min-height: 120px; /* Minimum height for textarea */
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+  .modal-confirm-text,
+  .modal-warning-text {
+      font-size: 0.9rem; /* Smaller text for confirmation */
+  }
+  .modal-footer-pro {
+    padding-top: 0.8rem;
+    gap: 0.5rem;
+  }
+  .modal-footer-pro .btn {
+    padding: 0.6rem 0.8rem; /* Smaller button padding */
+    font-size: 0.85rem; /* Smaller button text */
   }
 }
 

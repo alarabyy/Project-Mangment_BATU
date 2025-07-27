@@ -38,8 +38,6 @@ export interface MailReplyRequest {
   providedIn: 'root'
 })
 export class MailService {
-  // ***** التعديل الرئيسي هنا: إضافة '/api/' *****
-  // بناءً على الـ Endpoints التي أرسلتها للـ Backend: /api/mail/list
   private mailApiUrl = `${environment.apiUrl}/api/mail`;
 
   constructor(
@@ -127,6 +125,18 @@ export class MailService {
     console.log('[MailService] Sending mail reply request (with auth headers):', replyData);
     // المسار: /api/mail/reply
     return this.http.post(`${this.mailApiUrl}/reply`, replyData, { headers }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * يحذف رسالة بريد إلكتروني.
+   * DELETE /api/mail/{id}
+   */
+  deleteMail(id: number): Observable<any> {
+    const headers = this.authService.getAuthHeaders();
+    console.log(`[MailService] Deleting mail ${id} (with auth headers).`);
+    return this.http.delete<any>(`${this.mailApiUrl}/${id}`, { headers }).pipe(
       catchError(this.handleError)
     );
   }
