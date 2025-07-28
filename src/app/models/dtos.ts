@@ -30,4 +30,5 @@ export interface ChatMessageDto {
     date: string; // ISO 8601 string from backend (DateTime.UtcNow)
     senderId: number;
     chatId: number;
+    attachments: string[];
 }

@@ -28,30 +28,32 @@
   <div class="message-list" #messageList>
     <div *ngFor="let message of messages" class="message-bubble-wrapper animate__animated animate__fadeInUp">
       <div class="message-bubble" [ngClass]="{'my-message': message.sender === 'me', 'other-message': message.sender === 'other'}">
-        <p *ngIf="message.type === 'text'" class="message-content">{{ message.content }}</p>
+        
+        <!-- 1. Display the text content of the message if it exists -->
+        <p *ngIf="message.content" class="message-content">{{ message.content }}</p>
 
-        <div *ngIf="message.type === 'image'" class="message-media-container">
-            <img [src]="message.url" alt="Image" class="message-image" (load)="scrollToBottom()">
-            <span class="media-filename" *ngIf="message.fileName">{{ message.fileName }}</span>
-        </div>
+        <!-- 2. Container to hold all attachments for this message -->
+        <div *ngIf="message.attachments && message.attachments.length > 0" class="attachments-container">
+          
+          <!-- 3. Loop through the attachments array -->
+          <div *ngFor="let attachment of message.attachments" class="attachment-item">
+            
+            <!-- Display logic for an image attachment -->
+            <div *ngIf="attachment.type === 'image'" class="message-media-container">
+              <a [href]="attachment.url" target="_blank">
+                <img [src]="attachment.url" alt="Image Attachment" class="message-image" (load)="scrollToBottom()">
+              </a>
+            </div>
 
-        <div *ngIf="message.type === 'audio'" class="message-media-container">
-            <audio controls [src]="message.url"></audio>
-            <span class="media-filename" *ngIf="message.fileName">{{ message.fileName }}</span>
-        </div>
-
-        <div *ngIf="message.type === 'video'" class="message-media-container">
-            <video controls [src]="message.url"></video>
-            <span class="media-filename" *ngIf="message.fileName">{{ message.fileName }}</span>
-        </div>
-
-        <div *ngIf="message.type === 'file'" class="message-file-container">
-            <i class="fas fa-file-alt file-icon"></i>
-            <a [href]="message.url" target="_blank" class="file-link" download="{{message.fileName}}">
-                <span class="file-name">{{ message.fileName || 'Unknown File' }}</span>
-                <i class="fas fa-download download-icon"></i>
-            </a>
-            <span class="message-content" *ngIf="message.content">{{message.content}}</span>
+            <!-- Display logic for a PDF file attachment -->
+            <div *ngIf="attachment.type === 'pdf'" class="message-file-container">
+              <i class="fas fa-file-pdf file-icon pdf-icon"></i>
+              <a [href]="attachment.url" target="_blank" class="file-link" download>
+                  <span class="file-name">{{ attachment.fileName }}</span>
+                  <i class="fas fa-download download-icon"></i>
+              </a>
+            </div>
+          </div>
         </div>
 
         <span class="message-time">{{ message.time }}</span>
@@ -61,13 +63,16 @@
 
   <div class="message-input-area">
     <div class="file-attachment-container">
-      <input type="file" id="fileInput" class="hidden-file-input" (change)="onFileSelected($event)" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt" />
-      <label for="fileInput" class="attach-button btn btn-icon" title="Attach File">
+      <!-- 4. Updated file input to accept only images and PDFs -->
+      <input type="file" id="fileInput" class="hidden-file-input" (change)="onFileSelected($event)" accept="image/*,.pdf" multiple />
+      <label for="fileInput" class="attach-button btn btn-icon" title="Attach Files">
         <i class="fas fa-paperclip"></i>
       </label>
-      <div *ngIf="selectedFile" class="selected-file-info card">
-        <span><i class="fas fa-file"></i> {{ selectedFile.name }}</span>
-        <button class="btn-clear-file" (click)="clearSelectedFile()" title="Remove File">
+      
+      <!-- 5. Updated display for multiple selected files -->
+      <div *ngIf="selectedFiles.length > 0" class="selected-file-info card">
+        <span><i class="fas fa-file-alt"></i> {{ selectedFiles.length }} file(s) selected</span>
+        <button class="btn-clear-file" (click)="clearSelectedFile()" title="Remove Files">
           <i class="fas fa-times-circle"></i>
         </button>
       </div>
@@ -80,7 +85,7 @@
       class="form-input message-textarea"
       rows="1"
     ></textarea>
-    <button class="send-button btn btn-primary" (click)="sendMessage()" [disabled]="!newMessage.trim() && !selectedFile">
+    <button class="send-button btn btn-primary" (click)="sendMessage()" [disabled]="!newMessage.trim() && selectedFiles.length === 0">
       <i class="fas fa-paper-plane"></i>
     </button>
   </div>

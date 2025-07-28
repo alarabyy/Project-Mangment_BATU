@@ -8,15 +8,19 @@ import { PersonalChatApiService } from '../../../Services/personal-chats-api.ser
 import { SignalRService } from '../../../Services/signalr.service';
 import { AuthService } from '../../../Services/auth.service';
 import { ChatDto, ChatMessageDto } from '../../../models/dtos'; // **تم التصحيح هنا: من models/dtos إلى shared/dtos**
+import { environment } from '../../../environments/environment';
 
 interface Message {
   id: number;
   sender: 'me' | 'other';
-  content: string;
+  content: string;      // The text part of the message
   time: string;
-  type: 'text' | 'image' | 'audio' | 'video' | 'file';
-  url?: string;
-  fileName?: string;
+  attachments: Attachment[]; // An array of attachments
+}
+interface Attachment {
+  url: string;        // The full URL to the file
+  fileName: string;   // The unique filename (e.g., "guid1.pdf")
+  type: 'image' | 'pdf';
 }
 
 interface ChatContact {
@@ -44,7 +48,7 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
   newMessage: string = '';
   isTyping: boolean = false;
   isUserOnline: boolean = false;
-  selectedFile: File | null = null;
+  selectedFiles: File[] = [];
 
   private currentUserId: number | null = null;
   private routeSubscription?: Subscription;
@@ -182,12 +186,26 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
     const date = new Date(dto.date);
     const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    let attachments: Attachment[] = [];
+
+    // This logic now correctly handles the string array from the backend
+    if (dto.attachments && dto.attachments.length > 0) {
+      attachments = dto.attachments.map(fileName => {
+        const isPdf = fileName.toLowerCase().endsWith('.pdf');
+        return {
+          url: `${environment.apiUploadUrl}${fileName}`, // Construct the full URL
+          fileName: fileName,
+          type: isPdf ? 'pdf' : 'image'
+        };
+      });
+    }
+
     return {
       id: dto.id,
       sender: isMe ? 'me' : 'other',
       content: dto.message,
       time: timeString,
-      type: 'text'
+      attachments: attachments // Assign the newly created array
     };
   }
 
@@ -201,64 +219,71 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   sendMessage(): void {
-    if (this.chatId === null || (!this.newMessage.trim() && !this.selectedFile)) {
-      return;
+    if (this.chatId === null) return;
+  
+    const messageText = this.newMessage.trim();
+    const hasText = messageText.length > 0;
+    const hasFiles = this.selectedFiles.length > 0;
+
+    if (!hasText && !hasFiles) {
+      return; // Nothing to send
     }
 
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // --- CASE 1: Message HAS attachments (always use HTTP POST) ---
+    if (hasFiles) {
+      const formData = new FormData();
+      formData.append('chatId', this.chatId.toString());
 
-    if (this.selectedFile) {
-        const fileType = this.selectedFile.type.split('/')[0];
-        let type: 'text' | 'image' | 'audio' | 'video' | 'file' = 'file';
+      if (hasText) {
+        formData.append('message', messageText);
+      }
 
-        let url = '';
-        if (fileType === 'image') {
-          type = 'image';
-        } else if (fileType === 'audio') {
-          type = 'audio';
-        } else if (fileType === 'video') {
-          type = 'video';
-        }
-        url = URL.createObjectURL(this.selectedFile);
+      // Append all selected files to the form data with the same key
+      for (const file of this.selectedFiles) {
+        formData.append('attachments', file, file.name);
+      }
 
-        this.messages.push({
-            id: this.messages.length + 1,
-            sender: 'me',
-            content: (type === 'file' ? `Sent file: ${this.selectedFile.name}` : ''),
-            time: currentTime,
-            type: type,
-            url: url,
-            fileName: this.selectedFile.name
-        });
-        this.selectedFile = null;
-    }
-
-    if (this.newMessage.trim()) {
-      this.signalRService.sendMessage(this.chatId, this.newMessage.trim())
+      // This method needs to be added to your PersonalChatApiService.
+      // It will make a POST request to your backend endpoint for messages.
+      firstValueFrom(this.chatApiService.sendMessageWithAttachments(formData))
         .then(() => {
-          this.newMessage = '';
+          // Success! The UI will update via the SignalR broadcast from the server.
+          // DO NOT manually add the message to the UI here.
         })
-        .catch((err: any) => {
-          console.error('Failed to send message:', err);
-          alert('Failed to send message. Please try again.');
+        .catch(err => {
+          console.error('Failed to send message with attachments:', err);
+          alert('Could not upload files. Please try again.');
+        });
+
+    // --- CASE 2: Message ONLY has text (use fast SignalR method) ---
+    } else if (hasText) {
+      this.signalRService.sendMessage(this.chatId, messageText)
+        .catch(err => {
+          console.error('Failed to send text message:', err);
+          alert('Failed to send message.');
         });
     }
+
+    // --- Reset inputs after initiating the send ---
+    this.newMessage = '';
+    this.selectedFiles = [];
+    this.clearSelectedFile(); // Use your existing method to clear the file input UI
 
     this.scrollToBottom();
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-      console.log('Selected file:', this.selectedFile.name, this.selectedFile.type);
+    if (input.files) {
+      this.selectedFiles = Array.from(input.files); // Convert FileList to array
+      console.log(`Selected ${this.selectedFiles.length} files.`);
     } else {
-      this.selectedFile = null;
+      this.selectedFiles = [];
     }
   }
 
   clearSelectedFile(): void {
-    this.selectedFile = null;
+    this.selectedFiles = [];
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';

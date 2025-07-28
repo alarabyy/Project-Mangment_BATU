@@ -54,6 +54,15 @@ export class PersonalChatApiService {
     );
   }
 
+  sendMessageWithAttachments(formData: FormData): Observable<ChatMessageDto> {
+    // Make the POST request. The browser will automatically set the
+    // 'Content-Type' to 'multipart/form-data' with the correct boundary.
+    // Do not set it manually.
+    return this.http.post<ChatMessageDto>(`${this.baseUrl}/create/message`, formData).pipe(
+      catchError(this.handleError) // Reuse your excellent error handler
+    );
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error(`[PersonalChatApiService] Backend returned code ${error.status}, body was: `, error.error);
     let errorMessage = 'An unknown error occurred while communicating with chat service!';
