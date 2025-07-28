@@ -3,32 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, firstValueFrom } from 'rxjs';
+import Swal from 'sweetalert2';
 
 import { PersonalChatApiService } from '../../../Services/personal-chats-api.service';
 import { SignalRService } from '../../../Services/signalr.service';
 import { AuthService } from '../../../Services/auth.service';
-import { ChatDto, ChatMessageDto } from '../../../models/dtos'; // **تم التصحيح هنا: من models/dtos إلى shared/dtos**
+import { ChatDto, ChatMessageDto, UserMinimalDto } from '../../../models/dtos';
 import { environment } from '../../../environments/environment';
 
 interface Message {
   id: number;
   sender: 'me' | 'other';
-  content: string;      // The text part of the message
+  senderName?: string;
+  content: string;
   time: string;
-  attachments: Attachment[]; // An array of attachments
-}
-interface Attachment {
-  url: string;        // The full URL to the file
-  fileName: string;   // The unique filename (e.g., "guid1.pdf")
-  type: 'image' | 'pdf';
+  attachments?: Attachment[];
 }
 
-interface ChatContact {
-  id: number;
-  name: string;
-  avatar: string;
-  isOnline: boolean;
-  lastSeen?: string;
+interface Attachment {
+  url: string;
+  fileName: string;
+  type: 'image' | 'pdf';
 }
 
 @Component({
@@ -43,16 +38,17 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   chatId: number | null = null;
   chatDetails: ChatDto | null = null;
-  contact: ChatContact | null = null;
   messages: Message[] = [];
   newMessage: string = '';
   isTyping: boolean = false;
   isUserOnline: boolean = false;
+  showParticipantsOverlay: boolean = false;
   selectedFiles: File[] = [];
 
-  private currentUserId: number | null = null;
+  currentUserId: number | null = null;
   private routeSubscription?: Subscription;
   private receiveMessageSubscription?: Subscription;
+  private chatDeletedSubscription?: Subscription;
   private typingTimer?: any;
 
   constructor(
@@ -93,50 +89,44 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.scrollToBottom();
+    setTimeout(() => this.scrollToBottom(), 100);
   }
 
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
     this.receiveMessageSubscription?.unsubscribe();
+    this.chatDeletedSubscription?.unsubscribe();
     if (this.typingTimer) clearTimeout(this.typingTimer);
   }
 
   private async loadChatData(id: number): Promise<void> {
     try {
-      const chatDetailsResponse = await firstValueFrom(this.chatApiService.getChatDetails(id)) as ChatDto;
+      const chatDetailsResponse = await firstValueFrom(this.chatApiService.getChatDetails(id));
 
       if (!chatDetailsResponse || Object.keys(chatDetailsResponse).length === 0) {
         console.error('Chat details not found or user not authorized (response empty/malformed).');
-        this.contact = null;
+        this.chatDetails = null;
+        Swal.fire('Error', 'Chat not found or you do not have access.', 'error');
+        this.router.navigate(['/chats']);
         return;
       }
       this.chatDetails = chatDetailsResponse;
 
-      if (this.chatDetails) {
-        this.contact = {
-          id: this.chatDetails.id,
-          name: this.chatDetails.name,
-          avatar: 'https://i.pravatar.cc/150?img=' + (id % 10 + 1),
-          isOnline: false,
-          lastSeen: 'Unknown'
-        };
-      }
+      this.isUserOnline = false;
 
-
-      const messagesDto = await firstValueFrom(this.chatApiService.getChatMessages(id)) as ChatMessageDto[];
+      const messagesDto = await firstValueFrom(this.chatApiService.getChatMessages(id));
       this.messages = messagesDto.map((dto: ChatMessageDto) => this.mapChatMessageDtoToMessage(dto));
 
       setTimeout(() => this.scrollToBottom(), 100);
 
     } catch (error: any) {
       console.error('Error loading chat data:', error);
-      this.contact = null;
-      if (error.status === 404) {
-        alert('Chat not found or you do not have access.');
-      } else {
-        alert('An error occurred while loading chat data.');
+      this.chatDetails = null;
+      let errorMessage = 'An error occurred while loading chat data.';
+      if (error && error.message) {
+        errorMessage = error.message;
       }
+      Swal.fire('Error', errorMessage, 'error');
       this.router.navigate(['/chats']);
     }
   }
@@ -150,7 +140,7 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     } catch (err: any) {
       console.error('Failed to start SignalR connection:', err);
-      alert('Failed to connect to real-time chat service.');
+      Swal.fire('Error', 'Failed to connect to real-time chat service.', 'error');
       return;
     }
 
@@ -174,9 +164,23 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
           },
           error: (err: any) => console.error('Error receiving message:', err)
         });
+
+        this.chatDeletedSubscription = this.signalRService.onChatDeleted().subscribe((deletedChatId: number) => {
+            if (deletedChatId === this.chatId) {
+                Swal.fire({
+                  title: 'Chat Deleted',
+                  text: 'This chat has been deleted by its owner and is no longer available.',
+                  icon: 'info',
+                  confirmButtonText: 'OK'
+                }).then(() => {
+                  this.router.navigate(['/chats']);
+                });
+            }
+        });
+
       } catch (err: any) {
         console.error(`Failed to join chat ${this.chatId} via SignalR:`, err);
-        alert('Failed to join chat for real-time messages. You might need to refresh.');
+        Swal.fire('Error', 'Failed to join chat for real-time messages. You might need to refresh.', 'error');
       }
     }
   }
@@ -186,14 +190,19 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
     const date = new Date(dto.date);
     const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    let attachments: Attachment[] = [];
+    let senderName: string = '';
+    if (this.chatDetails && this.chatDetails.members) {
+      const senderMember = this.chatDetails.members.find((m: UserMinimalDto) => m.id === dto.senderId);
+      senderName = senderMember ? senderMember.name : 'Unknown User';
+    }
 
-    // This logic now correctly handles the string array from the backend
+    let attachments: Attachment[] = [];
     if (dto.attachments && dto.attachments.length > 0) {
       attachments = dto.attachments.map(fileName => {
         const isPdf = fileName.toLowerCase().endsWith('.pdf');
+        const attachmentUrl = `${environment.apiUploadUrl}${fileName}`;
         return {
-          url: `${environment.apiUploadUrl}${fileName}`, // Construct the full URL
+          url: attachmentUrl,
           fileName: fileName,
           type: isPdf ? 'pdf' : 'image'
         };
@@ -203,79 +212,87 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
     return {
       id: dto.id,
       sender: isMe ? 'me' : 'other',
+      senderName: senderName,
       content: dto.message,
       time: timeString,
-      attachments: attachments // Assign the newly created array
+      attachments: attachments
     };
   }
 
-  toggleContactOnlineStatus(): void {
-    if (this.contact) {
-      this.contact.isOnline = !this.contact.isOnline;
-      this.isUserOnline = this.contact.isOnline;
-      this.contact.lastSeen = this.contact.isOnline ? 'Online' : `Last seen ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      console.log(`Contact ${this.contact.name} is now ${this.contact.isOnline ? 'online' : 'offline'}.`);
+  // New getter to format member names for display
+  get displayMemberNames(): string {
+    if (!this.chatDetails?.members || this.chatDetails.members.length === 0) {
+      return 'No participants';
     }
+    const memberNames = this.chatDetails.members.slice(0, 3).map(m => m.name);
+    if (this.chatDetails.members.length > 3) {
+      return memberNames.join(', ') + '...';
+    }
+    return memberNames.join(', ');
+  }
+
+  toggleContactOnlineStatus(): void {
+    this.isUserOnline = !this.isUserOnline;
+    console.log(`User online status toggled to ${this.isUserOnline ? 'online' : 'offline'}.`);
+  }
+
+  toggleParticipantsOverlay(): void {
+    this.showParticipantsOverlay = !this.showParticipantsOverlay;
   }
 
   sendMessage(): void {
     if (this.chatId === null) return;
-  
+
     const messageText = this.newMessage.trim();
     const hasText = messageText.length > 0;
     const hasFiles = this.selectedFiles.length > 0;
 
     if (!hasText && !hasFiles) {
-      return; // Nothing to send
+      return;
     }
 
-    // --- CASE 1: Message HAS attachments (always use HTTP POST) ---
     if (hasFiles) {
       const formData = new FormData();
       formData.append('chatId', this.chatId.toString());
+      formData.append('senderId', this.currentUserId!.toString());
 
       if (hasText) {
         formData.append('message', messageText);
       }
 
-      // Append all selected files to the form data with the same key
-      for (const file of this.selectedFiles) {
-        formData.append('attachments', file, file.name);
-      }
+      this.selectedFiles.forEach((file, index) => {
+        formData.append(`attachments`, file, file.name);
+      });
 
-      // This method needs to be added to your PersonalChatApiService.
-      // It will make a POST request to your backend endpoint for messages.
       firstValueFrom(this.chatApiService.sendMessageWithAttachments(formData))
         .then(() => {
-          // Success! The UI will update via the SignalR broadcast from the server.
-          // DO NOT manually add the message to the UI here.
+          this.newMessage = '';
+          this.selectedFiles = [];
+          this.clearSelectedFile();
+          this.scrollToBottom();
         })
         .catch(err => {
           console.error('Failed to send message with attachments:', err);
-          alert('Could not upload files. Please try again.');
+          Swal.fire('Error', 'Could not upload files. Please try again.', 'error');
         });
 
-    // --- CASE 2: Message ONLY has text (use fast SignalR method) ---
     } else if (hasText) {
       this.signalRService.sendMessage(this.chatId, messageText)
+        .then(() => {
+          this.newMessage = '';
+          this.scrollToBottom();
+        })
         .catch(err => {
           console.error('Failed to send text message:', err);
-          alert('Failed to send message.');
+          Swal.fire('Error', 'Failed to send message. Please try again.', 'error');
         });
     }
-
-    // --- Reset inputs after initiating the send ---
-    this.newMessage = '';
-    this.selectedFiles = [];
-    this.clearSelectedFile(); // Use your existing method to clear the file input UI
-
-    this.scrollToBottom();
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
-      this.selectedFiles = Array.from(input.files); // Convert FileList to array
+      this.selectedFiles = Array.from(input.files);
       console.log(`Selected ${this.selectedFiles.length} files.`);
     } else {
       this.selectedFiles = [];
@@ -291,16 +308,46 @@ export class PrivateChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   scrollToBottom(): void {
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       try {
-        if (this.messageListRef) {
+        if (this.messageListRef && this.messageListRef.nativeElement) {
             this.messageListRef.nativeElement.scrollTop = this.messageListRef.nativeElement.scrollHeight;
         }
-      } catch (err) { /* Handle error */ }
-    }, 0);
+      } catch (err) {
+        console.error('Error scrolling to bottom:', err);
+      }
+    });
   }
 
   goBack(): void {
     this.router.navigate(['/chats']);
+  }
+
+  async onDeleteChat(): Promise<void> {
+      if (!this.chatId) return;
+
+      const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'Do you want to permanently delete this chat? This action cannot be undone and will affect all participants.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
+          try {
+              await firstValueFrom(this.chatApiService.deleteChat(this.chatId));
+              console.log(`Chat ${this.chatId} delete request sent successfully.`);
+          } catch (error: any) {
+              console.error('Failed to delete chat:', error);
+              let errorMessage = 'An error occurred while trying to delete the chat.';
+              if (error && error.message) {
+                  errorMessage = error.message;
+              }
+              Swal.fire('Error!', errorMessage, 'error');
+          }
+      }
   }
 }

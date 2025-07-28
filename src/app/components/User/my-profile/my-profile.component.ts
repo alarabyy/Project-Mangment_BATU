@@ -1,12 +1,12 @@
-// src/app/components/my-profile/my-profile.component.ts
-import { Component, OnInit } from '@angular/core';
+// src/app/components/User/my-profile/my-profile.component.ts
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { User } from '../../models/user';
-import { AuthService, ChangePasswordRequest, UserProfile } from '../../Services/auth.service';
-import { UserService } from '../../Services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService, ChangePasswordRequest, UserProfile } from '../../../Services/auth.service';
+import { environment } from '../../../environments/environment';
+import { UserService } from '../../../Services/user.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -15,7 +15,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './my-profile.component.html',
   styleUrls: ['./my-profile.component.css']
 })
-export class MyProfileComponent implements OnInit {
+export class MyProfileComponent implements OnInit, OnDestroy {
   userProfile: UserProfile | null = null;
   isLoading = true;
   errorMessage: string | null = null;
@@ -27,6 +27,12 @@ export class MyProfileComponent implements OnInit {
   editProfileForm!: FormGroup;
   changePasswordForm!: FormGroup;
 
+  @ViewChild('avatarFileInput') avatarFileInput!: ElementRef<HTMLInputElement>; // Reference to hidden file input
+
+  selectedAvatarFile: File | null = null;
+  previewImageUrl: string | null = null; // New property for local preview URL
+  readonly environment = environment; // Make environment accessible in template
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -36,6 +42,11 @@ export class MyProfileComponent implements OnInit {
   ngOnInit(): void {
     this.loadUserProfile();
     this.initForms();
+  }
+
+  // IMPORTANT: Clean up created object URLs when the component is destroyed
+  ngOnDestroy(): void {
+    this.clearPreviewImage();
   }
 
   initForms(): void {
@@ -69,6 +80,8 @@ export class MyProfileComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
     this.successMessage = null;
+    this.selectedAvatarFile = null; // Reset file selection on profile load
+    this.clearPreviewImage(); // Clear any existing preview when loading new profile data
 
     this.authService.getUserProfileFromApi().pipe(
       finalize(() => {
@@ -83,7 +96,7 @@ export class MyProfileComponent implements OnInit {
           lastName: profile.lastname,
           middleName: profile.middleName || '',
           email: profile.email,
-          gender: this.getGenderString(profile.gender)
+          gender: this.getGenderString(profile.gender) // Map number to string for dropdown
         });
       },
       error: (err: HttpErrorResponse) => {
@@ -123,7 +136,7 @@ export class MyProfileComponent implements OnInit {
 
   toggleChangePasswordForm(): void {
     this.showChangePasswordForm = !this.showChangePasswordForm;
-    this.showEditProfileForm = false;
+    this.showEditProfileForm = false; // Hide other form
     this.changePasswordForm.reset();
     this.errorMessage = null;
     this.successMessage = null;
@@ -158,6 +171,9 @@ export class MyProfileComponent implements OnInit {
   toggleEditProfileForm(): void {
     this.showEditProfileForm = !this.showEditProfileForm;
     this.showChangePasswordForm = false;
+    this.selectedAvatarFile = null; // Clear selected file when toggling form
+    this.clearPreviewImage(); // Clear preview when toggling form
+
     if (this.userProfile) {
       this.editProfileForm.patchValue({
         firstName: this.userProfile.firstName,
@@ -171,6 +187,37 @@ export class MyProfileComponent implements OnInit {
     this.successMessage = null;
   }
 
+  triggerFileInput(): void {
+    if (this.avatarFileInput && this.avatarFileInput.nativeElement) {
+      this.avatarFileInput.nativeElement.value = '';
+    }
+    this.avatarFileInput.nativeElement.click();
+    console.log('File input triggered.'); // Debugging
+  }
+
+  onFileSelected(event: Event): void {
+    const element = event.currentTarget as HTMLInputElement;
+    let fileList: FileList | null = element.files;
+    if (fileList && fileList.length > 0) {
+      const file = fileList[0];
+      this.selectedAvatarFile = file;
+      this.clearPreviewImage();
+      this.previewImageUrl = URL.createObjectURL(file);
+      console.log('File selected:', this.selectedAvatarFile.name, 'Preview URL:', this.previewImageUrl); // Debugging
+    } else {
+      this.selectedAvatarFile = null;
+      this.clearPreviewImage();
+      console.log('No file selected.'); // Debugging
+    }
+  }
+
+  private clearPreviewImage(): void {
+    if (this.previewImageUrl) {
+      URL.revokeObjectURL(this.previewImageUrl);
+      this.previewImageUrl = null;
+    }
+  }
+
   onUpdateProfile(): void {
     this.errorMessage = null;
     this.successMessage = null;
@@ -181,30 +228,86 @@ export class MyProfileComponent implements OnInit {
       return;
     }
 
-    if (!this.userProfile?.id || isNaN(parseInt(this.userProfile.id))) {
-      this.errorMessage = 'User ID not found or invalid for profile update.';
+    if (!this.userProfile?.id) {
+      this.errorMessage = 'User ID is missing for profile update.';
+      return;
+    }
+
+    const userId = parseInt(this.userProfile.id, 10);
+    if (isNaN(userId)) {
+      this.errorMessage = 'Invalid User ID for profile update.';
       return;
     }
 
     const updatedData = this.editProfileForm.value;
-    const userToUpdate: Partial<User> = {
-      id: parseInt(this.userProfile.id),
-      firstName: updatedData.firstName,
-      middleName: updatedData.middleName || null,
-      lastname: updatedData.lastName,
-      email: updatedData.email,
-      gender: this.getGenderNumber(updatedData.gender)
-    };
+    const formData = new FormData();
 
-    this.userService.updateUser(userToUpdate).subscribe({
+    // Append ID
+    formData.append('id', userId.toString());
+
+    // FIXED: Explicitly cast values to string to satisfy FormData.append() overloads
+    // Check if values are not null/undefined and then append.
+    // Use String() conversion to be safe, as backend expects strings for `string?` fields.
+
+    // First Name
+    // It's required by form validator, so it should be a string.
+    formData.append('firstName', String(updatedData.firstName || '')); // Convert to string
+
+    // Middle Name (optional in backend, can be an empty string if cleared)
+    formData.append('middleName', String(updatedData.middleName || '')); // Convert to string
+
+    // Last Name
+    formData.append('lastName', String(updatedData.lastName || '')); // Convert to string
+
+    // Email
+    // It's required by form validator, so it should be a string.
+    formData.append('email', String(updatedData.email || '')); // Convert to string
+
+    // Gender
+    const genderNum = this.getGenderNumber(updatedData.gender);
+    if (genderNum !== undefined && genderNum !== null) {
+      formData.append('gender', genderNum.toString());
+    } else {
+      // If "Select Gender" (empty string) is chosen, ensure it's sent as an empty string.
+      // Backend's Enum.TryParse will handle this as null for `Gender?`.
+      formData.append('gender', '');
+    }
+
+    // Avatar Image
+    if (this.selectedAvatarFile) {
+      formData.append('avatarImage', this.selectedAvatarFile, this.selectedAvatarFile.name);
+      console.log('Appending avatarImage to FormData:', this.selectedAvatarFile.name);
+    } else {
+      console.log('No new avatarImage selected to append.');
+      // If no new image is selected, the 'avatarImage' field will NOT be in FormData,
+      // and backend's req.AvatarImage will be null, thus keeping the existing image.
+    }
+
+    // --- Debugging FormData contents (Optional, keep for testing) ---
+    console.log("FormData contents before sending:");
+    formData.forEach((value, key) => {
+      if (value instanceof File) {
+        console.log(`${key}: File - ${value.name} (${value.size} bytes, ${value.type})`);
+      } else {
+        console.log(`${key}: ${value}`);
+      }
+    });
+    // --- End Debugging ---
+
+    this.userService.updateUser(formData).subscribe({
       next: () => {
         this.successMessage = 'Profile updated successfully!';
-        this.loadUserProfile();
+        this.clearPreviewImage();
+        this.selectedAvatarFile = null;
+        this.loadUserProfile(); // RELOAD PROFILE DATA FROM BACKEND
         this.showEditProfileForm = false;
+        console.log('Profile update successful, reloading user profile.');
       },
       error: (err: HttpErrorResponse) => {
         console.error('Profile update failed:', err);
-        this.errorMessage = err.error?.message || 'Failed to update profile. Please try again.';
+        // Display a user-friendly error message from backend
+        this.errorMessage = err.error?.message || err.error?.errors?.general || err.error || 'Failed to update profile. Please try again.';
+        console.log('Error message to user:', this.errorMessage);
       }
     });
   }

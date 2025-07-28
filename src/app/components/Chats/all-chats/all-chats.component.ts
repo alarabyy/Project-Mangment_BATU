@@ -1,4 +1,3 @@
-// src/app/components/Chats/all-chats/all-chats.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,14 +10,13 @@ import { AuthService } from '../../../Services/auth.service';
 import { UserService, Dean } from '../../../Services/user.service';
 import { ChatCreateRequest, ChatMinimalDto } from '../../../models/dtos';
 
-import Swal from 'sweetalert2'; // **لا تغيير هنا بعد التثبيت**
+import Swal from 'sweetalert2';
 
 interface Chat {
   id: number;
   name: string;
-  lastMessage?: string;
-  time?: string;
-  avatar?: string;
+  lastMessage?: string; // Can be undefined or null
+  time?: string; // Can be undefined or null
   unreadCount?: number;
   isPinned?: boolean;
 }
@@ -62,9 +60,8 @@ export class AllChatsComponent implements OnInit {
         this.chats = data.map(chat => ({
           id: chat.id,
           name: chat.name,
-          avatar: 'https://i.pravatar.cc/150?img=' + (chat.id % 10 + 1),
-          lastMessage: 'No recent messages',
-          time: '',
+          lastMessage: undefined, // Changed to undefined for dynamic display
+          time: undefined, // Changed to undefined
           unreadCount: 0,
           isPinned: false,
         }));
@@ -72,7 +69,7 @@ export class AllChatsComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error fetching my chats:', err);
-        alert('Failed to load chats. Please try again later.');
+        Swal.fire('Error', 'Failed to load chats. Please try again later.', 'error');
       }
     });
   }
@@ -102,7 +99,11 @@ export class AllChatsComponent implements OnInit {
     if (term) {
       this.userService.searchUsers(term).subscribe({
         next: (users: Dean[]) => {
-          this.searchResults = users;
+          const currentUserIdString = this.authService.getUserId();
+          const currentUserId = currentUserIdString ? parseInt(currentUserIdString, 10) : null;
+          this.searchResults = users.filter(user =>
+            user.id !== currentUserId && !this.isUserSelected(user)
+          );
           console.log('User search results:', this.searchResults);
         },
         error: (err: HttpErrorResponse) => {
@@ -134,19 +135,45 @@ export class AllChatsComponent implements OnInit {
 
   deleteChat(chat: Chat, event: MouseEvent): void {
     event.stopPropagation();
-    if (confirm(`Are you sure you want to delete chat with ${chat.name}?`)) {
-      this.chats = this.chats.filter(c => c.id !== chat.id);
-      this.filterChats();
-      console.log(`Chat ${chat.name} deleted client-side only.`);
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you want to delete chat with "${chat.name}"? This cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.chatApiService.deleteChat(chat.id).subscribe({
+          next: () => {
+            this.chats = this.chats.filter(c => c.id !== chat.id);
+            this.filterChats();
+            Swal.fire('Deleted!', `Chat with "${chat.name}" has been deleted.`, 'success');
+          },
+          error: (err) => {
+            console.error('Error deleting chat:', err);
+            Swal.fire('Error!', `Failed to delete chat: ${err.message}`, 'error');
+          }
+        });
+      }
+    });
   }
 
   toggleUserSelection(user: Dean): void {
     const index = this.selectedUsers.findIndex(u => u.id === user.id);
     if (index > -1) {
       this.selectedUsers.splice(index, 1);
+      if (this.userSearchTerm.trim() !== '') {
+          const searchIndex = this.searchResults.findIndex(u => u.id === user.id);
+          if (searchIndex === -1) {
+              this.searchResults.push(user);
+              this.searchResults.sort((a, b) => a.name.localeCompare(b.name));
+          }
+      }
     } else {
       this.selectedUsers.push(user);
+      this.searchResults = this.searchResults.filter(u => u.id !== user.id);
     }
     console.log('Currently selected users for new chat:', this.selectedUsers);
   }
@@ -158,32 +185,31 @@ export class AllChatsComponent implements OnInit {
   async createChatWithSelectedUsers(): Promise<void> {
     const currentUserIdString = this.authService.getUserId();
     if (!currentUserIdString) {
-      alert('You must be logged in to create a chat.');
+      Swal.fire('Error', 'You must be logged in to create a chat.', 'error');
       this.router.navigate(['/Login']);
       return;
     }
 
     const currentUserId = parseInt(currentUserIdString, 10);
     if (isNaN(currentUserId)) {
-        alert('Invalid user ID. Please log in again.');
+        Swal.fire('Error', 'Invalid user ID. Please log in again.', 'error');
         this.router.navigate(['/Login']);
         return;
     }
 
     if (this.selectedUsers.length === 0) {
-      alert('Please select at least one user to create a chat.');
+      Swal.fire('Info', 'Please select at least one user to create a chat.', 'info');
       return;
     }
 
-    // **التعديل هنا: تحديد نوع `value`**
     const { value: chatName } = await Swal.fire({
       title: 'Enter Chat Name',
       input: 'text',
       inputLabel: 'Name of your new chat group',
       inputValue: '',
       showCancelButton: true,
-      inputValidator: (value: string) => { // **تم التصحيح: (value: string)**
-        if (!value) {
+      inputValidator: (value: string) => {
+        if (!value || value.trim() === '') {
           return 'You need to enter a chat name!';
         }
         return null;
@@ -200,14 +226,14 @@ export class AllChatsComponent implements OnInit {
     }
 
     const request: ChatCreateRequest = {
-      name: chatName,
+      name: chatName.trim(),
       memberIds: memberIds
     };
 
     this.chatApiService.createChat(request).subscribe({
       next: (errorMessage: string) => {
         if (!errorMessage) {
-          console.log(`New chat created with: ${this.selectedUsers.map(u => u.name).join(', ')}`);
+          console.log(`New chat "${chatName}" created successfully.`);
           Swal.fire('Success!', `New chat "${chatName}" created successfully!`, 'success');
           this.selectedUsers = [];
           this.userSearchTerm = '';
@@ -221,7 +247,7 @@ export class AllChatsComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error creating chat:', err);
-        Swal.fire('Error!', `An unexpected error occurred while creating the chat.`, 'error');
+        Swal.fire('Error!', `An unexpected error occurred while creating the chat. ${err.message}`, 'error');
       }
     });
   }

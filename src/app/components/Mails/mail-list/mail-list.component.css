@@ -890,9 +890,7 @@ body.rtl-active .mail-actions {
 body.rtl-active .modal-header-pro {
   flex-direction: row-reverse;
 }
-body.rtl-active .modal-title-pro {
-  /* No specific RTL adjustment needed for font styling */
-}
+
 body.rtl-active .modal-label-pro {
   text-align: right; /* Ensure label is right-aligned in RTL */
 }

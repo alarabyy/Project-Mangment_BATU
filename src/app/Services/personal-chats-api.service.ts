@@ -8,7 +8,7 @@ import {
   ChatDto,
   ChatMessageDto,
   ChatCreateRequest,
-} from '../models/dtos'; // **تم التصحيح**
+} from '../models/dtos';
 import { environment } from '../environments/environment';
 
 @Injectable({
@@ -54,12 +54,19 @@ export class PersonalChatApiService {
     );
   }
 
+  // New method for sending messages with attachments (uses FormData)
+  // This POST request should go to your backend's message creation endpoint,
+  // which might be different from a plain text message endpoint.
+  // Assuming the endpoint is something like: POST /api/chat/{chatId}/messages/with-attachments
   sendMessageWithAttachments(formData: FormData): Observable<ChatMessageDto> {
-    // Make the POST request. The browser will automatically set the
-    // 'Content-Type' to 'multipart/form-data' with the correct boundary.
-    // Do not set it manually.
-    return this.http.post<ChatMessageDto>(`${this.baseUrl}/create/message`, formData).pipe(
-      catchError(this.handleError) // Reuse your excellent error handler
+    return this.http.post<ChatMessageDto>(`${this.baseUrl}/create/message`, formData).pipe( // <-- Adjust endpoint if needed
+      catchError(this.handleError)
+    );
+  }
+
+  deleteChat(chatId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${chatId}`).pipe(
+      catchError(this.handleError)
     );
   }
 

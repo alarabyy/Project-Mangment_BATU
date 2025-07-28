@@ -1,4 +1,3 @@
-// src/app/services/project.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -8,8 +7,6 @@ import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
-  // ***** التعديل هنا: إضافة '/api/' إلى المسار الأساسي *****
-  // بناءً على رسائل الخطأ وكود AuthService، يبدو أن الـ Backend يتوقع مسارًا يبدأ بـ /api/
   private apiUrl = `${environment.apiUrl}/api/project`;
 
   constructor(
@@ -18,7 +15,6 @@ export class ProjectService {
   ) {}
 
   getProjects(): Observable<Project[]> {
-    // الآن سيبني هذا الـ URL: https://batuprojects.runasp.net/api/project/get/all
     return this.http.get<Project[]>(`${this.apiUrl}/get/all`);
   }
 
@@ -49,8 +45,6 @@ export class ProjectService {
   }
 
   deleteProject(id: number): Observable<any> {
-    // لاحظ: إذا كان الـ Backend يتوقع الـ ID في الـ URL (مثل /delete/id) بدلاً من Query Parameter،
-    // فستحتاج إلى تغيير هذا أيضاً: return this.http.delete(`${this.apiUrl}/delete/${id}`, { headers: headers });
     const params = new HttpParams().set('id', id.toString());
     const headers = this.getAuthHeaders();
     return this.http.delete(`${this.apiUrl}/delete`, { headers: headers, params });
@@ -62,13 +56,15 @@ export class ProjectService {
     files.forEach(file => {
       formData.append('Files', file, file.name);
     });
-    const headers = this.getAuthHeaders().delete('Content-Type'); // حذف Content-Type مهم لـ FormData
+    const headers = this.getAuthHeaders().delete('Content-Type');
     return this.http.post(`${this.apiUrl}/images/upload`, formData, { headers: headers });
   }
 
+  // هذا هو الـ method المعني
   deleteImage(projectId: number, fileNames: string[]): Observable<any> {
     const payload = { id: projectId, files: fileNames };
     const headers = this.getAuthHeaders();
+    // الكود هنا سليم: يستخدم http.post مع الـ payload المطلوب
     return this.http.post(`${this.apiUrl}/images/delete`, payload, { headers: headers });
   }
 

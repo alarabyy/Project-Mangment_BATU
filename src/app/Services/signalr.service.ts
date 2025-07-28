@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Observable, Subject, throwError } from 'rxjs';
-import { ChatMessageDto } from '../models/dtos'; // **تم التصحيح هنا: من models/dtos إلى shared/dtos**
+import { ChatMessageDto } from '../models/dtos';
 import { AuthService } from '../Services/auth.service';
 import { environment } from '../environments/environment';
 
@@ -12,6 +12,7 @@ import { environment } from '../environments/environment';
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;
   private receiveMessageSubject = new Subject<ChatMessageDto>();
+  private chatDeletedSubject = new Subject<number>();
   private hubUrl = `${environment.apiUrl}/chathub`;
 
   constructor(private authService: AuthService) { }
@@ -44,6 +45,11 @@ export class SignalRService {
 
     this.hubConnection.on('ReceiveMessage', (message: ChatMessageDto) => {
       this.receiveMessageSubject.next(message);
+    });
+
+    this.hubConnection.on('ChatDeleted', (chatId: number) => {
+      console.log(`SignalR: Chat ${chatId} was deleted.`);
+      this.chatDeletedSubject.next(chatId);
     });
 
     this.hubConnection.onclose((error: Error | undefined) => {
@@ -105,6 +111,10 @@ export class SignalRService {
 
   public onReceiveMessage(): Observable<ChatMessageDto> {
     return this.receiveMessageSubject.asObservable();
+  }
+
+  public onChatDeleted(): Observable<number> {
+    return this.chatDeletedSubject.asObservable();
   }
 
   public isConnected(): boolean {

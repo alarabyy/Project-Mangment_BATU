@@ -1,26 +1,39 @@
-<div class="private-chat-container" *ngIf="contact">
+<!-- src/app/components/Chats/private-chat/private-chat.component.html -->
+<div class="private-chat-container" *ngIf="chatDetails">
   <header class="chat-header">
     <button class="back-button btn btn-icon" (click)="goBack()" title="Back to Chats">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <div class="chat-header-info">
-      <img [src]="contact.avatar" alt="{{ contact.name }}'s avatar" class="chat-header-avatar" />
+    <div class="chat-header-info" (click)="toggleParticipantsOverlay()" title="View Participants">
+      <!-- No chat header avatar for group chats as per previous request -->
       <div class="chat-header-details">
-        <h2 class="chat-header-name">{{ contact.name }}</h2>
-        <span class="chat-status" [ngClass]="{'online': isUserOnline}">
+        <h2 class="chat-header-name">{{ chatDetails.name }}</h2>
+        <span class="chat-status">
           <ng-container *ngIf="isTyping; else statusText">
             Typing... <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
           </ng-container>
           <ng-template #statusText>
             <ng-container *ngIf="isUserOnline">Online</ng-container>
-            <ng-container *ngIf="!isUserOnline">{{ contact.lastSeen }}</ng-container>
+            <ng-container *ngIf="!isUserOnline">
+              <!-- Display participant names for group chats when not online/typing -->
+              <span class="chat-participants">{{ displayMemberNames }}</span>
+            </ng-container>
           </ng-template>
         </span>
       </div>
     </div>
     <div class="chat-header-actions">
+      <!-- Toggle Online Status for demo, can be removed for production group chats -->
       <button class="btn btn-icon" title="Toggle Online Status" (click)="toggleContactOnlineStatus()">
         <i class="fas fa-toggle-{{ isUserOnline ? 'on' : 'off' }}"></i>
+      </button>
+
+      <!-- Delete Chat Button (only visible to owner) -->
+      <button *ngIf="chatDetails.ownerId === currentUserId"
+              (click)="onDeleteChat()"
+              class="btn btn-icon delete-chat-button"
+              title="Delete Chat">
+        <i class="fas fa-trash-alt"></i>
       </button>
     </div>
   </header>
@@ -28,16 +41,20 @@
   <div class="message-list" #messageList>
     <div *ngFor="let message of messages" class="message-bubble-wrapper animate__animated animate__fadeInUp">
       <div class="message-bubble" [ngClass]="{'my-message': message.sender === 'me', 'other-message': message.sender === 'other'}">
-        
+        <div class="message-header">
+          <span *ngIf="message.sender === 'other'" class="sender-name">{{ message.senderName }}</span>
+          <span class="message-time">{{ message.time }}</span>
+        </div>
+
         <!-- 1. Display the text content of the message if it exists -->
         <p *ngIf="message.content" class="message-content">{{ message.content }}</p>
 
         <!-- 2. Container to hold all attachments for this message -->
         <div *ngIf="message.attachments && message.attachments.length > 0" class="attachments-container">
-          
+
           <!-- 3. Loop through the attachments array -->
           <div *ngFor="let attachment of message.attachments" class="attachment-item">
-            
+
             <!-- Display logic for an image attachment -->
             <div *ngIf="attachment.type === 'image'" class="message-media-container">
               <a [href]="attachment.url" target="_blank">
@@ -56,7 +73,6 @@
           </div>
         </div>
 
-        <span class="message-time">{{ message.time }}</span>
       </div>
     </div>
   </div>
@@ -68,7 +84,7 @@
       <label for="fileInput" class="attach-button btn btn-icon" title="Attach Files">
         <i class="fas fa-paperclip"></i>
       </label>
-      
+
       <!-- 5. Updated display for multiple selected files -->
       <div *ngIf="selectedFiles.length > 0" class="selected-file-info card">
         <span><i class="fas fa-file-alt"></i> {{ selectedFiles.length }} file(s) selected</span>
@@ -91,7 +107,31 @@
   </div>
 </div>
 
-<div *ngIf="!contact" class="chat-not-found">
-  <p><i class="fas fa-exclamation-circle fa-2x"></i><br>Chat not found. Please go back to all chats.</p>
+<!-- Participants Overlay (Modal) -->
+<div class="participants-overlay" *ngIf="showParticipantsOverlay">
+  <div class="participants-modal animate__animated animate__fadeInUp" *ngIf="chatDetails as chat">
+    <div class="modal-header">
+      <h3 class="modal-title">Participants ({{ chat.members?.length || 0 }})</h3>
+      <button class="close-modal-button btn-icon" (click)="toggleParticipantsOverlay()" title="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="participant-list">
+      <div *ngFor="let member of chat.members || []" class="participant-item">
+        <span class="participant-name">{{ member.name }}</span>
+        <span class="participant-role">
+          <ng-container *ngIf="chat.ownerId === member.id">(Owner)</ng-container>
+          <ng-container *ngIf="currentUserId === member.id && currentUserId !== chat.ownerId">(You)</ng-container>
+        </span>
+      </div>
+      <div *ngIf="!chat.members || chat.members.length === 0" class="no-participants-message">
+        <p>No participants found for this chat.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!chatDetails" class="chat-not-found">
+  <p><i class="fas fa-exclamation-circle fa-2x"></i><br>Chat not found or access denied. Please go back to all chats.</p>
   <button class="btn btn-primary" (click)="goBack()">Back to All Chats</button>
 </div>

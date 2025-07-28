@@ -1,3 +1,4 @@
+<!-- src/app/components/Chats/all-chats/all-chats.component.html -->
 <div class="chats-container">
   <header class="chats-header">
     <h1 class="chats-title">Chats</h1>
@@ -38,7 +39,7 @@
     <h2 class="section-title">My Conversations</h2>
     <div *ngIf="filteredChats.length === 0 && chatSearchTerm.trim() === ''" class="no-chats-message">
       <i class="fas fa-inbox fa-3x"></i>
-      <p>No chats found. Start a new one!</p>
+      <p>No conversations found. Let's start a new one!</p>
     </div>
     <div *ngIf="filteredChats.length === 0 && chatSearchTerm.trim() !== ''" class="no-chats-message">
       <i class="fas fa-search fa-3x"></i>
@@ -51,18 +52,17 @@
       (click)="goToChat(chat.id)"
       [ngClass]="{'chat-item-pinned': chat.isPinned}"
     >
-      <div class="chat-avatar">
-        <img [src]="chat.avatar" alt="{{ chat.name }}'s avatar" />
-        <span class="online-indicator"></span>
-      </div>
-      <div class="chat-info">
-        <div class="chat-name-time">
+      <div class="chat-content-primary">
+        <div class="chat-info-main">
           <span class="chat-name">{{ chat.name }}</span>
-          <span class="chat-time">{{ chat.time || '' }}</span>
+          <span *ngIf="chat.unreadCount && chat.unreadCount > 0" class="unread-count-badge">{{ chat.unreadCount }}</span>
         </div>
-        <div class="chat-last-message">
-          <p>{{ chat.lastMessage || 'No recent messages' }}</p>
-          <span *ngIf="chat.unreadCount" class="unread-count">{{ chat.unreadCount }}</span>
+        <div class="chat-summary-details">
+            <p class="chat-last-message" *ngIf="chat.lastMessage; else noLastMessageP">{{ chat.lastMessage }}</p>
+            <ng-template #noLastMessageP>
+              <p class="chat-last-message subtle-text">Start a conversation</p>
+            </ng-template>
+            <span class="chat-time" *ngIf="chat.time">{{ chat.time }}</span>
         </div>
       </div>
       <div class="chat-actions-hover">
@@ -85,8 +85,7 @@
     <div *ngIf="searchResults.length > 0; else noUserSearchResults" class="user-list">
       <div *ngFor="let user of searchResults" class="user-item card animate__animated animate__fadeInUp">
         <div class="user-info">
-          <img src="https://placehold.co/150x150/2a3038/c9d1d9?text=User" alt="User avatar" class="user-avatar-placeholder" />
-          <span class="user-name">{{ user.name }}</span>
+          <span class="user-name" style="color: rgb(112, 198, 27);">{{ user.name }}</span>
         </div>
         <div class="user-actions">
           <input
@@ -104,13 +103,23 @@
         <p *ngIf="userSearchTerm.trim() !== ''">No users found matching "{{ userSearchTerm }}"</p>
       </div>
     </ng-template>
+  </div>
 
+  <!-- Selection Strip at the bottom -->
+  <div *ngIf="showUserSearch && selectedUsers.length > 0" class="selected-users-strip-container">
+    <div class="selected-users-strip">
+        <div *ngFor="let user of selectedUsers" class="selected-user-pill animate__animated animate__fadeIn">
+            <span>{{ user.name }}</span>
+            <button class="btn-clear-user" (click)="toggleUserSelection(user)" title="Remove user">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
     <button
-      *ngIf="selectedUsers.length > 0"
       class="btn btn-primary create-chat-button"
       (click)="createChatWithSelectedUsers()"
     >
-      Create Chat with Selected ({{ selectedUsers.length }})
+      Create Chat ({{ selectedUsers.length }})
     </button>
   </div>
 </div>

@@ -10,7 +10,7 @@ import { UnauthorizedComponent } from './components/Components/unauthorized/unau
 
 
 // --- User-Specific Protected Components ---
-import { MyProfileComponent } from './components/my-profile/my-profile.component';
+import { MyProfileComponent } from './components/User/my-profile/my-profile.component';
 import { ChatComponent } from './components/chat-AI/chat.component'; // هذا شات الـ AI، مختلف عن الشات العادي
 import { UserProfileComponent } from './components/User/user-profile/user-profile.component';
 
@@ -22,7 +22,7 @@ import { ProjectDetailsComponent } from './components/project/project-details/pr
 
 // --- Admin Dashboard Components ---
 import { NotificationsPageComponent } from './components/Components/notifications-page/notifications-page.component';
-import { UserManagementComponent } from './components/User/user-management/user-management.component';
+// import { UserManagementComponent } from './components/User/user-management/user-management.component';
 import { UserAnalyticsComponent } from './components/User/user-analytics/user-analytics.component';
 import { DepartmentCreateComponent } from './components/Departments/department-create/department-create.component';
 import { DepartmentEditComponent } from './components/Departments/department-edit/department-edit.component';
@@ -52,6 +52,7 @@ import { MailListComponent } from './components/Mails/mail-list/mail-list.compon
 import { MailReplyComponent } from './components/Mails/mail-reply/mail-reply.component';
 import { PrivateChatComponent } from './components/Chats/private-chat/private-chat.component';
 import { AllChatsComponent } from './components/Chats/all-chats/all-chats.component';
+import { UserManagementComponent } from './components/User/user-management/user-management.component';
 
 // =================================================================
 //                 ROUTES CONFIGURATION
@@ -70,7 +71,7 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
 
   // --- SignUp is now an Admin-only route ---
-  { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'SignUp', component: SignUpComponent },
 
   // ---------------------- MAIL ROUTES (Protected by RoleGuard) --------------------
   { path: 'allMails', component: MailListComponent , canActivate: [RoleGuard], data: { roles: ['admin']} },

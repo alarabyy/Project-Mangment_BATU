@@ -1,46 +1,76 @@
-/* src/app/pages/user-management/user-management.component.scss */
-
-
+/* Global Host & Container */
 :host {
   display: block;
-  padding: 3rem 2rem; /* Using rem equivalents for --spacing-xxl and --spacing-xl */
+  padding: 3rem 2rem;
   background-color: var(--bg-color);
-  min-height: calc(100vh - var(--navbar-height));
-  transition: background-color var(--transition-speed-normal) var(--easing-curve-elegant);
+  min-height: calc(100vh - var(--navbar-height, 70px)); /* Fallback for --navbar-height */
   font-family: var(--font-family-base);
   color: var(--text-color);
+  transition: background-color var(--transition-speed-normal) var(--easing-curve-elegant);
+  position: relative; /* Crucial for fixed positioning of feedback messages within this component's scope */
 }
 
 .user-management-container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-/* --- Page Header --- */
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* NEW: Feedback Message Styles */
+.feedback-message {
+  position: fixed; /* Fixed position relative to viewport */
+  top: 20px; /* Distance from the top */
+  left: 50%;
+  transform: translateX(-50%); /* Center horizontally */
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius-base);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  z-index: 1000; /* Ensure it's on top of other content */
+  opacity: 0; /* Start hidden for animation */
+  animation: slideInFromTop 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth entrance animation */
 }
 
+.feedback-message.success-message {
+  background-color: var(--success-color); /* Green for success */
+  color: white;
+}
+
+.feedback-message.error-message {
+  background-color: var(--error-color); /* Red for errors */
+  color: white;
+}
+
+.feedback-message i {
+  font-size: 1.2rem;
+}
+
+@keyframes slideInFromTop {
+  from { opacity: 0; transform: translate(-50%, -50px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* --- Page Header --- */
 .page-header {
-  margin-bottom: 3rem; /* Using rem equivalent for --spacing-xxl */
+  margin-bottom: 3rem;
   animation: fadeInDown var(--transition-speed-slow) var(--easing-curve-elegant);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Using rem equivalent for --spacing-lg */
+  gap: 1.5rem;
 }
 
-.header-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .header-content h1 {
   font-size: 2.75rem;
   font-weight: var(--font-weight-extrabold);
   color: var(--text-color);
-  margin: 1rem 0 0.5rem; /* Using rem equivalents for --spacing-md and --spacing-sm */
+  margin: 1rem 0 0.5rem;
 }
 
 .header-content p {
@@ -51,528 +81,444 @@
 }
 
 .header-actions {
-  margin-top: 2rem; /* Using rem equivalent for --spacing-xl */
+  margin-top: 2rem;
   width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
 
-/* --- Search Box --- */
-.search-box {
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+  border: none;
+  border-radius: var(--border-radius-base);
+  padding: 0.8rem 1.5rem;
+  color: white;
+  font-weight: var(--font-weight-semibold);
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(var(--primary-accent-rgb), 0.3);
+  transition: transform var(--transition-speed-fast) var(--easing-curve-elegant), box-shadow var(--transition-speed-normal) var(--easing-curve-elegant);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(var(--primary-accent-rgb), 0.4);
+}
+
+/* --- Search Bar --- */
+.search-bar {
   position: relative;
   width: 100%;
+  margin-bottom: 2rem;
 }
 
-.search-icon {
-  position: absolute;
-  left: 1rem; /* Using rem equivalent for --spacing-md */
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--subtle-text-color);
-  font-size: 1.1rem;
-  transition: color var(--transition-speed-fast) var(--easing-curve-elegant);
-}
-
-.search-box input {
+.search-bar input {
   background: var(--surface-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-base);
-  padding: 1rem 1rem 1rem 3.5rem; /* Using rem equivalent for --spacing-md */
+  padding: 1rem 1.5rem;
   width: 100%;
   transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
   font-size: 1.1rem;
   color: var(--text-color);
   font-weight: var(--font-weight-medium);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
-.search-box input::placeholder {
+.search-bar input::placeholder {
   color: var(--subtle-text-color);
   font-weight: var(--font-weight-regular);
 }
 
-.search-box input:focus {
+.search-bar input:focus {
   border-color: var(--primary-accent);
   box-shadow: 0 0 0 3px var(--primary-accent-translucent);
   outline: none;
 }
 
-.search-box input:focus ~ .search-icon {
-  color: var(--primary-accent);
-}
-
-/* --- User Cards Wrapper (New approach for 'Rows' using Cards) --- */
-.user-cards-wrapper {
-  margin-top: 2rem; /* Using rem equivalent for --spacing-xl */
+/* --- Table Styling --- */
+.table-responsive {
+  overflow-x: auto;
   background-color: var(--surface-color);
   border-radius: var(--border-radius-xl);
   border: 1px solid var(--border-color);
   box-shadow: 0 8px 30px var(--shadow-color);
+  margin-top: 2rem;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 750px;
+}
+
+.user-table th, .user-table td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color-light);
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* --- Card Grid (will now behave like a list of rows) --- */
-.card-grid {
-  display: block;
+.user-table th {
+  background-color: var(--bg-color);
+  color: var(--text-color-light);
+  font-weight: var(--font-weight-semibold);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
-/* --- User Card (now styled as a Row) --- */
-@keyframes row-slide-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.user-table .column-id { width: 5%; }
+.user-table .column-first-name { width: 19%; }
+.user-table .column-last-name { width: 19%; }
+.user-table .column-email { width: 32%; }
+.user-table .column-gender { width: 10%; }
+.user-table .column-actions { width: 15%; text-align: center; }
+
+
+.user-table tbody tr {
+  background-color: var(--surface-color);
+  /* Enhanced transition for a smoother professional feel */
+  transition: background-color var(--transition-speed-fast) ease,
+              box-shadow var(--transition-speed-fast) ease,
+              transform var(--transition-speed-fast) ease;
 }
 
-.user-card {
-  display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 1.5fr) minmax(0, 1.5fr) auto;
-  align-items: center;
-  gap: 1.5rem; /* Using rem equivalent for --spacing-lg */
-  padding: 1.5rem 2rem; /* Using rem equivalents for --spacing-lg and --spacing-xl */
-  border-bottom: 1px solid var(--border-color);
-  transition: all var(--transition-speed-normal) var(--easing-curve-elegant);
-  text-decoration: none;
-  color: inherit;
-  position: relative;
-  overflow: hidden;
-  animation: row-slide-in var(--transition-speed-slow) var(--easing-curve-elegant) var(--animation-delay, 0s) forwards;
-  opacity: 0;
-  transform: translateY(20px);
+.user-table tbody tr:hover {
+  background-color: var(--bg-color);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Subtle hover shadow */
+  transform: translateY(-2px); /* Slight lift effect */
 }
 
-.user-card:last-child {
+.user-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.user-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, var(--primary-accent-translucent), transparent);
-  transition: left var(--transition-speed-normal) var(--easing-curve-elegant);
-  z-index: 0;
-}
+.user-table td:first-child { font-weight: var(--font-weight-medium); color: var(--primary-accent); }
 
-.user-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.user-card:hover {
-  background-color: rgba(var(--primary-accent-rgb), 0.03); /* Subtle background hover */
-  transform: translateY(-5px) scale(1.005);
-  box-shadow: 0 10px 25px var(--shadow-color); /* Using global shadow color */
-  border-color: var(--primary-accent);
-}
-
-.user-card:hover::before {
-  left: 100%;
-}
-
-/* Specific Card Sections for Row layout */
-.card-header {
+/* Action Buttons within the table cells */
+.user-table .actions {
   display: flex;
-  flex-direction: column;
+  gap: 0.5rem;
   justify-content: center;
-  gap: 0.25rem; /* Using rem equivalent for --spacing-xs */
-}
-
-.user-profile-link {
-  text-decoration: none;
-  color: inherit;
-  transition: color var(--transition-speed-fast) var(--easing-curve-elegant);
-}
-
-.user-profile-link:hover {
-  color: var(--primary-accent);
-}
-
-.user-name {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-color);
-  margin: 0;
-}
-
-.user-email {
-  font-size: 0.95rem;
-  color: var(--subtle-text-color);
-  margin-top: 0;
-}
-
-.card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem; /* Using rem equivalent for --spacing-md */
-}
-
-.detail-item {
-  display: flex;
   align-items: center;
-  gap: 0.5rem; /* Using rem equivalent for --spacing-sm */
-  font-size: 0.95rem;
-  color: var(--subtle-text-color);
-}
-
-.detail-label {
-  font-weight: var(--font-weight-medium);
-  color: var(--text-color);
-}
-
-.user-id-value {
-  font-family: monospace;
-  font-size: 0.9rem;
-  color: var(--subtle-text-color);
-  background-color: var(--border-color-translucent);
-  padding: 0.3rem 0.6rem;
-  border-radius: var(--border-radius-sm);
-  display: inline-block;
-}
-
-.role-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem; /* Using rem equivalent for --spacing-sm */
-  padding: 0.4rem 1rem; /* Using rem equivalent for --spacing-md */
-  border-radius: var(--border-radius-pill);
-  font-size: 0.85rem;
-  font-weight: var(--font-weight-medium);
   white-space: nowrap;
-  transition: transform var(--transition-speed-fast) var(--easing-curve-elegant);
 }
 
-.role-badge:hover {
-  transform: scale(1.08);
-}
-
-/* Specific colors for each role */
-.role-badge.admin {
-  background-color: rgba(var(--error-color-rgb), 0.15);
-  color: var(--error-color);
-}
-.role-badge.student {
-  background-color: rgba(var(--secondary-accent-rgb), 0.15);
-  color: var(--secondary-accent);
-}
-.role-badge.doctor {
-  background-color: rgba(var(--primary-accent-rgb), 0.15);
-  color: var(--primary-accent);
-}
-
-
-.card-footer {
-  display: flex;
-  gap: 1rem; /* Using rem equivalent for --spacing-md */
-  justify-content: flex-end;
-}
-
-.action-btn {
+.btn-action {
   border: none;
   border-radius: var(--border-radius-base);
-  padding: 0.5rem 1rem; /* Using rem equivalents for --spacing-sm and --spacing-md */
-  font-size: 0.9rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem; /* Using rem equivalent for --spacing-xs */
-  transition: background-color var(--transition-speed-fast) var(--easing-curve-elegant),
-              transform var(--transition-speed-fast) var(--easing-curve-elegant);
-  color: var(--bg-color); /* Dark text on button color */
-}
-
-.action-btn:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
-
-.action-btn.edit-btn { background-color: var(--secondary-accent); }
-.action-btn.delete-btn { background-color: var(--error-color); }
-.action-btn.save-btn { background-color: var(--primary-accent); }
-.action-btn.cancel-btn { background-color: var(--subtle-text-color); }
-
-/* --- Edit Form Styles --- */
-.user-edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem; /* Using rem equivalent for --spacing-sm */
-  width: 100%;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-size: 0.85rem;
-  color: var(--subtle-text-color);
-  margin-bottom: 0.25rem; /* Using rem equivalent for --spacing-xs */
+  /* Enhanced transition for buttons */
+  transition: background-color var(--transition-speed-fast) ease,
+              transform var(--transition-speed-fast) ease,
+              box-shadow var(--transition-speed-fast) ease;
+  color: white;
   font-weight: var(--font-weight-medium);
+  display: inline-flex; /* Align icon and text */
+  align-items: center;
+  gap: 0.3rem; /* Space between icon and text */
 }
 
-.form-group input {
-  background-color: var(--bg-color);
+.btn-action:hover {
+  transform: translateY(-2px); /* More pronounced lift */
+  opacity: 0.9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Hover shadow */
+}
+
+.btn-edit { background-color: var(--secondary-accent); }
+.btn-delete { background-color: var(--error-color); }
+.btn-save { background-color: var(--success-color); }
+.btn-cancel { background-color: var(--subtle-text-color); }
+
+
+/* Edit Form within Table Row */
+.user-table input[type="text"],
+.user-table input[type="email"],
+.user-table select {
+  width: calc(100% - 1.2rem);
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-sm);
-  padding: 0.6rem 1rem; /* Using rem equivalent for --spacing-md */
+  background-color: var(--bg-color);
   color: var(--text-color);
-  font-size: 0.95rem;
-  transition: border-color var(--transition-speed-fast) var(--easing-curve-elegant), box-shadow var(--transition-speed-fast) var(--easing-curve-elegant);
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Added transition for focus */
 }
 
-.form-group input:focus {
+.user-table input:focus,
+.user-table select:focus {
   border-color: var(--primary-accent);
-  box-shadow: 0 0 0 2px var(--primary-accent-translucent);
+  box-shadow: 0 0 0 3px var(--primary-accent-translucent);
   outline: none;
 }
 
-
-/* --- State Messages (Error/Empty) --- */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
+/* --- State Messages (Loading, Error, No Users) --- */
 .state-message {
   text-align: center;
-  padding: 3rem 2rem; /* Using rem equivalents for --spacing-xxl and --spacing-xl */
+  padding: 3rem 2rem;
   background-color: var(--surface-color);
   border-radius: var(--border-radius-xl);
   border: 1px solid var(--border-color);
   box-shadow: 0 6px 20px var(--shadow-color);
-  margin-top: 2rem; /* Using rem equivalent for --spacing-xl */
+  margin-top: 2rem;
   animation: fadeIn var(--transition-speed-slow) var(--easing-curve-elegant) forwards;
   opacity: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem; /* Using rem equivalent for --spacing-lg */
+  gap: 1.5rem;
 }
 
-.error-message i, .empty-state-container i {
-  font-size: 4.5rem;
-  margin-bottom: 0;
-  opacity: 0.6;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.error-message i {
-  color: var(--error-color);
+.state-message .loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--border-color);
+  border-top-color: var(--primary-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
-.empty-state-container i {
-  color: var(--subtle-text-color);
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.state-message .icon-wrapper {
+  width: 70px; height: 70px;
+  display: flex; justify-content: center; align-items: center;
+  background-color: rgba(var(--error-rgb), 0.1);
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
 }
 
-.empty-state-container h2, .error-message h2 {
+.state-message .icon-wrapper svg {
+  width: 40px; height: 40px;
+  stroke: var(--error-color);
+}
+
+.state-message.no-users-message .icon-wrapper {
+  background-color: rgba(var(--subtle-text-color-rgb), 0.1);
+}
+.state-message.no-users-message .icon-wrapper svg {
+  stroke: var(--subtle-text-color);
+}
+
+
+.state-message h2 {
   font-size: 2rem;
   font-weight: var(--font-weight-bold);
   color: var(--text-color);
-  margin-bottom: 0.5rem; /* Using rem equivalent for --spacing-sm */
+  margin-bottom: 0.5rem;
 }
 
-.empty-state-container p, .error-message p {
+.state-message p {
   font-size: 1.15rem;
   color: var(--subtle-text-color);
   margin-top: 0;
 }
 
-/* --- Skeleton Loader for Rows --- */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.user-card-skeleton {
-  padding: 1.5rem 2rem; /* Using rem equivalents for --spacing-lg and --spacing-xl */
-  border-bottom: 1px solid var(--border-color);
-  position: relative;
-  overflow: hidden;
-  background-color: var(--surface-color);
-  display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 1.5fr) minmax(0, 1.5fr) auto;
-  gap: 1.5rem; /* Using rem equivalent for --spacing-lg */
-  align-items: center;
-}
-
-.user-card-skeleton::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-  animation: shimmer 1.5s infinite;
-}
-
-.skeleton-header, .skeleton-details, .skeleton-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem; /* Using rem equivalent for --spacing-sm */
-  width: 100%;
-}
-
-.line {
-  height: 16px;
-  border-radius: var(--border-radius-sm);
-  background-color: var(--border-color);
-  opacity: 0.7;
-}
-
-.line.long { width: 70%; }
-.line.short { width: 45%; }
-.line.xs { width: 30%; height: 14px; }
-.line.sm { width: 50%; height: 14px; }
-
-.action-btn-skeleton {
-  width: 80px;
-  height: 38px;
-  border-radius: var(--border-radius-base);
-  background-color: var(--border-color); /* Make it visible in skeleton */
-}
-
-/* --- Custom Nav Button --- */
-.custom-nav-btn {
-  background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+.retry-btn {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-accent);
+  color: white;
   border: none;
-  padding: 0;
   border-radius: var(--border-radius-base);
-  overflow: hidden;
-  box-shadow: 0 4px 10px var(--shadow-color-accent);
-  transition: transform var(--transition-speed-fast) var(--easing-curve-elegant),
-    box-shadow var(--transition-speed-normal) var(--easing-curve-elegant);
-  margin-bottom: 1.5rem;
-  display: inline-block;
-  text-decoration: none;
-}
-
-.custom-nav-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px var(--shadow-color-accent);
-}
-
-.custom-nav-btn a {
-  display: flex;
-  align-items: center;
-  padding: 1rem 1.5rem; /* Using rem equivalents for --spacing-md and --spacing-lg */
-  color: #fff;
-  text-decoration: none;
+  cursor: pointer;
   font-weight: var(--font-weight-semibold);
-  font-size: 1rem;
-  transition: background-color var(--transition-speed-fast) var(--easing-curve-elegant);
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.custom-nav-btn a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.retry-btn:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
 }
 
-.custom-nav-btn .menu-icon {
-  margin-right: 0.5rem; /* Using rem equivalent for --spacing-sm */
-  font-size: 1.2rem;
-}
 
-.custom-nav-btn .menu-text {
-  display: inline-block;
-}
-
-.custom-nav-btn .active-link {
-  font-weight: var(--font-weight-bold);
-  text-decoration: underline;
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 992px) {
-  .user-management-container {
-    max-width: 90%;
-  }
-  .user-card {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 1.5fr) auto;
-    gap: 1rem; /* Using rem equivalent for --spacing-md */
-    padding: 1rem 1.5rem; /* Using rem equivalents for --spacing-md and --spacing-lg */
-  }
-  .card-body {
-    grid-column: span 1;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-  }
-  .detail-item {
-    font-size: 0.9rem;
-    gap: 0.25rem; /* Using rem equivalent for --spacing-xs */
-  }
-
-  .skeleton-header, .skeleton-details, .skeleton-actions {
-    grid-column: span 1;
-  }
-
-  .header-content h1 { font-size: 2.25rem; }
-  .header-content p { font-size: 1rem; }
-}
-
+/* --- Responsive Adjustments: Table to Cards --- */
 @media (max-width: 768px) {
-  :host { padding: 2rem 1rem; } /* Using rem equivalents for --spacing-xl and --spacing-md */
+  :host { padding: 2rem 1rem; }
   .user-management-container { max-width: 100%; }
 
   .page-header {
     flex-direction: column;
     align-items: center;
-  }
-  .header-content { align-items: center; text-align: center; }
-  .header-actions { margin-top: 1.5rem; } /* Using rem equivalent for --spacing-lg */
-
-  .user-card {
-    grid-template-columns: 1fr;
-    gap: 1rem; /* Using rem equivalent for --spacing-md */
-    padding: 1.5rem; /* Using rem equivalent for --spacing-lg */
     text-align: center;
-    flex-direction: column;
-    align-items: center;
+  }
+  .header-actions {
     justify-content: center;
   }
 
-  .card-header, .card-body, .card-footer {
+  .search-bar input { font-size: 1rem; padding: 0.8rem 1.2rem; }
+
+  /* Hide table header on small screens */
+  .user-table thead {
+    display: none;
+  }
+
+  /* Make each table row (tr) behave like a block-level card */
+  .user-table, .user-table tbody, .user-table tr, .user-table td {
+    display: block;
     width: 100%;
+  }
+
+  .user-table {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    min-width: unset;
+  }
+
+  /* Style each row as a card */
+  .user-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--surface-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: all var(--transition-speed-fast) ease;
+  }
+
+  .user-table tr:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .user-table tr:last-child {
+    margin-bottom: 1rem;
+  }
+
+  /* Style table cells (td) as individual data points within the card */
+  .user-table td {
+    border-bottom: none;
+    padding: 0.2rem 0;
+    text-align: right;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  /* Create data labels using data-label attribute and pseudo-elements */
+  .user-table td::before {
+    content: attr(data-label) ":";
+    font-weight: var(--font-weight-medium);
+    color: var(--text-color-light);
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    text-align: left;
+  }
+
+  /* Adjust inputs within edit mode for card layout */
+  .user-table input[type="text"],
+  .user-table input[type="email"],
+  .user-table select {
+    width: auto;
+    flex-grow: 1;
+    max-width: 60%;
+    text-align: right;
+  }
+   .user-table select {
+    appearance: none; /* Remove default select arrow */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="%23FFFFFF" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 0.8em;
+  }
+  @media (prefers-color-scheme: light) {
+    .user-table select {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="%23000000" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+    }
+  }
+
+  .user-table .actions {
+    flex-direction: row;
     justify-content: center;
-    align-items: center;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .user-table .btn-action {
+    flex-grow: 1;
+    max-width: 48%;
   }
 
-  .user-email { font-size: 0.85rem; }
-  .user-name { font-size: 1.1rem; }
-
-  .user-edit-form { align-items: center; }
-  .form-group { width: 90%; max-width: 300px; }
-
-  .custom-nav-btn a {
-    padding: 0.5rem 1rem; /* Using rem equivalents for --spacing-sm and --spacing-md */
+  /* NEW: Responsive adjustment for feedback messages */
+  .feedback-message {
+    width: calc(100% - 2rem); /* Full width with padding */
+    left: 1rem; /* Align to left edge with padding */
+    transform: translateX(0); /* Remove center transform */
     font-size: 0.9rem;
-  }
-  .custom-nav-btn .menu-icon {
-    font-size: 1rem;
-  }
-
-  /* Skeleton adjustments for single column */
-  .user-card-skeleton {
-    grid-template-columns: 1fr;
-  }
-  .skeleton-header, .skeleton-details, .skeleton-actions {
-    align-items: center;
+    padding: 0.8rem 1.2rem;
   }
 }
 
+/* --- Even smaller screens (e.g., 480px and below) --- */
 @media (max-width: 480px) {
-  .page-header h1 { font-size: 2rem; }
-  .page-header p { font-size: 0.95rem; }
-  .search-box input { font-size: 1rem; padding-left: 3rem; }
-  .search-icon { left: 0.75rem; font-size: 1rem; }
+  .page-header h1 { font-size: 1.75rem; }
+  .page-header p { font-size: 0.9rem; }
+  .search-bar input { padding: 0.6rem 1rem; font-size: 0.9rem; }
 
-  .user-card {
-    padding: 1rem; /* Using rem equivalent for --spacing-md */
+  .btn-primary {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
   }
-  .user-name { font-size: 1rem; }
-  .user-email { font-size: 0.85rem; }
-  .user-id-value { font-size: 0.8rem; }
-  .role-badge { font-size: 0.75rem; padding: 0.3rem 0.8rem; }
+  .btn-primary i {
+    font-size: 1rem;
+  }
 
-  .action-btn { font-size: 0.8rem; padding: 0.4rem 0.6rem; }
+  .user-table {
+    min-width: 500px; /* Kept min-width for horizontal scroll if content overflows */
+  }
+  .user-table th, .user-table td {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.75rem;
+  }
+  .user-table td::before {
+    font-size: 0.75rem;
+  }
+  .user-table input[type="text"],
+  .user-table input[type="email"],
+  .user-table select {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .user-table .actions {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .btn-action {
+    width: 100%;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .feedback-message {
+    font-size: 0.8rem;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+  }
 }

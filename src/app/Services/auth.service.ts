@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, tap, throwError, catchError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../environments/environment';
+import Swal from 'sweetalert2';
 
 export interface UserProfile {
   id: string;
@@ -271,7 +272,7 @@ export class AuthService {
         errorMessage = `Server returned code ${error.status}: ${error.statusText}`;
       }
     }
-    alert(errorMessage);
+    Swal.fire('Error', errorMessage, 'error');
     return throwError(() => new Error(errorMessage));
   }
 }

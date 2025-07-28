@@ -71,16 +71,57 @@
   text-align: center;
 }
 
-.avatar-container { position: relative; margin-bottom: 1.5rem; }
-.avatar-image {
-  width: 120px; height: 120px;
-  border-radius: 50%; background-color: var(--bg-color);
+/* MODIFIED: Avatar Container - now ONLY for display in sidebar */
+.avatar-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+  width: 120px; /* Consistent size for both image and placeholder */
+  height: 120px;
+  border-radius: 50%;
   border: 4px solid var(--surface-color);
   box-shadow: 0 0 0 2px var(--primary-accent);
-  display: flex; justify-content: center; align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Important for image overflow */
+  /* REMOVED: cursor: pointer; and hover effects */
 }
-@media (min-width: 992px) { .avatar-image { width: 140px; height: 140px; } }
-.avatar-image svg { width: 60%; height: 60%; color: var(--primary-accent); }
+@media (min-width: 992px) {
+  .avatar-container { width: 140px; height: 140px; }
+}
+
+/* Styles for actual image */
+.profile-avatar-img {
+  width: 100%; /* Fill the container */
+  height: 100%; /* Fill the container */
+  object-fit: cover; /* Crop image to fit */
+  border-radius: 50%; /* Keep it round */
+  display: block; /* Remove extra space below image */
+}
+
+/* Styles for SVG placeholder when no image */
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column; /* To stack SVG and text */
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-color);
+  color: var(--primary-accent);
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.avatar-placeholder svg {
+  width: 60%;
+  height: 60%;
+  margin-bottom: 0.5rem;
+}
+.avatar-placeholder .upload-text {
+  font-size: 0.75rem;
+  color: var(--subtle-text-color);
+}
 
 .online-indicator {
   position: absolute; bottom: 10px; right: 10px; width: 18px; height: 18px;
@@ -315,4 +356,87 @@
     flex-direction: column;
     gap: 2rem; /* Maintain gap between sections */
   }
+}
+
+/* NEW: Styling for avatar upload group within the form */
+.avatar-upload-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center items horizontally within the group */
+  gap: 1rem; /* Spacing between preview/button */
+  margin-bottom: 2rem;
+}
+
+.current-avatar-preview {
+  width: 80px; /* Smaller preview in the form */
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-color); /* Fallback background */
+}
+
+.current-profile-img-small {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.avatar-placeholder-small {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--subtle-text-color);
+}
+
+.avatar-placeholder-small svg {
+  width: 70%;
+  height: 70%;
+}
+
+/* Styling for the new "Change Photo" button */
+.action-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-speed-fast) ease;
+}
+
+.action-btn-secondary:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.1);
+}
+
+.action-btn-secondary svg {
+  width: 16px;
+  height: 16px;
+  color: var(--primary-accent);
+}
+
+.file-info {
+  font-size: 0.8rem;
+  color: var(--subtle-text-color);
+  margin-top: 0.5rem;
+}
+
+.current-file {
+  font-style: italic;
 }

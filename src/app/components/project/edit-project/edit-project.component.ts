@@ -1,10 +1,9 @@
-// src/app/components/project/edit-project/edit-project.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '../../../Services/project.service';
-import { Project, Member, Supervisor } from '../../../models/project'; // Import Supervisor interface
+import { Project, Member, Supervisor } from '../../../models/project';
 import { finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -48,17 +47,16 @@ export class EditProjectComponent implements OnInit {
       technologies: ['', Validators.required],
       toolsUsed: ['', Validators.required],
       grade: [null, [Validators.min(0), Validators.max(100)]],
-      // تم إزالة teamLeaderId
       categoryId: [null, Validators.required],
       departmentId: [null, Validators.required],
-      members: this.fb.array([]), // Initialize members as a FormArray
-      supervisors: this.fb.array([]) // Initialize supervisors as a FormArray
+      members: this.fb.array([]),
+      supervisors: this.fb.array([])
     });
   }
 
   get f() { return this.projectForm.controls; }
-  get members() { return this.projectForm.get('members') as FormArray; } // Getter for members FormArray
-  get supervisorsArray() { return this.projectForm.get('supervisors') as FormArray; } // Getter for supervisors FormArray
+  get members() { return this.projectForm.get('members') as FormArray; }
+  get supervisorsArray() { return this.projectForm.get('supervisors') as FormArray; }
 
   newMember(name: string = '', academicId: number | null = null): FormGroup {
     return this.fb.group({
@@ -105,30 +103,25 @@ export class EditProjectComponent implements OnInit {
              technologies: projectData.technologies,
              toolsUsed: projectData.toolsUsed,
              grade: projectData.grade,
-             // تم إزالة teamLeaderId
              categoryId: projectData.category?.id,
              departmentId: projectData.department?.id
         });
 
-        // Populate members FormArray
-        this.members.clear(); // Clear existing controls
+        this.members.clear();
         if (projectData.members && projectData.members.length > 0) {
           projectData.members.forEach(member => {
             this.members.push(this.newMember(member.name, member.academicId));
           });
         } else {
-          // Add one empty member field if no members exist initially
           this.addMember();
         }
 
-        // Populate supervisors FormArray
-        this.supervisorsArray.clear(); // Clear existing controls
+        this.supervisorsArray.clear();
         if (projectData.supervisors && projectData.supervisors.length > 0) {
           projectData.supervisors.forEach(supervisor => {
             this.supervisorsArray.push(this.newSupervisor(supervisor.id));
           });
         } else {
-          // Add one empty supervisor field if no supervisors exist initially
           this.addSupervisor();
         }
       },
@@ -139,7 +132,6 @@ export class EditProjectComponent implements OnInit {
   onSubmit(): void {
     if (this.projectForm.invalid) {
       this.projectForm.markAllAsTouched();
-      // Mark all member and supervisor controls as touched as well
       this.members.controls.forEach(control => {
         if (control instanceof FormGroup) {
           Object.values(control.controls).forEach(c => c.markAsTouched());
@@ -162,15 +154,12 @@ export class EditProjectComponent implements OnInit {
       Technologies: formValue.technologies,
       ToolsUsed: formValue.toolsUsed,
       ProblemStatement: formValue.problemStatement,
-      // تم إزالة LeaderId
       CategoryId: formValue.categoryId,
       DepartmentId: formValue.departmentId,
-      // Ensure members are included in the payload with correct structure
       members: formValue.members.map((m: any) => ({
         name: m.name,
         academicId: Number(m.academicId)
       })),
-      // Ensure supervisors are included in the payload with correct structure
       supervisors: formValue.supervisors.map((s: any) => Number(s.id))
     };
 
@@ -210,10 +199,17 @@ export class EditProjectComponent implements OnInit {
     if (!filename) { console.error("Filename is empty"); return; }
     if (confirm(`Are you sure you want to delete this image? (${filename})`)) {
       this.imagesBeingDeleted.add(filename);
+      // ***** التعديل هنا: إضافة console.log لتصحيح الأخطاء *****
+      const payloadSent = { id: this.project!.id, files: [filename] };
+      console.log('Attempting to delete image with payload:', payloadSent);
+
       this.projectService.deleteImage(this.project!.id, [filename]).pipe(finalize(() => this.imagesBeingDeleted.delete(filename)))
       .subscribe({
         next: () => this.loadProjectData(),
-        error: (err) => { console.error('Error deleting image:', err); alert('Failed to delete the image.'); }
+        error: (err) => {
+          console.error('Error deleting image:', err);
+          alert('Failed to delete the image. Please check the console for details or contact support.'); // رسالة أكثر إفادة للمستخدم
+        }
       });
     }
   }
