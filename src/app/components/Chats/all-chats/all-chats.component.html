@@ -58,17 +58,13 @@
           <span *ngIf="chat.unreadCount && chat.unreadCount > 0" class="unread-count-badge">{{ chat.unreadCount }}</span>
         </div>
         <div class="chat-summary-details">
-            <p class="chat-last-message" *ngIf="chat.lastMessage; else noLastMessageP">{{ chat.lastMessage }}</p>
-            <ng-template #noLastMessageP>
-              <p class="chat-last-message subtle-text">Start a conversation</p>
-            </ng-template>
+            <p class="chat-last-message" >{{ chat.lastMessage }}</p>
+
             <span class="chat-time" *ngIf="chat.time">{{ chat.time }}</span>
         </div>
       </div>
       <div class="chat-actions-hover">
-        <button class="btn btn-icon" title="Mark as Read" (click)="markAsRead(chat, $event)">
-          <i class="fas fa-check-double"></i>
-        </button>
+   
         <button class="btn btn-icon btn-danger-icon" title="Delete Chat" (click)="deleteChat(chat, $event)">
           <i class="fas fa-trash-alt"></i>
         </button>
