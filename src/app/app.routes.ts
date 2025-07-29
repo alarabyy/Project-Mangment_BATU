@@ -71,7 +71,7 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
 
   // --- SignUp is now an Admin-only route ---
-  { path: 'SignUp', component: SignUpComponent },
+  { path: 'SignUp', component: SignUpComponent  , canActivate: [RoleGuard], data: { roles: ['admin']}},
 
   // ---------------------- MAIL ROUTES (Protected by RoleGuard) --------------------
   { path: 'allMails', component: MailListComponent , canActivate: [RoleGuard], data: { roles: ['admin']} },
