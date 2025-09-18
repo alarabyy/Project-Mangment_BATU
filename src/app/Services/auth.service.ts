@@ -1,28 +1,41 @@
+// src/app/Services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, tap, throwError, catchError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../environments/environment';
-import Swal from 'sweetalert2'; // يمكنك الاحتفاظ بها إذا كنت تستخدمها لحالات خاصة جدًا، لكننا سنزيلها من handleError
+import { NotificationService } from './notification-proxy.service';
 
-// إضافة استيراد خدمة الإشعارات
-import { NotificationService } from './notification-proxy.service'; // تأكد من المسار الصحيح
+// --- Interfaces for Type Safety ---
 
+// ✅ --- FIX: This interface is now corrected to match the API response exactly ---
 export interface UserProfile {
   id: string;
   email: string;
   firstName: string;
   lastname: string | null;
   middleName?: string;
-  imageUrl: string | null;
-  role: string | number;
-  gender?: number;
+  imageUrl: string;
+  gender: number;
+  graduationDate: string;
+  role: number;
 }
 
 export interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface RegisterRequest {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  gender: number;
+  role: number;
+  email: string;
+  password: string;
+  graduationDate?: string;
 }
 
 export interface LoginResponse {
@@ -53,12 +66,50 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private notificationService: NotificationService // حقن خدمة الإشعارات
+    private notificationService: NotificationService
   ) {
     this.checkInitialAuthState();
   }
 
-  public register(userData: any): Observable<any> {
+  // ✅ --- FIX: This is the corrected, simplified, and robust getUserRole function ---
+  public getUserRole(): string | null {
+    const decoded = this.getDecodedToken();
+    if (!decoded) {
+      return null;
+    }
+
+    // This is the most common claim name for roles from a .NET backend.
+    // It also has a fallback to a simple 'role' claim.
+    const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role;
+
+    if (roleClaim === undefined || roleClaim === null) {
+      console.warn('[AuthService] Role claim not found in token.');
+      return null;
+    }
+
+    // Handle both single role string/number and array of roles
+    const roleValue = Array.isArray(roleClaim) ? roleClaim[0] : roleClaim;
+    const normalizedRole = roleValue.toString().toLowerCase();
+
+    // This simple switch handles all cases: "Admin", "admin", 2, "2", etc.
+    // and returns the consistent lowercase string that RoleGuard expects.
+    switch (normalizedRole) {
+      case 'admin':
+      case '2':
+        return 'admin';
+      case 'doctor':
+      case '1':
+        return 'doctor';
+      case 'student':
+      case '0':
+        return 'student';
+      default:
+        console.warn(`[AuthService] Unknown role detected in token: '${roleValue}'`);
+        return null;
+    }
+  }
+
+  public register(userData: RegisterRequest): Observable<any> {
     return this.http.post(`${this.authApiUrl}/register`, userData).pipe(
       tap(() => {
         this.notificationService.showSuccess('Registration successful! Please log in.');
@@ -74,7 +125,7 @@ export class AuthService {
           localStorage.setItem(this.authTokenKey, response.token);
           this._isAuthenticated.next(true);
           console.log('[AuthService] Login successful, token stored, isAuthenticated = true.');
-          this.notificationService.showSuccess('Login successful! Welcome back.'); // إشعار نجاح
+          this.notificationService.showSuccess('Login successful! Welcome back.');
           this.redirectToDashboard();
         }
       }),
@@ -86,7 +137,7 @@ export class AuthService {
     console.log(`[AuthService] Sending forgot password request for email: ${email}`);
     return this.http.post(`${this.authApiUrl}/forgot-password?email=${encodeURIComponent(email)}`, null).pipe(
       tap(() => {
-        this.notificationService.showInfo('Password reset link sent to your email.'); // إشعار معلومات
+        this.notificationService.showInfo('Password reset link sent to your email.');
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error))
     );
@@ -96,7 +147,7 @@ export class AuthService {
     console.log('[AuthService] Sending reset password request with token and new password.');
     return this.http.post(`${this.authApiUrl}/reset-password`, request).pipe(
       tap(() => {
-        this.notificationService.showSuccess('Your password has been reset successfully!'); // إشعار نجاح
+        this.notificationService.showSuccess('Your password has been reset successfully!');
         this.router.navigate(['/Login']);
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error))
@@ -107,7 +158,7 @@ export class AuthService {
     const headers = this.getAuthHeaders();
     return this.http.post(`${this.authApiUrl}/change-password`, request, { headers }).pipe(
       tap(() => {
-        this.notificationService.showSuccess('Password changed successfully!'); // إشعار نجاح
+        this.notificationService.showSuccess('Password changed successfully!');
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error))
     );
@@ -117,24 +168,20 @@ export class AuthService {
     localStorage.removeItem(this.authTokenKey);
     this._isAuthenticated.next(false);
     console.log('[AuthService] User logged out. isAuthenticated = false.');
-    this.notificationService.showInfo('You have been logged out.'); // إشعار معلومات عند تسجيل الخروج
+    this.notificationService.showInfo('You have been logged out.');
     this.router.navigate(['/Login']);
   }
 
   public getUserProfileFromApi(): Observable<UserProfile> {
     const userId = this.getUserId();
     if (!userId) {
-      const errorMsg = "[AuthService] Cannot fetch profile, User ID not found in token. Logging out.";
-      console.error(errorMsg);
       this.logout();
-      // لا حاجة لإشعار هنا، لأن logout نفسه قد يُصدر إشعارًا وقد تظهر رسالة خطأ من الـ interceptor إذا كان هناك استدعاء آخر فاشل.
-      return throwError(() => new Error(errorMsg));
+      return throwError(() => new Error("User ID not found in token. Logging out."));
     }
     const profileUrl = `${this.userApiUrl}/profile/${userId}`;
     const headers = this.getAuthHeaders();
     console.log(`[AuthService] Fetching user profile for ID: ${userId}`);
     return this.http.get<UserProfile>(profileUrl, { headers }).pipe(
-      // لا داعي لإشعار نجاح هنا، عادةً لا نشعر المستخدم بنجاح تحميل ملفه الشخصي تلقائيًا.
       catchError((error: HttpErrorResponse) => this.handleError(error))
     );
   }
@@ -150,7 +197,7 @@ export class AuthService {
     const token = this.getToken();
     const valid = !!token && !this.isTokenExpired(token);
     if (this._isAuthenticated.value !== valid) {
-        this._isAuthenticated.next(valid);
+      this._isAuthenticated.next(valid);
     }
     return valid;
   }
@@ -165,11 +212,10 @@ export class AuthService {
       return null;
     }
     try {
-      const decoded = jwtDecode(token);
-      return decoded;
+      return jwtDecode(token);
     } catch (error) {
       console.error("[AuthService] Error decoding token:", error, "Logging out.");
-      this.notificationService.showError('Authentication failed. Please log in again.'); // إشعار خطأ
+      this.notificationService.showError('Authentication failed. Please log in again.');
       this.logout();
       return null;
     }
@@ -177,88 +223,26 @@ export class AuthService {
 
   public getUserId(): string | null {
     const decoded = this.getDecodedToken();
-    const userId = decoded ? (decoded.nameid || decoded.sub || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
-    return userId;
-  }
-
-  public getUserRole(): string | null {
-    const decoded = this.getDecodedToken();
-    if (!decoded) {
-      return null;
-    }
-
-    const potentialRoleClaims = [
-        'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
-        'role',
-        'Role',
-        'roles',
-    ];
-
-    let roleValue: any = null;
-
-    for (const claim of potentialRoleClaims) {
-        if (decoded[claim] !== undefined && decoded[claim] !== null) {
-            roleValue = decoded[claim];
-            break;
-        }
-    }
-
-    if (roleValue === undefined || roleValue === null) {
-      return null;
-    }
-
-    if (Array.isArray(roleValue)) {
-      roleValue = roleValue.length > 0 ? roleValue[0] : null;
-    }
-
-    if (roleValue === null) {
-        return null;
-    }
-
-    const lowerCaseRole = (roleValue?.toString() || '').toLowerCase();
-
-    if (!isNaN(Number(lowerCaseRole))) {
-      const numericRole = Number(lowerCaseRole);
-      switch (numericRole) {
-        case 0: return 'student';
-        case 1: return 'doctor';
-        case 2: return 'admin';
-        default:
-          console.warn(`[AuthService] Unknown numeric role: ${numericRole}`);
-          return null;
-      }
-    } else {
-      if (lowerCaseRole === 'student') {
-        return 'student';
-      } else if (lowerCaseRole === 'doctor') {
-        return 'doctor';
-      } else if (lowerCaseRole === 'admin') {
-        return 'admin';
-      }
-      console.warn(`[AuthService] Unknown string role: '${lowerCaseRole}'`);
-      return null;
-    }
+    return decoded ? (decoded.nameid || decoded.sub || decoded.id || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']) : null;
   }
 
   private isTokenExpired(token: string): boolean {
     try {
       const decoded: { exp?: number } = jwtDecode(token);
       if (typeof decoded.exp !== 'number') {
-        console.warn("[AuthService] Token does not contain a numeric 'exp' claim, or 'exp' is missing. Treating as expired.");
+        console.warn("[AuthService] Token does not contain a numeric 'exp' claim, treating as expired.");
         return true;
       }
-      const expirationTime = decoded.exp * 1000;
-      const currentTime = Date.now();
-      const expired = expirationTime < currentTime;
-      if (expired) {
-          console.warn(`[AuthService] Token expired. Expiration: ${new Date(expirationTime).toLocaleString()}, Current: ${new Date(currentTime).toLocaleString()}`);
-          this.notificationService.showWarning('Your session has expired. Please log in again.'); // إشعار تحذير عند انتهاء الجلسة
-          this.logout(); // تسجيل الخروج تلقائياً
+      const isExpired = (decoded.exp * 1000) < Date.now();
+      if (isExpired) {
+          console.warn(`[AuthService] Token expired.`);
+          this.notificationService.showWarning('Your session has expired. Please log in again.');
+          this.logout();
       }
-      return expired;
+      return isExpired;
     } catch (error) {
       console.error("[AuthService] Error checking token expiration:", error, "Treating as expired.");
-      this.notificationService.showError('Session validation failed. Please log in.'); // إشعار خطأ
+      this.notificationService.showError('Session validation failed. Please log in.');
       this.logout();
       return true;
     }
@@ -274,37 +258,12 @@ export class AuthService {
   }
 
   private redirectToDashboard(): void {
-    const role = this.getUserRole();
-    switch (role) {
-      case 'admin':
-      case 'doctor':
-      case 'student':
-        this.router.navigate(['/Home']);
-        break;
-      default:
-        this.router.navigate(['/Home']);
-        break;
-    }
+    this.router.navigate(['/Home']);
   }
 
-  // تم تعديل هذه الدالة بحيث لا تستخدم Swal.fire، بل تترك معالجة الإشعارات لـ notification.interceptor
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error(`[AuthService] Backend returned code ${error.status}, body was: `, error.error);
-    // الـ notification.interceptor.ts سيتولى مهمة إظهار الـ Swal أو الـ toast للمستخدم
-    // هنا فقط نعيد الخطأ للسماح للمكونات الأخرى بمعالجته إذا لزم الأمر
-    let errorMessage = 'An unknown error occurred!';
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = `A client-side error occurred: ${error.error.message}`;
-    } else {
-      if (typeof error.error === 'string') {
-        errorMessage = `Error: ${error.error}`;
-      } else if (error.error && error.error.message) {
-        errorMessage = `Error: ${error.error.message}`;
-      } else {
-        errorMessage = `Server returned code ${error.status}: ${error.statusText}`;
-      }
-    }
-    // لا نستخدم Swal.fire هنا، بل نعتمد على الـ Interceptor لإظهار الإشعار المرئي
+    const errorMessage = error.error?.message || error.error || 'An unknown error occurred!';
     return throwError(() => new Error(errorMessage));
   }
 }

@@ -1,23 +1,23 @@
-// KEEP ONLY ONE SET OF IMPORTS
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../Services/auth.service';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService, RegisterRequest } from '../../../Services/auth.service';
 import { PopupService } from '../../../Services/popup.service';
 
-// KEEP ONLY ONE @Component DECORATOR AND CLASS DEFINITION
 @Component({
   selector: 'app-sign-up',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './sign-up.component.html',
   styleUrls: ['./sign-up.component.css']
 })
-export class SignUpComponent implements OnInit {
+export class SignUpComponent implements OnInit, OnDestroy {
   signupForm!: FormGroup;
   showPassword = false;
   isSubmitting = false;
+  private roleChangesSubscription?: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -31,20 +31,46 @@ export class SignUpComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       middleName: [''],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      gender: ['0', Validators.required], // 0 = Male, 1 = Female
-      role: ['0', Validators.required],   // ✅ default role = Student (0)
+      gender: ['0', Validators.required],
+      role: ['0', Validators.required],
+      graduationDate: [{ value: '', disabled: true }],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
-        // Password must contain at least one letter (upper or lower case) and one digit, and be at least 8 characters long.
         Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$')
       ]]
     });
+
+    this.handleRoleChange();
+    this.updateGraduationDateValidation(this.signupForm.get('role')?.value);
   }
 
-  // Helper getter for easy access to form controls in the template
   get f() {
     return this.signupForm.controls;
+  }
+
+  private handleRoleChange(): void {
+    const roleControl = this.signupForm.get('role');
+    if (roleControl) {
+      this.roleChangesSubscription = roleControl.valueChanges.subscribe(role => {
+        this.updateGraduationDateValidation(role);
+      });
+    }
+  }
+
+  private updateGraduationDateValidation(role: string): void {
+    const graduationDateControl = this.signupForm.get('graduationDate');
+    if (!graduationDateControl) return;
+
+    if (role === '0') { // 0 = Student
+      graduationDateControl.setValidators([Validators.required]);
+      graduationDateControl.enable();
+    } else {
+      graduationDateControl.clearValidators();
+      graduationDateControl.disable();
+      graduationDateControl.reset();
+    }
+    graduationDateControl.updateValueAndValidity();
   }
 
   togglePassword(): void {
@@ -52,38 +78,45 @@ export class SignUpComponent implements OnInit {
   }
 
   submitSignup(): void {
-    // Mark all fields as touched to display validation errors immediately on submit attempt
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
       this.popupService.showError('Validation Error', 'Please correct the errors in the form.');
       return;
     }
 
-    const payload = {
-      ...this.signupForm.value,
-      // Ensure gender and role are sent as numbers, not strings
-      gender: Number(this.signupForm.value.gender),
-      role: Number(this.signupForm.value.role)
+    this.isSubmitting = true;
+    const formValue = this.signupForm.getRawValue();
+
+    const payload: RegisterRequest = {
+      ...formValue,
+      gender: Number(formValue.gender),
+      role: Number(formValue.role)
     };
 
-    console.log("📤 Payload to Register:", payload); // Debug
-
-    this.isSubmitting = true;
+    if (payload.role !== 0) {
+      delete payload.graduationDate;
+    }
 
     this.authService.register(payload).subscribe({
       next: () => {
-        this.isSubmitting = false;
-        this.popupService.showSuccess(
-          'Account Created!',
-          'Your account has been created successfully. You can now log in.',
-          () => this.router.navigate(['/home']) // Navigate to home or login page
-        );
+        // The service now handles the success notification
+        // We can add additional logic here, like a delayed redirect
+        this.router.navigate(['/Login']);
       },
       error: (err) => {
-        this.isSubmitting = false;
-        const errorMessage = err.error?.message || err.error?.title || 'Registration failed due to an unexpected error.';
+        const errorMessage = err.message || 'Registration failed. The email might already be in use.';
         this.popupService.showError('Registration Failed', errorMessage);
+        this.isSubmitting = false;
+      },
+      complete: () => {
+        this.isSubmitting = false;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.roleChangesSubscription) {
+      this.roleChangesSubscription.unsubscribe();
+    }
   }
 }

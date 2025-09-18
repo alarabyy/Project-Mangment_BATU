@@ -1,19 +1,6 @@
-:host {
-  display: block;
-  padding: 3rem 2rem;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  --card-bg: rgba(28, 37, 54, 0.6);
-  --card-border: rgba(132, 141, 151, 0.15);
-}
-:host-context(body.light-theme-active) {
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --card-border: rgba(0, 0, 0, 0.08);
-}
-.analytics-container {
-  max-width: 1600px;
-  margin: 0 auto;
-}
+:host { display: block; padding: 3rem 2rem; background-color: var(--bg-color); color: var(--text-color); --card-bg: rgba(28, 37, 54, 0.6); --card-border: rgba(132, 141, 151, 0.15); }
+:host-context(body.light-theme-active) { --card-bg: rgba(255, 255, 255, 0.8); --card-border: rgba(0, 0, 0, 0.08); }
+.analytics-container { max-width: 1600px; margin: 0 auto; }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 .page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 3rem; animation: fadeInDown 0.6s var(--easing-curve-elegant); }
 .header-content h1 { font-size: 2.75rem; font-weight: var(--font-weight-extrabold); margin: 0; }
@@ -21,24 +8,11 @@
 .header-filters { display: flex; gap: 1rem; }
 .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .filter-group label { font-size: 0.8rem; font-weight: var(--font-weight-semibold); color: var(--subtle-text-color); }
-.filter-group select {
-  background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-color);
-  padding: 0.6rem 1rem; border-radius: var(--border-radius-base); font-weight: var(--font-weight-medium);
-  min-width: 180px; transition: all var(--transition-speed-fast) var(--easing-curve-elegant); appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem;
-}
+.filter-group select { background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 0.6rem 1rem; border-radius: var(--border-radius-base); font-weight: var(--font-weight-medium); min-width: 180px; transition: all var(--transition-speed-fast) var(--easing-curve-elegant); appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; }
 .filter-group select:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 3px var(--primary-accent-translucent); outline: none; }
 @keyframes card-fade-in { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .analytics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-.kpi-card, .chart-card {
-  background: var(--card-bg); border: 1px solid var(--card-border);
-  border-radius: var(--border-radius-large); padding: 1.5rem;
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  position: relative; overflow: hidden;
-  animation: card-fade-in 0.6s var(--easing-curve-elegant) backwards;
-  --animation-order: 1; animation-delay: calc(var(--animation-order) * 70ms);
-}
+.kpi-card, .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--border-radius-large); padding: 1.5rem; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; overflow: hidden; animation: card-fade-in 0.6s var(--easing-curve-elegant) backwards; --animation-order: 1; animation-delay: calc(var(--animation-order) * 70ms); }
 .analytics-grid > *:nth-child(1) { --animation-order: 1; }
 .analytics-grid > *:nth-child(2) { --animation-order: 2; }
 .analytics-grid > *:nth-child(3) { --animation-order: 3; }
@@ -47,11 +21,7 @@
 .analytics-grid > *:nth-child(6) { --animation-order: 6; }
 .analytics-grid > *:nth-child(7) { --animation-order: 7; }
 .kpi-card { display: flex; align-items: center; gap: 1.5rem; }
-.kpi-icon {
-  font-size: 1.75rem; color: var(--primary-accent); background-color: var(--primary-accent-translucent);
-  width: 60px; height: 60px; border-radius: var(--border-radius-base);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
+.kpi-icon { font-size: 1.75rem; color: var(--primary-accent); background-color: var(--primary-accent-translucent); width: 60px; height: 60px; border-radius: var(--border-radius-base); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .kpi-content { line-height: 1.2; }
 .kpi-value { font-size: 2.25rem; font-weight: var(--font-weight-bold); min-height: 2.7rem; display: inline-block; }
 .kpi-title { font-size: 0.9rem; color: var(--subtle-text-color); display: block; }
@@ -62,16 +32,8 @@
 .chart-wrapper { flex-grow: 1; display: flex; align-items: center; justify-content: center; margin: -1rem; }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
 .skeleton-grid { grid-template-columns: repeat(4, 1fr); }
-.kpi-card-skeleton, .chart-card-skeleton {
-  background-color: var(--surface-color); border-radius: var(--border-radius-large);
-  position: relative; overflow: hidden;
-}
-.kpi-card-skeleton::after, .chart-card-skeleton::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, var(--shimmer-color, rgba(255, 255, 255, 0.04)), transparent);
-  animation: shimmer 1.8s infinite;
-}
+.kpi-card-skeleton, .chart-card-skeleton { background-color: var(--surface-color); border-radius: var(--border-radius-large); position: relative; overflow: hidden; }
+.kpi-card-skeleton::after, .chart-card-skeleton::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, var(--shimmer-color, rgba(255, 255, 255, 0.04)), transparent); animation: shimmer 1.8s infinite; }
 .kpi-card-skeleton { min-height: 124px; }
 .chart-card-skeleton.large { min-height: 420px; grid-column: span 2; }
 .chart-card-skeleton.full-width { min-height: 420px; grid-column: span 4; }

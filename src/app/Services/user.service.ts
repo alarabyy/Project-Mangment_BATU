@@ -5,14 +5,9 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { AuthService, UserProfile } from './auth.service';
+import { User } from '../models/user';
 
-import { User } from '../models/user'; // Ensure this path is correct if User is used elsewhere
-
-export interface Dean { // This interface is used in all-chats for user search results
-  id: number;
-  name: string;
-  email?: string;
-}
+export interface Dean { id: number; name: string; email?: string; }
 
 @Injectable({
   providedIn: 'root'
@@ -31,10 +26,7 @@ export class UserService {
 
   updateUser(formData: FormData): Observable<any> {
     const headers = this.authService.getAuthHeaders();
-    const headersForMultipart = new HttpHeaders({
-      'Authorization': headers.get('Authorization') || ''
-    });
-
+    const headersForMultipart = new HttpHeaders({ 'Authorization': headers.get('Authorization') || '' });
     return this.http.put(`${this.baseUrl}/update`, formData, { headers: headersForMultipart }).pipe(
       catchError(this.handleError)
     );
@@ -63,18 +55,11 @@ export class UserService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error(`[UserService] Backend returned code ${error.status}, body was: `, error.error);
-    let errorMessage = 'An unknown error occurred while interacting with user service!';
-
+    let errorMessage = 'An unknown error occurred!';
     if (error.error instanceof ErrorEvent) {
       errorMessage = `A client-side network error occurred: ${error.error.message}`;
     } else {
-      if (typeof error.error === 'string') {
-        errorMessage = `Error: ${error.error}`;
-      } else if (error.error && error.error.message) {
-        errorMessage = `Error: ${error.error.message}`;
-      } else {
-        errorMessage = `Server returned code ${error.status}: ${error.statusText || 'Unknown Error'}`;
-      }
+      errorMessage = error.error?.message || `Server returned code ${error.status}: ${error.statusText}`;
     }
     return throwError(() => new Error(errorMessage));
   }

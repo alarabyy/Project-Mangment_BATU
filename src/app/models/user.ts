@@ -1,14 +1,12 @@
-// src/app/models/user.ts
+// src/app/models/user.model.ts
 
 export interface User {
   id: number;
-  firstName: string;
-  middleName?: string;
-  lastname: string | null;
   email: string;
-  gender?: number;
-  role?: string | string[] | number;
-  imageUrl?: string | null;
-  status?: string;
-  createdAt?: string;
+  firstName: string;
+  lastname: string | null;
+  imageUrl: string;
+  gender: number;
+  graduationDate: string;
+  role: number;
 }

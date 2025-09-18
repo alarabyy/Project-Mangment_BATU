@@ -1,6 +1,5 @@
 <!-- src/app/components/User/user-management/user-management.component.html -->
 <div class="user-management-container">
-  <!-- NEW: Feedback Message Area (Fixed position for better visibility) -->
   <div *ngIf="successMessage" class="feedback-message success-message">
     <i class="fas fa-check-circle"></i> {{ successMessage }}
   </div>
@@ -8,14 +7,12 @@
     <i class="fas fa-times-circle"></i> {{ errorMessage }}
   </div>
 
-  <!-- Page Header section -->
   <div class="page-header">
     <div class="header-content">
       <h1>User Management</h1>
       <p>Manage all registered users, view their details, and perform administrative actions.</p>
     </div>
     <div class="header-actions">
-      <!-- User Analytics Button with Icon -->
       <button class="btn-primary" (click)="goToUserAnalytics()">
         <i class="fas fa-chart-line"></i> User Analytics
       </button>
@@ -23,99 +20,85 @@
   </div>
 
   <div class="search-bar">
-    <input
-      type="text"
-      placeholder="Search users by name or email..."
-      (input)="onSearch($event)"
-      class="form-control"
-    />
+    <input type="text" placeholder="Search users by name, email or role..." (input)="onSearch($event)" class="form-control" />
   </div>
 
   <ng-container *ngIf="state$ | async as state">
     <div *ngIf="state.isLoading" class="loading-spinner state-message">
-      <div class="loader"></div>
-      <p>Loading users...</p>
+      <div class="loader"></div> <p>Loading users...</p>
     </div>
     <div *ngIf="state.error" class="error-message state-message">
-      <div class="icon-wrapper">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-        </svg>
-      </div>
-      <h2>Error!</h2>
-      <p>{{ state.error }}</p>
-      <button class="retry-btn" (click)="refreshUsers$.next()">Retry Loading</button>
+      <!-- Error content -->
     </div>
 
-    <!-- Only attempt to display users if NOT loading and NO error -->
     <ng-container *ngIf="!state.isLoading && !state.error">
-        <ng-container *ngIf="filteredUsers$ | async as users">
-            <div *ngIf="users.length === 0" class="no-users-message state-message">
-                <div class="icon-wrapper">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.75V6.75A2.25 2.25 0 0015.75 4.5H9.75A2.25 2.25 0 007.5 6.75v12M3 5.25v14.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V5.25A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25z" />
-                  </svg>
-                </div>
-                <h2>No Users Found</h2>
-                <p>Try adjusting your search or add new users.</p>
-            </div>
+      <ng-container *ngIf="filteredUsers$ | async as users">
+        <div *ngIf="users.length === 0" class="no-users-message state-message">
+          <!-- No users content -->
+        </div>
 
-            <!-- Main User Table - Wrapped in a div for scrollability on small screens -->
-            <div class="table-responsive" *ngIf="users.length > 0">
-              <table class="user-table">
-                  <thead>
-                  <tr>
-                      <th class="column-id">ID</th>
-                      <th class="column-first-name">First Name</th>
-                      <th class="column-last-name">Last Name</th>
-                      <th class="column-email">Email</th>
-                      <th class="column-gender">Gender</th>
-                      <th class="column-actions">Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <ng-container *ngFor="let user of users; trackBy: trackById">
-                      <tr *ngIf="editingUserId !== user.id">
-                        <td data-label="ID">{{ user.id }}</td>
-                        <td data-label="First Name">{{ user.firstName }}</td>
-                        <td data-label="Last Name">{{ user.lastname }}</td>
-                        <td data-label="Email">{{ user.email }}</td>
-                        <td data-label="Gender">{{ getGenderName(user.gender) }}</td>
-                        <td class="actions" data-label="Actions">
-                            <button (click)="startEdit(user)" class="btn-action btn-edit">
-                              <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button *ngIf="isAdmin()" (click)="deleteUser(user.id)" class="btn-action btn-delete">
-                              <i class="fas fa-trash-alt"></i> Delete
-                            </button>
-                        </td>
-                      </tr>
-                      <tr *ngIf="editingUserId === user.id">
-                        <td data-label="ID">{{ editedUser?.id }}</td>
-                        <td data-label="First Name"><input type="text" [(ngModel)]="editedUser!.firstName" /></td>
-                        <td data-label="Last Name"><input type="text" [(ngModel)]="editedUser!.lastname" /></td>
-                        <td data-label="Email"><input type="email" [(ngModel)]="editedUser!.email" /></td>
-                        <td data-label="Gender">
-                            <select [(ngModel)]="editedUser!.gender">
-                            <option [ngValue]="0">Male</option>
-                            <option [ngValue]="1">Female</option>
-                            <option [ngValue]="2">Other</option>
-                            </select>
-                        </td>
-                        <td class="actions" data-label="Actions">
-                            <button (click)="saveEdit()" class="btn-action btn-save">
-                              <i class="fas fa-save"></i> Save
-                            </button>
-                            <button (click)="cancelEdit()" class="btn-action btn-cancel">
-                              <i class="fas fa-times"></i> Cancel
-                            </button>
-                        </td>
-                      </tr>
-                  </ng-container>
-                </tbody>
-              </table>
-            </div>
-        </ng-container>
+        <div class="table-responsive" *ngIf="users.length > 0">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th class="column-avatar">Avatar</th>
+                <th class="column-name">Name</th>
+                <th class="column-email">Email</th>
+                <th class="column-role">Role</th>
+                <th class="column-grad-date">Graduation Date</th>
+                <th class="column-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let user of users; trackBy: trackById">
+                <!-- View Mode -->
+                <tr *ngIf="editingUserId !== user.id">
+                  <td data-label="Avatar">
+                    <div class="user-avatar">
+                      <!-- ✅ FIX: Calling the new component method on error -->
+                      <img [src]="user.imageUrl" (error)="handleImageError($event)" alt="Avatar"/>
+                      <i class="fas fa-user-circle fallback-icon"></i>
+                    </div>
+                  </td>
+                  <td data-label="Name">{{ user.firstName }} {{ user.lastname }}</td>
+                  <td data-label="Email">{{ user.email }}</td>
+                  <td data-label="Role">
+                    <span class="role-badge" [ngClass]="getRoleInfo(user.role).class">
+                      <i class="fas" [ngClass]="getRoleInfo(user.role).icon"></i>
+                      {{ getRoleInfo(user.role).name }}
+                    </span>
+                  </td>
+                  <td data-label="Graduation Date">{{ formatGraduationDate(user) }}</td>
+                  <td class="actions" data-label="Actions">
+                    <button (click)="startEdit(user)" class="btn-action btn-edit"><i class="fas fa-edit"></i> Edit</button>
+                    <button *ngIf="isAdmin()" (click)="deleteUser(user.id)" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                  </td>
+                </tr>
+                <!-- Edit Mode -->
+                <tr *ngIf="editingUserId === user.id">
+                  <td data-label="Avatar">
+                    <div class="user-avatar">
+                      <!-- ✅ FIX: Calling the new component method on error -->
+                      <img [src]="editedUser?.imageUrl" (error)="handleImageError($event)" alt="Avatar"/>
+                      <i class="fas fa-user-circle fallback-icon"></i>
+                    </div>
+                  </td>
+                  <td data-label="Name"><input type="text" [(ngModel)]="editedUser!.firstName" /> <input type="text" [(ngModel)]="editedUser!.lastname" /></td>
+                  <td data-label="Email"><input type="email" [(ngModel)]="editedUser!.email" /></td>
+                  <td data-label="Role">
+                    <span class="role-badge" [ngClass]="getRoleInfo(user.role).class">{{ getRoleInfo(user.role).name }}</span>
+                  </td>
+                  <td data-label="Graduation Date">{{ formatGraduationDate(user) }}</td>
+                  <td class="actions" data-label="Actions">
+                    <button (click)="saveEdit()" class="btn-action btn-save"><i class="fas fa-save"></i> Save</button>
+                    <button (click)="cancelEdit()" class="btn-action btn-cancel"><i class="fas fa-times"></i> Cancel</button>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
     </ng-container>
   </ng-container>
 </div>

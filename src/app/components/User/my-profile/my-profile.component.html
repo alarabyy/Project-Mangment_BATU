@@ -1,203 +1,111 @@
-<!-- src/app/my-profile/my-profile.component.html -->
-
-<div class="profile-page-wrapper">
-
-  <!-- حالة التحميل -->
-  <div *ngIf="isLoading" class="status-container">
-    <div class="loader"></div>
-    <p style="margin-top: 1rem; color: var(--subtle-text-color);">Loading Profile...</p>
-  </div>
-
-  <!-- حالة الخطأ -->
-  <div *ngIf="errorMessage && !isLoading" class="status-container error-container">
-    <div class="icon-wrapper">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-      </svg>
+<!-- src/app/components/User/my-profile/my-profile.component.html -->
+<ng-container *ngIf="state$ | async as state">
+  <div class="profile-page-wrapper">
+    <!-- Loading State -->
+    <div *ngIf="state.isLoading" class="status-container">
+      <div class="loader"></div>
+      <p>Loading Profile...</p>
     </div>
-    <h2>An Error Occurred</h2>
-    <p>{{ errorMessage }}</p>
-    <button *ngIf="errorMessage && !isLoading" class="retry-btn" (click)="loadUserProfile()">Retry Load Profile</button>
-  </div>
 
-  <!-- حالة النجاح -->
-  <div *ngIf="successMessage && !isLoading" class="status-container success-container">
-    <div class="icon-wrapper">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    </div>
-    <h2>Success!</h2>
-    <p>{{ successMessage }}</p>
-  </div>
+    <!-- Error/Success Toasts -->
+    <div *ngIf="state.error" class="toast error-toast">{{ state.error }}</div>
+    <div *ngIf="state.success" class="toast success-toast">{{ state.success }}</div>
 
-
-  <!-- محتوى الصفحة عند النجاح -->
-  <div *ngIf="userProfile && !isLoading && !errorMessage" class="profile-layout-grid animate-fade-in">
-
-    <!-- الشريط الجانبي الأيسر -->
-    <aside class="profile-sidebar">
-      <div class="sidebar-content">
-        <!-- UPDATED: Avatar Container - Removed direct click, now only for display -->
+    <!-- Main Content -->
+    <div *ngIf="state.profile && !state.isLoading" class="profile-layout-grid animate-fade-in">
+      <!-- Left Sidebar -->
+      <aside class="profile-sidebar">
         <div class="avatar-container">
-           <!-- Display local preview image if available -->
-           <img *ngIf="previewImageUrl"
-                [src]="previewImageUrl"
-                alt="New Avatar Preview"
-                class="profile-avatar-img">
-           <!-- Display existing avatar from server if no new preview and imageUrl exists -->
-           <img *ngIf="!previewImageUrl && userProfile?.imageUrl"
-                [src]="environment.imageBaseUrl + userProfile.imageUrl"
-                alt="User Avatar"
-                class="profile-avatar-img">
-           <!-- Display placeholder if no preview and no existing image -->
-           <div *ngIf="!previewImageUrl && !userProfile?.imageUrl" class="avatar-placeholder">
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
-               </svg>
-               <span class="upload-text">Upload Photo</span>
-           </div>
-           <div class="online-indicator"></div>
-           <!-- Hidden file input: It lives in the form section now -->
+          <img [src]="getAvatarUrl(state.profile)" *ngIf="getAvatarUrl(state.profile)" alt="User Avatar" class="profile-avatar-img">
+          <div *ngIf="!getAvatarUrl(state.profile)" class="avatar-placeholder">
+            <span>{{ state.profile.firstName.charAt(0) }}</span>
+          </div>
+          <div class="online-indicator"></div>
         </div>
+        <h1 class="user-name">{{ state.profile.firstName }} {{ state.profile.lastname }}</h1>
+        <p class="user-role">{{ getRoleAsString(state.profile.role) }}</p>
+        <button class="logout-btn-sidebar" (click)="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </aside>
 
-        <h1 class="user-name">{{ getFullName() }}</h1>
-        <p class="user-role">{{ getRoleAsString(userProfile.role) }}</p>
-        <button class="logout-btn-sidebar" (click)="logout()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10.75 4.75a.75.75 0 000 1.5h2.5a.75.75 0 000-1.5h-2.5zM10 6a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5A.75.75 0 0110 6zM8.25 6.75a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5zM12 1.5A10.5 10.5 0 1022.5 12 10.512 10.512 0 0012 1.5zm0 19.5a9 9 0 119-9 9.01 9.01 0 01-9 9z" /></svg>
-          Logout
-        </button>
-      </div>
-    </aside>
+      <!-- Right Main Content -->
+      <main class="profile-main-content">
+        <!-- User Information Card -->
+        <section class="info-card">
+          <h2 class="card-title"><i class="fas fa-user-circle"></i> Personal Information</h2>
+          <div class="info-grid">
+            <div class="info-item"><label><i class="fas fa-user"></i> Full Name</label><span>{{ state.profile.firstName }} {{ state.profile.middleName }} {{ state.profile.lastname }}</span></div>
+            <div class="info-item"><label><i class="fas fa-envelope"></i> Email Address</label><span>{{ state.profile.email }}</span></div>
+            <div class="info-item"><label><i class="fas fa-venus-mars"></i> Gender</label><span>{{ getGenderAsString(state.profile.gender) }}</span></div>
+          </div>
+        </section>
 
-    <!-- المحتوى الرئيسي الأيمن -->
-    <main class="profile-main-content">
-      <section class="info-card">
-        <h2 class="card-title">User Information</h2>
-        <div class="info-grid">
-          <div class="info-item"><label>Full Name</label><span>{{ getFullName() }}</span></div>
+        <!-- Academic Info (Students Only) -->
+        <section class="info-card" *ngIf="state.profile.role === 0">
+          <h2 class="card-title"><i class="fas fa-graduation-cap"></i> Academic Information</h2>
+          <div class="info-grid">
+            <div class="info-item"><label><i class="fas fa-calendar-alt"></i> Graduation Date</label><span>{{ formatGraduationDate(state.profile.graduationDate) }}</span></div>
+          </div>
+        </section>
 
-          <div class="info-item"><label>Email Address</label><span>{{ userProfile.email }}</span></div>
-          <div class="info-item"><label>User ID</label><span>{{ userProfile.id }}</span></div>
-          <div *ngIf="userProfile.middleName" class="info-item"><label>Middle Name</label><span>{{ userProfile.middleName }}</span></div>
-          <div *ngIf="userProfile.gender !== undefined && userProfile.gender !== null" class="info-item"><label>Gender</label><span>{{ getGenderString(userProfile.gender) }}</span></div>
-          <div class="info-item"><label>Account Status</label><span class="status-active">Active</span></div>
-          <div class="info-item"><label>Member Since</label><span>January 2024</span></div>
-        </div>
-      </section>
+        <!-- Actions Card -->
+        <section class="info-card">
+          <h2 class="card-title"><i class="fas fa-cog"></i> Account Actions</h2>
+          <div class="actions-grid">
+            <button class="action-btn" (click)="toggleEditProfileForm(state.profile!)"><i class="fas fa-edit"></i><span>Edit Profile</span></button>
+            <button class="action-btn" (click)="toggleChangePasswordForm()"><i class="fas fa-key"></i><span>Change Password</span></button>
+          </div>
+        </section>
 
-      <section class="info-card">
-        <h2 class="card-title">Actions</h2>
-        <div class="actions-grid">
-           <button class="action-btn" (click)="toggleEditProfileForm()">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z" /></svg>
-             <span>Edit Profile</span>
-           </button>
-           <button class="action-btn" (click)="toggleChangePasswordForm()">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" /></svg>
-             <span>Change Password</span>
-           </button>
-        </div>
-      </section>
-
-      <!-- نموذج تعديل الملف الشخصي -->
-      <section *ngIf="showEditProfileForm" class="info-card form-card animate-fade-in">
-        <h2 class="card-title">Edit Profile Information</h2>
-        <form [formGroup]="editProfileForm" (ngSubmit)="onUpdateProfile()">
-          <!-- NEW: Button to trigger file input and the hidden input itself -->
-          <div class="form-group avatar-upload-group">
-            <label>Profile Photo</label>
-            <div class="current-avatar-preview">
-              <img *ngIf="previewImageUrl" [src]="previewImageUrl" alt="New Preview" class="current-profile-img-small">
-              <img *ngIf="!previewImageUrl && userProfile?.imageUrl" [src]="environment.imageBaseUrl + userProfile.imageUrl" alt="Current Avatar" class="current-profile-img-small">
-              <div *ngIf="!previewImageUrl && !userProfile?.imageUrl" class="current-profile-img-small avatar-placeholder-small">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg>
+        <!-- Edit Profile Form (Conditional) -->
+        <section *ngIf="showEditProfileForm" class="info-card form-card">
+          <h2 class="card-title">Edit Profile</h2>
+          <form [formGroup]="editProfileForm" (ngSubmit)="onUpdateProfile()">
+            <div class="form-group avatar-upload-group">
+              <label>Profile Photo</label>
+              <button type="button" class="action-btn-secondary" (click)="triggerFileInput()">Change Photo</button>
+              <input type="file" #avatarFileInput hidden accept="image/*" (change)="onFileSelected($event)">
+              <p *ngIf="selectedAvatarFile" class="file-info">Selected: {{ selectedAvatarFile.name }}</p>
+            </div>
+            <div class="form-grid">
+              <div class="form-group"><label for="firstName">First Name</label><input id="firstName" formControlName="firstName" class="form-control"></div>
+              <div class="form-group"><label for="lastname">Last Name</label><input id="lastname" formControlName="lastname" class="form-control"></div>
+              <div class="form-group"><label for="middleName">Middle Name</label><input id="middleName" formControlName="middleName" class="form-control"></div>
+              <div class="form-group"><label for="email">Email</label><input id="email" type="email" formControlName="email" class="form-control"></div>
+              <div class="form-group"><label for="gender">Gender</label>
+                <select id="gender" formControlName="gender" class="form-control">
+                  <option [ngValue]="null">Select Gender</option>
+                  <option [ngValue]="0">Male</option>
+                  <option [ngValue]="1">Female</option>
+                </select>
+              </div>
+              <div class="form-group" *ngIf="state.profile?.role === 0">
+                <label for="graduationDate">Graduation Date</label>
+                <input id="graduationDate" type="date" formControlName="graduationDate" class="form-control">
               </div>
             </div>
-            <button type="button" class="action-btn-secondary" (click)="triggerFileInput()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 6a2.25 2.25 0 00-2.25 2.25v.75m-1.5 6h6m-3-3v3m-1.5-9h5.25A2.25 2.25 0 0118 10.5v4.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 15V6.75A2.25 2.25 0 016.75 4.5h2.25M11.25 12.75l-3-3m0 0l-3 3m3-3l3 3" /></svg>
-              <span>Change Photo</span>
-            </button>
-            <!-- Hidden file input that gets triggered -->
-            <input type="file" #avatarFileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;">
-            <p *ngIf="selectedAvatarFile" class="file-info">Selected: {{ selectedAvatarFile.name }}</p>
-            <p *ngIf="!selectedAvatarFile && userProfile?.imageUrl" class="file-info current-file">No new photo selected.</p>
-          </div>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn" [disabled]="editProfileForm.invalid">Save Changes</button>
+              <button type="button" class="cancel-btn" (click)="toggleEditProfileForm(state.profile!)">Cancel</button>
+            </div>
+          </form>
+        </section>
 
-          <!-- Other form fields remain -->
-          <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input id="firstName" type="text" formControlName="firstName" class="form-control" [class.is-invalid]="editProfileForm.get('firstName')?.invalid && editProfileForm.get('firstName')?.touched">
-            <div *ngIf="editProfileForm.get('firstName')?.invalid && editProfileForm.get('firstName')?.touched" class="invalid-feedback">
-              First Name is required.
+        <!-- Change Password Form (Conditional) -->
+        <section *ngIf="showChangePasswordForm" class="info-card form-card">
+          <h2 class="card-title">Change Password</h2>
+          <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePassword()">
+            <div class="form-group"><label for="currentPassword">Current Password</label><input id="currentPassword" type="password" formControlName="currentPassword" class="form-control"></div>
+            <div class="form-group"><label for="newPassword">New Password</label><input id="newPassword" type="password" formControlName="newPassword" class="form-control"></div>
+            <div class="form-group"><label for="confirmNewPassword">Confirm New Password</label><input id="confirmNewPassword" type="password" formControlName="confirmNewPassword" class="form-control">
+              <div *ngIf="changePasswordForm.hasError('mismatch') && changePasswordForm.get('confirmNewPassword')?.touched" class="invalid-feedback">Passwords do not match.</div>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="middleName">Middle Name</label>
-            <input id="middleName" type="text" formControlName="middleName" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input id="lastName" type="text" formControlName="lastName" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input id="email" type="email" formControlName="email" class="form-control" [class.is-invalid]="editProfileForm.get('email')?.invalid && editProfileForm.get('email')?.touched">
-            <div *ngIf="editProfileForm.get('email')?.invalid && editProfileForm.get('email')?.touched" class="invalid-feedback">
-              <span *ngIf="editProfileForm.get('email')?.errors?.['required']">Email is required.</span>
-              <span *ngIf="editProfileForm.get('email')?.errors?.['email']">Enter a valid email address.</span>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn" [disabled]="changePasswordForm.invalid">Update Password</button>
+              <button type="button" class="cancel-btn" (click)="toggleChangePasswordForm()">Cancel</button>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="gender">Gender</label>
-            <select id="gender" formControlName="gender" class="form-control">
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="submit-btn" [disabled]="editProfileForm.invalid || editProfileForm.pending">Save Changes</button>
-            <button type="button" class="cancel-btn" (click)="toggleEditProfileForm()">Cancel</button>
-          </div>
-        </form>
-      </section>
-
-      <!-- نموذج تغيير كلمة المرور -->
-      <section *ngIf="showChangePasswordForm" class="info-card form-card animate-fade-in">
-        <h2 class="card-title">Change Password</h2>
-        <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePassword()">
-          <div class="form-group">
-            <label for="currentPassword">Current Password</label>
-            <input id="currentPassword" type="password" formControlName="currentPassword" class="form-control" [class.is-invalid]="changePasswordForm.get('currentPassword')?.invalid && changePasswordForm.get('currentPassword')?.touched">
-            <div *ngIf="changePasswordForm.get('currentPassword')?.invalid && changePasswordForm.get('currentPassword')?.touched" class="invalid-feedback">
-              Current password is required.
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <input id="newPassword" type="password" formControlName="newPassword" class="form-control" [class.is-invalid]="changePasswordForm.get('newPassword')?.invalid && changePasswordForm.get('newPassword')?.touched">
-            <div *ngIf="changePasswordForm.get('newPassword')?.invalid && changePasswordForm.get('newPassword')?.touched" class="invalid-feedback">
-              <span *ngIf="changePasswordForm.get('newPassword')?.errors?.['required']">New password is required.</span>
-              <span *ngIf="changePasswordForm.get('newPassword')?.errors?.['minlength']">New password must be at least 6 characters.</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="confirmNewPassword">Confirm New Password</label>
-            <input id="confirmNewPassword" type="password" formControlName="confirmNewPassword" class="form-control" [class.is-invalid]="(changePasswordForm.get('confirmNewPassword')?.invalid && changePasswordForm.get('confirmNewPassword')?.touched) || (changePasswordForm.hasError('mismatch') && changePasswordForm.get('confirmNewPassword')?.touched)">
-            <div *ngIf="(changePasswordForm.get('confirmNewPassword')?.invalid && changePasswordForm.get('confirmNewPassword')?.touched) || (changePasswordForm.hasError('mismatch') && changePasswordForm.get('confirmNewPassword')?.touched)" class="invalid-feedback">
-              <span *ngIf="changePasswordForm.get('confirmNewPassword')?.errors?.['required']">Confirm new password is required.</span>
-              <span *ngIf="changePasswordForm.hasError('mismatch')">Passwords do not match.</span>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="submit-btn" [disabled]="changePasswordForm.invalid || changePasswordForm.pending">Change Password</button>
-            <button type="button" class="cancel-btn" (click)="toggleChangePasswordForm()">Cancel</button>
-          </div>
-        </form>
-      </section>
-
-    </main>
+          </form>
+        </section>
+      </main>
+    </div>
   </div>
-</div>
+</ng-container>

@@ -1,72 +1,126 @@
-// File: src/app/components/sign-up/sign-up.component.ts
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
+import { SignUpComponent } from './sign-up.component';
+import { AuthService, RegisterRequest } from '../../../Services/auth.service';
+import { PopupService } from '../../../Services/popup.service';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../Services/auth.service';
 
-@Component({
-  selector: 'app-sign-up',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './sign-up.component.html',
-  styleUrls: ['./sign-up.component.css']
-})
-export class SignUpComponent implements OnInit {
-  signupForm!: FormGroup;
-  showPassword = false;
-  isSubmitting = false;
-  errorMessage: string | null = null;
+describe('SignUpComponent', () => {
+  let component: SignUpComponent;
+  let fixture: ComponentFixture<SignUpComponent>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
+  let mockRouter: jasmine.SpyObj<Router>;
+  let mockPopupService: jasmine.SpyObj<PopupService>;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  beforeEach(async () => {
+    mockAuthService = jasmine.createSpyObj('AuthService', ['register']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockPopupService = jasmine.createSpyObj('PopupService', ['showSuccess', 'showError']);
 
-  ngOnInit(): void {
-    this.signupForm = this.fb.group({
-      firstName: ['', [Validators.required]],
-      middleName: [''],
-      lastName: ['', [Validators.required]],
-      gender: ['0', Validators.required],
-      role: ['0', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern('^(?=.*[a-zA-Z])(?=.*\\d).{8,}$')]]
+    await TestBed.configureTestingModule({
+      imports: [
+        ReactiveFormsModule,
+        CommonModule,
+        SignUpComponent
+      ],
+      providers: [
+        FormBuilder,
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: Router, useValue: mockRouter },
+        { provide: PopupService, useValue: mockPopupService }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(SignUpComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should call authService.register with correct student payload on valid form submission', () => {
+    mockAuthService.register.and.returnValue(of({ success: true }));
+
+    component.signupForm.setValue({
+      firstName: 'Test',
+      middleName: 'User',
+      lastName: 'Student',
+      gender: '0',
+      role: '0',
+      graduationDate: '2025-12-31',
+      email: 'test.student@example.com',
+      password: 'Password123'
     });
-  }
 
-  get f() { return this.signupForm.controls; }
-  togglePassword(): void { this.showPassword = !this.showPassword; }
-
-  submitSignup(): void {
-    if (this.signupForm.invalid) {
-      this.signupForm.markAllAsTouched();
-      return;
-    }
-
-    this.isSubmitting = true;
-    this.errorMessage = null;
-
-    const formValues = this.signupForm.value;
-    const payload = {
-      FirstName: formValues.firstName,
-      MiddleName: formValues.middleName,
-      LastName: formValues.lastName,
-      Email: formValues.email,
-      Password: formValues.password,
-      Gender: +formValues.gender,
-      Role: +formValues.role
+    const expectedPayload: RegisterRequest = {
+      firstName: 'Test',
+      middleName: 'User',
+      lastName: 'Student',
+      gender: 0,
+      role: 0,
+      graduationDate: '2025-12-31',
+      email: 'test.student@example.com',
+      password: 'Password123'
     };
 
-    this.authService.register(payload).subscribe({
-      next: () => {
-        alert('Account created successfully! Please log in.');
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        // رسالة الخطأ الآن ستكون أكثر فائدة بعد حل مشكلة CORS
-        this.errorMessage = err.error?.message || 'Registration failed. The email might already be in use.';
-        this.isSubmitting = false;
-      },
-      complete: () => { this.isSubmitting = false; }
+    component.submitSignup();
+
+    expect(mockAuthService.register).toHaveBeenCalledWith(expectedPayload);
+    // As per the provided auth service, it handles the success popup itself.
+    // The component just navigates.
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/Login']);
+  });
+
+  it('should call authService.register without graduationDate for a doctor', () => {
+    mockAuthService.register.and.returnValue(of({ success: true }));
+
+    component.signupForm.get('role')?.setValue('1');
+    component.signupForm.patchValue({
+      firstName: 'Test',
+      lastName: 'Doctor',
+      gender: '1',
+      email: 'test.doctor@example.com',
+      password: 'Password123',
     });
-  }
-}
+
+    const expectedPayload: RegisterRequest = {
+      firstName: 'Test',
+      middleName: '',
+      lastName: 'Doctor',
+      gender: 1,
+      role: 1,
+      email: 'test.doctor@example.com',
+      password: 'Password123'
+    };
+
+    component.submitSignup();
+
+    expect(mockAuthService.register).toHaveBeenCalledWith(expectedPayload);
+  });
+
+  it('should show an error popup if registration fails', () => {
+    const errorResponse = new Error('Email already exists');
+    mockAuthService.register.and.returnValue(throwError(() => errorResponse));
+
+    component.signupForm.setValue({
+      firstName: 'Test',
+      lastName: 'Fail',
+      middleName: '',
+      gender: '0',
+      role: '0',
+      graduationDate: '2025-01-01',
+      email: 'fail@example.com',
+      password: 'Password123'
+    });
+
+    component.submitSignup();
+
+    expect(mockAuthService.register).toHaveBeenCalled();
+    expect(mockPopupService.showError).toHaveBeenCalledWith('Registration Failed', 'Email already exists');
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
+});
