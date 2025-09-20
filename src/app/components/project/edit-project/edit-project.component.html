@@ -1,190 +1,97 @@
 <!-- src/app/components/project/edit-project/edit-project.component.html -->
 <div class="container">
   <header class="header">
-    <div class="header-content">
-      <i class="header-icon fas fa-edit"></i>
-      <h1 class="header-title">{{ pageTitle }}</h1>
-    </div>
+    <div class="header-content"><i class="header-icon fas fa-edit"></i><h1 class="header-title">{{ pageTitle }}</h1></div>
   </header>
 
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="loading-spinner"></div>
-    <p>Loading project details...</p>
-  </div>
+  <div *ngIf="isLoading" class="loading-container"><div class="loading-spinner"></div><p>Loading project details...</p></div>
 
-  <div *ngIf="!isLoading && project">
-    <div class="form-container">
-      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
-        <!-- Project Details Section -->
-        <h2 class="section-title"><i class="fas fa-info-circle"></i> Project Details</h2>
-        <div class="form-group">
-          <label for="title">Project Title</label>
-          <input type="text" id="title" formControlName="title" class="form-control"
-                 [class.is-invalid]="f['title'].invalid && f['title'].touched">
-          <div *ngIf="f['title'].touched && f['title'].errors" class="error-message">
-            <small *ngIf="f['title'].errors?.['required']">Project title is required.</small>
-          </div>
+  <ng-container *ngIf="!isLoading && project">
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
+      <!-- Project Details Card -->
+      <div class="form-card">
+        <h2 class="card-title">Core Details</h2>
+        <div class="form-grid">
+          <div class="form-group span-2"><label for="title">Title</label><input id="title" formControlName="title" class="form-control"></div>
+          <div class="form-group span-2"><label for="description">Description</label><textarea id="description" formControlName="description" rows="4" class="form-control"></textarea></div>
+          <div class="form-group span-2"><label for="problemStatement">Problem Statement</label><textarea id="problemStatement" formControlName="problemStatement" rows="4" class="form-control"></textarea></div>
+          <div class="form-group"><label for="leaderId">Project Leader ID</label><input type="number" id="leaderId" formControlName="leaderId" class="form-control"></div>
+          <div class="form-group"><label for="score">Score</label><input type="number" id="score" formControlName="score" class="form-control"></div>
         </div>
-        <div class="form-group">
-          <label for="description">Description</label>
-          <textarea id="description" formControlName="description" class="form-control" rows="3"
-                    [class.is-invalid]="f['description'].invalid && f['description'].touched"></textarea>
-          <div *ngIf="f['description'].touched && f['description'].errors" class="error-message">
-            <small *ngIf="f['description'].errors?.['required']">Description is required.</small>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="problemStatement">Problem Statement</label>
-          <textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3"
-                    [class.is-invalid]="f['problemStatement'].invalid && f['problemStatement'].touched"></textarea>
-          <div *ngIf="f['problemStatement'].touched && f['problemStatement'].errors" class="error-message">
-            <small *ngIf="f['problemStatement'].errors?.['required']">Problem statement is required.</small>
-          </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-              <label for="technologies">Technologies</label>
-              <input type="text" id="technologies" formControlName="technologies" class="form-control"
-                     [class.is-invalid]="f['technologies'].invalid && f['technologies'].touched">
-              <div *ngIf="f['technologies'].touched && f['technologies'].errors" class="error-message">
-                <small *ngIf="f['technologies'].errors?.['required']">Technologies are required.</small>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="toolsUsed">Tools Used</label>
-              <input type="text" id="toolsUsed" formControlName="toolsUsed" class="form-control"
-                     [class.is-invalid]="f['toolsUsed'].invalid && f['toolsUsed'].touched">
-              <div *ngIf="f['toolsUsed'].touched && f['toolsUsed'].errors" class="error-message">
-                <small *ngIf="f['toolsUsed'].errors?.['required']">Tools used are required.</small>
-              </div>
-            </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="grade">Grade (Optional)</label>
-            <input type="number" id="grade" formControlName="grade" class="form-control"
-                   [class.is-invalid]="f['grade'].invalid && f['grade'].touched">
-            <div *ngIf="f['grade'].touched && f['grade'].errors" class="error-message">
-              <small *ngIf="f['grade'].errors?.['min'] || f['grade'].errors?.['max']">Grade must be between 0 and 100.</small>
-            </div>
-          </div>
-          <!-- تم إزالة حقل Leader ID بالكامل -->
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="categoryId">Category ID</label>
-            <input type="number" id="categoryId" formControlName="categoryId" class="form-control"
-                   [class.is-invalid]="f['categoryId'].invalid && f['categoryId'].touched">
-            <div *ngIf="f['categoryId'].touched && f['categoryId'].errors" class="error-message">
-              <small *ngIf="f['categoryId'].errors?.['required']">Category ID is required.</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="departmentId">Department ID</label>
-            <input type="number" id="departmentId" formControlName="departmentId" class="form-control"
-                   [class.is-invalid]="f['departmentId'].invalid && f['departmentId'].touched">
-            <div *ngIf="f['departmentId'].touched && f['departmentId'].errors" class="error-message">
-              <small *ngIf="f['departmentId'].errors?.['required']">Department ID is required.</small>
-            </div>
-          </div>
-        </div>
+      </div>
 
-        <!-- Team Members Section -->
-        <h2 class="section-title mt-4"><i class="fas fa-users"></i> Team Members</h2>
-        <div formArrayName="members" class="array-section">
-          <div *ngFor="let memberGroup of members.controls; let i = index" [formGroupName]="i" class="array-group">
-            <div class="form-row">
-              <div class="form-group">
-                <label [for]="'memberName' + i">Member Name</label>
-                <input [id]="'memberName' + i" type="text" formControlName="name" class="form-control"
-                       [class.is-invalid]="memberGroup.get('name')?.invalid && memberGroup.get('name')?.touched">
-                <div *ngIf="memberGroup.get('name')?.touched && memberGroup.get('name')?.errors" class="error-message">
-                  <small *ngIf="memberGroup.get('name')?.errors?.['required']">Name is required.</small>
-                </div>
-              </div>
-              <div class="form-group">
-                <label [for]="'academicId' + i">Academic ID</label>
-                <input [id]="'academicId' + i" type="text" formControlName="academicId" class="form-control"
-                       [class.is-invalid]="memberGroup.get('academicId')?.invalid && memberGroup.get('academicId')?.touched">
-                <div *ngIf="memberGroup.get('academicId')?.touched && memberGroup.get('academicId')?.errors" class="error-message">
-                  <small *ngIf="memberGroup.get('academicId')?.errors?.['required']">Academic ID is required.</small>
-                  <small *ngIf="memberGroup.get('academicId')?.errors?.['min'] || memberGroup.get('academicId')?.errors?.['pattern']">Must be a valid ID.</small>
-                </div>
-              </div>
+      <div class="form-card">
+        <h2 class="card-title">Academic Context</h2>
+        <div class="form-grid">
+            <div class="form-group"><label for="categoryId">Category</label>
+              <select id="categoryId" formControlName="categoryId" class="form-control">
+                <option [ngValue]="null" disabled>Select Category</option>
+                <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+              </select>
             </div>
-            <button type="button" (click)="removeMember(i)" class="btn remove-item-btn" title="Remove Member">
-              <i class="fas fa-user-minus"></i>
-            </button>
+        </div>
+        <div class="form-group">
+          <label>Departments</label>
+          <div class="checkbox-group" formArrayName="departments">
+            <div *ngFor="let dept of departments; let i = index" class="checkbox-item">
+              <input type="checkbox" [id]="'dept-' + i" [formControlName]="i"><label [for]="'dept-' + i">{{ dept.name }}</label>
+            </div>
           </div>
-          <button type="button" (click)="addMember()" class="btn btn-add-item">
-            <i class="fas fa-user-plus"></i> Add Another Member
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2 class="card-title">Technical Details</h2>
+        <div class="form-grid">
+            <div class="form-group"><label>Technologies</label><div class="checkbox-group" formArrayName="technologies"><div *ngFor="let tech of availableTechnologies; let i=index" class="checkbox-item"><input type="checkbox" [id]="'tech-'+i" [formControlName]="i"><label [for]="'tech-'+i">{{tech}}</label></div></div></div>
+            <div class="form-group"><label>Tools Used</label><div class="checkbox-group" formArrayName="toolsUsed"><div *ngFor="let tool of availableTools; let i=index" class="checkbox-item"><input type="checkbox" [id]="'tool-'+i" [formControlName]="i"><label [for]="'tool-'+i">{{tool}}</label></div></div></div>
+        </div>
+      </div>
+
+      <div class="form-card"><h2 class="card-title">Patent (Optional)</h2><div class="form-grid"><div class="form-group"><label for="patentNumber">Patent Number</label><input type="number" id="patentNumber" formControlName="patentNumber" class="form-control"></div><div class="form-group"><label for="patentDate">Patent Date</label><input type="date" id="patentDate" formControlName="patentDate" class="form-control"></div></div></div>
+
+      <div class="form-card" formArrayName="members"><h2 class="card-title">Team Members</h2><div *ngFor="let item of members.controls; let i=index" [formGroupName]="i" class="array-group"><div class="form-grid"><div class="form-group"><label [for]="'memberId'+i">Member ID (read-only)</label><input [id]="'memberId'+i" formControlName="id" class="form-control" readonly></div><div class="form-group"><label [for]="'memberName'+i">Name</label><input [id]="'memberName'+i" formControlName="name" class="form-control"></div><div class="form-group"><label [for]="'memberAcademicId'+i">Academic ID</label><input type="number" [id]="'memberAcademicId'+i" formControlName="academicId" class="form-control"></div><div class="form-group"><label [for]="'memberDegree'+i">Degree</label><select [id]="'memberDegree'+i" formControlName="academicDegree" class="form-control"><option [value]="0">Student</option><option [value]="1">Graduate</option></select></div></div><button type="button" (click)="removeMember(i)" class="remove-item-btn" *ngIf="members.length > 1">&times;</button></div><button type="button" (click)="addMember()" class="btn-add-item"><i class="fas fa-plus"></i> Add Member</button></div>
+      <div class="form-card" formArrayName="supervisors"><h2 class="card-title">Supervisors</h2><div *ngFor="let item of supervisorsArray.controls; let i=index" [formGroupName]="i" class="array-group"><div class="form-group"><label [for]="'supervisorId'+i">Supervisor ID</label><input type="number" [id]="'supervisorId'+i" formControlName="id" class="form-control"></div><button type="button" (click)="removeSupervisor(i)" class="remove-item-btn" *ngIf="supervisorsArray.length > 1">&times;</button></div><button type="button" (click)="addSupervisor()" class="btn-add-item"><i class="fas fa-plus"></i> Add Supervisor</button></div>
+      <div class="form-card" formArrayName="evaluators"><h2 class="card-title">Evaluators</h2><div *ngFor="let item of evaluators.controls; let i=index" [formGroupName]="i" class="array-group"><div class="form-grid"><div class="form-group"><label [for]="'evaluatorId'+i">Evaluator ID (read-only)</label><input [id]="'evaluatorId'+i" formControlName="id" class="form-control" readonly></div><div class="form-group"><label [for]="'evaluatorName'+i">Name</label><input [id]="'evaluatorName'+i" formControlName="name" class="form-control"></div><div class="form-group"><label [for]="'evaluatorDegree'+i">Degree</label><select [id]="'evaluatorDegree'+i" formControlName="academicDegree" class="form-control"><option [value]="0">Lecturer</option><option [value]="1">Professor</option></select></div><div class="form-group"><label [for]="'evaluatorScore'+i">Score</label><input type="number" [id]="'evaluatorScore'+i" formControlName="score" class="form-control"></div></div><button type="button" (click)="removeEvaluator(i)" class="remove-item-btn" *ngIf="evaluators.length > 1">&times;</button></div><button type="button" (click)="addEvaluator()" class="btn-add-item"><i class="fas fa-plus"></i> Add Evaluator</button></div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">{{ isSubmitting ? 'Saving...' : 'Update Project' }}</button>
+      </div>
+    </form>
+
+    <!-- ✅ NEW: Document Management Section -->
+    <div class="images-section-container">
+      <h2 class="section-title"><i class="fas fa-file-alt"></i> Manage Project Documents</h2>
+      <div class="image-upload-form">
+        <label for="docUpload">Upload New Document(s) (PDF, DOCX, etc.)</label>
+        <div class="upload-controls">
+          <input type="file" id="docUpload" (change)="onFilesSelected($event, 'doc')" class="form-control-file" multiple>
+          <button (click)="onDocumentUpload()" class="btn btn-primary" [disabled]="selectedDocFiles.length === 0 || isUploadingDocs">
+            <span *ngIf="isUploadingDocs"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>
+            <span *ngIf="!isUploadingDocs"><i class="fas fa-upload"></i> Upload ({{selectedDocFiles.length}})</span>
           </button>
         </div>
-
-        <!-- Team Supervisors Section -->
-        <h2 class="section-title mt-4"><i class="fas fa-user-tie"></i> Project Supervisors</h2>
-        <div formArrayName="supervisors" class="array-section">
-          <div *ngFor="let supervisorGroup of supervisorsArray.controls; let i = index" [formGroupName]="i" class="array-group">
-            <div class="form-group">
-              <label [for]="'supervisorId' + i">Supervisor ID</label>
-              <input [id]="'supervisorId' + i" type="text" formControlName="id" class="form-control"
-                     [class.is-invalid]="supervisorGroup.get('id')?.invalid && supervisorGroup.get('id')?.touched">
-              <div *ngIf="supervisorGroup.get('id')?.touched && supervisorGroup.get('id')?.errors" class="error-message">
-                <small *ngIf="supervisorGroup.get('id')?.errors?.['required']">Supervisor ID is required.</small>
-                <small *ngIf="supervisorGroup.get('id')?.errors?.['min'] || supervisorGroup.get('id')?.errors?.['pattern']">Must be a valid ID.</small>
-              </div>
-            </div>
-            <button type="button" (click)="removeSupervisor(i)" class="btn remove-item-btn" title="Remove Supervisor">
-              <i class="fas fa-user-minus"></i>
-            </button>
-          </div>
-          <button type="button" (click)="addSupervisor()" class="btn btn-add-item">
-            <i class="fas fa-user-plus"></i> Add Another Supervisor
+      </div>
+      <div *ngIf="project.documents && project.documents.length > 0; else noDocsTemplate" class="document-list">
+        <div *ngFor="let doc of project.documents" class="doc-item">
+          <i class="doc-icon" [ngClass]="getFileIconClass(doc)"></i>
+          <a [href]="docBaseUrl + doc" target="_blank" class="doc-name">{{ doc }}</a>
+          <button (click)="deleteDocument(doc)" class="btn-delete-doc" title="Delete Document" [disabled]="docsBeingDeleted.has(doc)">
+            <i *ngIf="!docsBeingDeleted.has(doc)" class="fas fa-trash-alt"></i>
+            <i *ngIf="docsBeingDeleted.has(doc)" class="fas fa-spinner fa-spin"></i>
           </button>
         </div>
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">
-            <i class="fas" [class.fa-save]="!isSubmitting" [class.fa-spinner]="isSubmitting" [class.fa-spin]="isSubmitting"></i>
-            {{ isSubmitting ? 'Saving...' : 'Update Project Details' }}
-          </button>
-        </div>
-      </form>
+      </div>
+      <ng-template #noDocsTemplate><div class="empty-message"><i class="fas fa-file-excel"></i><p>This project has no documents yet.</p></div></ng-template>
     </div>
 
-    <!-- Images Section -->
+    <!-- Image Management Section -->
     <div class="images-section-container">
       <h2 class="section-title"><i class="fas fa-images"></i> Manage Project Images</h2>
-
-      <div class="image-upload-form">
-          <label for="imageUpload">Upload New Image(s)</label>
-          <div class="upload-controls">
-            <input type="file" id="imageUpload" (change)="onFilesSelected($event)" accept="image/*" class="form-control-file" multiple>
-            <button (click)="onImageUpload()" class="btn btn-primary" [disabled]="selectedFiles.length === 0 || isUploading">
-              <span *ngIf="isUploading"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>
-              <span *ngIf="!isUploading"><i class="fas fa-upload"></i> Upload ({{selectedFiles.length}})</span>
-            </button>
-          </div>
-      </div>
-
-      <div *ngIf="project.images && project.images.length > 0; else noImagesTemplate" class="image-gallery">
-        <div *ngFor="let filename of project.images; let i = index" class="image-card">
-          <img [src]="imageBaseUrl + filename" [alt]="project.title + ' image ' + (i + 1)" (error)="onImageError($event)">
-          <button (click)="deleteImage(filename)" class="btn-delete-image" title="Delete Image" [disabled]="imagesBeingDeleted.has(filename)">
-            <i class="fas fa-times"></i>
-          </button>
-          <div *ngIf="imagesBeingDeleted.has(filename)" class="delete-overlay"><i class="fas fa-spinner fa-spin"></i></div>
-        </div>
-      </div>
-
-      <ng-template #noImagesTemplate>
-        <div class="empty-message">
-          <i class="fas fa-photo-video"></i>
-          <p>This project has no images yet. Upload one above!</p>
-        </div>
-      </ng-template>
+      <div class="image-upload-form"><label for="imageUpload">Upload New Image(s)</label><div class="upload-controls"><input type="file" id="imageUpload" (change)="onFilesSelected($event, 'image')" accept="image/*" class="form-control-file" multiple><button (click)="onImageUpload()" class="btn btn-primary" [disabled]="selectedImageFiles.length === 0 || isUploadingImages"><span *ngIf="isUploadingImages"><i class="fas fa-spinner fa-spin"></i> Uploading...</span><span *ngIf="!isUploadingImages"><i class="fas fa-upload"></i> Upload ({{selectedImageFiles.length}})</span></button></div></div>
+      <div *ngIf="project.images && project.images.length > 0; else noImagesTemplate" class="image-gallery"><div *ngFor="let filename of project.images; let i = index" class="image-card"><img [src]="imageBaseUrl + filename" [alt]="project.title + ' image ' + (i + 1)" (error)="onImageError($event)"><button (click)="deleteImage(filename)" class="btn-delete-image" title="Delete Image" [disabled]="imagesBeingDeleted.has(filename)"><i class="fas fa-times"></i></button><div *ngIf="imagesBeingDeleted.has(filename)" class="delete-overlay"><i class="fas fa-spinner fa-spin"></i></div></div></div>
+      <ng-template #noImagesTemplate><div class="empty-message"><i class="fas fa-photo-video"></i><p>This project has no images yet.</p></div></ng-template>
     </div>
-  </div>
+  </ng-container>
 </div>

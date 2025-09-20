@@ -1,26 +1,10 @@
+<!-- src/app/components/project/project-analysis/project-analysis.component.html -->
 <ng-container *ngIf="state$ | async as state">
   <main class="analytics-container">
     <header class="page-header">
       <div class="header-content">
         <h1>Project Analysis Dashboard</h1>
-        <p>In-depth insights into project statuses, categories, and technologies.</p>
-      </div>
-      <div class="header-filters">
-        <div class="filter-group">
-          <label for="category-filter">Category</label>
-          <select id="category-filter" (change)="onCategoryFilterChange($event)">
-            <option value="all">All Categories</option>
-            <option *ngFor="let category of uniqueCategories" [value]="category.toLowerCase()">{{ category }}</option>
-            <option value="uncategorized">Uncategorized</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="status-filter">Status</label>
-          <select id="status-filter" (change)="onStatusFilterChange($event)">
-            <option value="all">All Statuses</option>
-            <option *ngFor="let status of uniqueStatuses" [value]="status.toLowerCase()">{{ status }}</option>
-          </select>
-        </div>
+        <p>In-depth insights into project technologies and tools.</p>
       </div>
     </header>
 
@@ -29,10 +13,6 @@
         <div class="kpi-card-skeleton" *ngFor="let i of [1,2,3,4]"></div>
         <div class="chart-card-skeleton large"></div>
         <div class="chart-card-skeleton large"></div>
-        <div class="chart-card-skeleton large"></div>
-        <div class="chart-card-skeleton large"></div>
-        <div class="chart-card-skeleton full-width"></div>
-        <div class="chart-card-skeleton full-width"></div><!-- For projects by tech if it shows initially -->
       </div>
     </ng-container>
 
@@ -44,183 +24,65 @@
     </div>
 
     <ng-container *ngIf="!state.isLoading && !state.error">
-      <div *ngIf="filteredProjects$ | async as projects">
-        <ng-container *ngIf="kpiData$ | async as kpiData">
-          <div class="analytics-grid">
+      <ng-container *ngIf="kpiData$ | async as kpiData">
+        <div class="analytics-grid">
 
-            <!-- KPI Cards -->
-            <div class="kpi-card">
-              <i class="fas fa-project-diagram kpi-icon"></i>
-              <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.total">0</span>
-                <span class="kpi-title">Total Projects</span>
-              </div>
-            </div>
-            <div class="kpi-card">
-              <i class="fas fa-spinner kpi-icon ongoing-icon"></i>
-              <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.ongoing">0</span>
-                <span class="kpi-title">Ongoing Projects</span>
-              </div>
-            </div>
-            <div class="kpi-card">
-              <i class="fas fa-check-circle kpi-icon submitted-icon"></i>
-              <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.submitted">0</span>
-                <span class="kpi-title">Submitted Projects</span>
-              </div>
-            </div>
-            <div class="kpi-card">
-              <i class="fas fa-calendar-plus kpi-icon"></i>
-              <div class="kpi-content">
-                <span class="kpi-value" #kpiValue [attr.data-value]="kpiData.newLastMonth">0</span>
-                <span class="kpi-title">New Last 30 Days</span>
-              </div>
-            </div>
-
-            <!-- Project Status Distribution Chart (Doughnut) -->
-            <div class="chart-card large">
-              <h3 class="chart-title">Project Status Distribution</h3>
-              <div *ngIf="projectStatusDistributionOptions$ | async as options" class="chart-wrapper">
-                <apx-chart
-                  [series]="options.series!"
-                  [chart]="options.chart!"
-                  [labels]="options.labels!"
-                  [colors]="options.colors!"
-                  [legend]="options.legend!"
-                  [dataLabels]="options.dataLabels!"
-                  [plotOptions]="options.plotOptions!"
-                  [tooltip]="options.tooltip!">
-                </apx-chart>
-              </div>
-            </div>
-
-            <!-- New Projects Over Time Chart (Area) -->
-            <div class="chart-card large">
-                <h3 class="chart-title">New Projects (Last 30 Days)</h3>
-                <div *ngIf="newProjectsOverTimeOptions$ | async as options" class="chart-wrapper">
-                  <apx-chart
-                    [series]="options.series!"
-                    [chart]="options.chart!"
-                    [xaxis]="options.xaxis!"
-                    [yaxis]="options.yaxis!"
-                    [stroke]="options.stroke!"
-                    [tooltip]="options.tooltip!"
-                    [dataLabels]="options.dataLabels!"
-                    [grid]="options.grid!"
-                    [fill]="options.fill!"
-                    [colors]="options.colors!">
-                  </apx-chart>
-                </div>
-            </div>
-
-            <!-- Projects by Category Chart (Bar) -->
-            <div class="chart-card large">
-                <h3 class="chart-title">Projects by Category</h3>
-                <div *ngIf="projectsByCategoryOptions$ | async as options" class="chart-wrapper">
-                  <apx-chart
-                    [series]="options.series!"
-                    [chart]="options.chart!"
-                    [xaxis]="options.xaxis!"
-                    [yaxis]="options.yaxis!"
-                    [stroke]="options.stroke!"
-                    [tooltip]="options.tooltip!"
-                    [dataLabels]="options.dataLabels!"
-                    [grid]="options.grid!"
-                    [fill]="options.fill!"
-                    [colors]="options.colors!"
-                    [plotOptions]="options.plotOptions!"
-                    [legend]="options.legend!">
-                  </apx-chart>
-                </div>
-            </div>
-
-            <!-- Projects by Department Chart (Bar) -->
-            <div class="chart-card large">
-                <h3 class="chart-title">Projects by Department</h3>
-                <div *ngIf="projectsByDepartmentOptions$ | async as options" class="chart-wrapper">
-                  <apx-chart
-                    [series]="options.series!"
-                    [chart]="options.chart!"
-                    [xaxis]="options.xaxis!"
-                    [yaxis]="options.yaxis!"
-                    [stroke]="options.stroke!"
-                    [tooltip]="options.tooltip!"
-                    [dataLabels]="options.dataLabels!"
-                    [grid]="options.grid!"
-                    [fill]="options.fill!"
-                    [colors]="options.colors!"
-                    [plotOptions]="options.plotOptions!"
-                    [legend]="options.legend!">
-                  </apx-chart>
-                </div>
-            </div>
-
-            <!-- Top Technologies Chart (Horizontal Bar) -->
-            <div class="chart-card full-width">
-              <h3 class="chart-title">Top Technologies Used</h3>
-               <div *ngIf="topTechnologiesOptions$ | async as options" class="chart-wrapper">
-                <apx-chart
-                  [series]="options.series!"
-                  [chart]="options.chart!"
-                  [plotOptions]="options.plotOptions!"
-                  [xaxis]="options.xaxis!"
-                  [yaxis]="options.yaxis!"
-                  [grid]="options.grid!"
-                  [tooltip]="options.tooltip!"
-                  [legend]="options.legend!"
-                  [colors]="options.colors!"
-                  [dataLabels]="options.dataLabels!">
-                </apx-chart>
-              </div>
-            </div>
-
-            <!-- Projects by Selected Technology -->
-            <!-- Use a combined object in *ngIf to access both observables cleanly -->
-            <ng-container *ngIf="{ techProjects: selectedTechProjects$ | async, selectedTech: clickedTechnology$ | async } as data">
-              <!-- Use a nested ng-container to narrow the type of data.selectedTech -->
-              <ng-container *ngIf="data.selectedTech as techName">
-                <!-- Main section for displaying projects -->
-                <div class="selected-tech-projects-section" *ngIf="data.techProjects && data.techProjects.length > 0">
-                  <div class="section-header">
-                    <!-- Use the type-narrowed 'techName' variable here with non-null assertion for strictness -->
-                    <h3 class="chart-title">Projects Using Selected Technology: {{ techName! }}</h3>
-                    <button class="btn btn-secondary" (click)="clearTechnologySelection()">
-                      <i class="fas fa-times"></i> Clear Selection
-                    </button>
-                  </div>
-
-                  <div class="tech-projects-grid">
-                    <div class="project-card" *ngFor="let project of data.techProjects">
-                      <div class="project-card-header">
-                        <h4 class="project-title">{{ project.title }}</h4>
-                        <span class="project-status" [ngClass]="{'status-ongoing': getProjectStatus(project) === 'Ongoing', 'status-submitted': getProjectStatus(project) === 'Submitted'}">
-                          {{ getProjectStatus(project) }}
-                        </span>
-                      </div>
-                      <p class="project-description">{{ project.description | slice:0:100 }}...</p>
-                      <div class="project-meta">
-                        <!-- APPLY OPTIONAL CHAINING HERE -->
-                        <span *ngIf="project.category?.name" class="meta-item"><i class="fas fa-tag"></i> {{ project.category?.name }}</span>
-                        <span *ngIf="project.department?.name" class="meta-item"><i class="fas fa-building"></i> {{ project.department?.name }}</span>
-                        <span *ngIf="project.startDate" class="meta-item"><i class="fas fa-calendar-alt"></i> Started: {{ project.startDate | date:'mediumDate' }}</span>
-                        <span *ngIf="project.technologies" class="meta-item technologies"><i class="fas fa-code"></i> {{ project.technologies }}</span>
-                        <span *ngIf="project.grade" class="meta-item"><i class="fas fa-star"></i> Grade: {{ project.grade }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Message for when a technology is selected but no projects are found -->
-                <div *ngIf="!data.techProjects || data.techProjects.length === 0" class="no-projects-message">
-                  No projects found for the selected technology: {{ techName! }}.
-                </div>
-              </ng-container>
-            </ng-container>
-
+          <!-- KPI Cards -->
+          <div class="kpi-card">
+            <div class="icon-wrapper total"><i class="fas fa-project-diagram"></i></div>
+            <div class="kpi-content"><span class="kpi-value" #kpiValue [attr.data-value]="kpiData.total">0</span><span class="kpi-title">Total Projects</span></div>
           </div>
-        </ng-container>
-      </div>
+          <div class="kpi-card">
+            <div class="icon-wrapper tech"><i class="fas fa-microchip"></i></div>
+            <div class="kpi-content"><span class="kpi-value" #kpiValue [attr.data-value]="kpiData.uniqueTech">0</span><span class="kpi-title">Unique Technologies</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="icon-wrapper tools"><i class="fas fa-tools"></i></div>
+            <div class="kpi-content"><span class="kpi-value" #kpiValue [attr.data-value]="kpiData.uniqueTools">0</span><span class="kpi-title">Unique Tools</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="icon-wrapper length"><i class="fas fa-text-width"></i></div>
+            <div class="kpi-content"><span class="kpi-value" #kpiValue [attr.data-value]="kpiData.avgTitleLength">0</span><span class="kpi-title">Avg. Title Length</span></div>
+          </div>
+
+          <!-- Top Technologies Chart -->
+          <div class="chart-card large">
+            <h3 class="chart-title">Top Technologies Used</h3>
+            <div *ngIf="topTechnologiesOptions$ | async as options" class="chart-wrapper">
+              <apx-chart [series]="options.series!" [chart]="options.chart!" [plotOptions]="options.plotOptions!" [xaxis]="options.xaxis!" [yaxis]="options.yaxis!" [legend]="options.legend!" [tooltip]="options.tooltip"></apx-chart>
+            </div>
+          </div>
+
+          <!-- Top Tools Used Chart -->
+          <div class="chart-card large">
+            <h3 class="chart-title">Top Tools Used</h3>
+            <div *ngIf="topToolsOptions$ | async as options" class="chart-wrapper">
+              <apx-chart [series]="options.series!" [chart]="options.chart!" [plotOptions]="options.plotOptions!" [xaxis]="options.xaxis!" [yaxis]="options.yaxis!" [legend]="options.legend!" [tooltip]="options.tooltip"></apx-chart>
+            </div>
+          </div>
+
+          <!-- Projects by Selected Item -->
+          <ng-container *ngIf="{ selectedProjects: selectedItemProjects$ | async, selectedItem: clickedItem$ | async } as data">
+            <ng-container *ngIf="data.selectedItem as item">
+              <div class="selected-tech-projects-section">
+                <div class="section-header">
+                  <h3 class="chart-title">Projects Using: {{ item.name }}</h3>
+                  <button class="btn btn-secondary" (click)="clearSelection()"><i class="fas fa-times"></i> Clear</button>
+                </div>
+                <div *ngIf="data.selectedProjects && data.selectedProjects.length > 0; else noProjects" class="tech-projects-grid">
+                  <div class="project-card" *ngFor="let project of data.selectedProjects">
+                    <h4 class="project-title">{{ project.title }}</h4>
+                    <p class="project-description">{{ project.description | slice:0:120 }}...</p>
+                  </div>
+                </div>
+                <ng-template #noProjects>
+                  <div class="no-projects-message">No projects found for the selected item.</div>
+                </ng-template>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </ng-container>
     </ng-container>
   </main>
 </ng-container>

@@ -1,4 +1,4 @@
-// src/app/components/add-project/add-project.component.ts
+// src/app/components/project/add-project/add-project.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,14 +9,12 @@ import { DepartmentService } from '../../../Services/department.service';
 import { finalize } from 'rxjs';
 import { Category } from '../../../models/category';
 import { Department } from '../../../models/department';
-import { Faculty } from '../../../models/faculty';
-import { SuccessPopupComponent } from '../success-popup/success-popup.component';
-import { Member } from '../../../models/project'; // Make sure Project model defines Member interface correctly
+import { PopupService } from '../../../Services/popup.service'; // استيراد خدمة الباوباب
 
 @Component({
   selector: 'app-add-project',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SuccessPopupComponent],
+  imports: [CommonModule, ReactiveFormsModule], // تم إزالة SuccessPopup لأنه سيتم استبداله بخدمة
   templateUrl: './add-project.component.html',
   styleUrls: ['./add-project.component.css']
 })
@@ -25,66 +23,17 @@ export class AddProjectComponent implements OnInit {
   isSubmitting = false;
   categories: Category[] = [];
   departments: Department[] = [];
-  faculties: Faculty[] = [
-    {
-      id: 1,
-      name: 'IT Faculty',
-      description: 'Faculty dedicated to Information Technology and Computer Science.',
-      deanId: 101,
-      dean: { id: 101, name: 'Dr. Ahmad Adel' }
-    },
-    {
-      id: 2,
-      name: 'Industry & Energy Faculty',
-      description: 'Faculty focused on industrial engineering and energy solutions.',
-      deanId: 102,
-      dean: { id: 102, name: 'Dr. Sara Hesham' }
-    },
-    {
-      id: 3,
-      name: 'Health Sciences Faculty',
-      description: 'Faculty providing education in various health science disciplines.',
-      deanId: 103,
-      dean: { id: 103, name: 'Dr. Karim Tarek' }
-    },
-    {
-      id: 4,
-      name: 'Food Industries Faculty',
-      description: 'Faculty specializing in food science, technology, and engineering.',
-      deanId: 104,
-      dean: { id: 104, name: 'Dr. Mona Hassan' }
-    }
-  ];
 
-  availableTechnologies: string[] = [
-    'Artificial Intelligence (AI)', 'Machine Learning (ML)', 'Data Science', 'Big Data Analytics',
-    'Internet of Things (IoT)', 'Cybersecurity', 'Cloud Computing', 'Web Development',
-    'Mobile App Development', 'Robotics', 'Embedded Systems', 'Digital Twins',
-    'Bioinformatics', 'Medical Imaging', 'Telemedicine', 'Smart Manufacturing',
-    'Renewable Energy Systems', 'Food Processing Automation', 'Quality Control Systems', 'Supply Chain Optimization'
-  ];
-
-  availableTools: string[] = [
-    'Python', 'Java', 'C++', 'JavaScript', 'TypeScript', 'Node.js', 'React', 'Angular', 'Vue.js', 'Spring Boot',
-    'Django', 'Flask', 'ASP.NET Core', 'SQL Server', 'MySQL', 'PostgreSQL', 'MongoDB', 'Firebase', 'AWS', 'Azure',
-    'Google Cloud Platform (GCP)', 'Docker', 'Kubernetes', 'Git', 'GitHub', 'Jira', 'Confluence', 'Figma', 'Adobe XD', 'Photoshop',
-    'Illustrator', 'Unity', 'Unreal Engine', 'TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy', 'MATLAB', 'RStudio'
-  ];
-
-  showSuccessPopup = false;
-  popupTitle = '';
-  popupMessage = '';
-
-  // New state variables for toggling checkbox visibility
-  showTechnologiesCheckboxes: boolean = false;
-  showToolsUsedCheckboxes: boolean = false;
+  availableTechnologies: string[] = ['AI/Machine Learning', 'Web Development', 'Mobile Development', 'IoT', 'Cybersecurity', 'Data Science', 'Cloud Computing', 'Robotics', 'Embedded Systems', 'Game Development'];
+  availableTools: string[] = ['Python', 'JavaScript', 'TypeScript', 'Java', 'C#', 'React', 'Angular', 'Vue.js', 'Node.js', 'ASP.NET Core', 'TensorFlow', 'PyTorch', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'Firebase', 'Unity'];
 
   constructor(
     private fb: FormBuilder,
     private projectService: ProjectService,
     private categoryService: CategoryService,
     private departmentService: DepartmentService,
-    private router: Router
+    private router: Router,
+    private popupService: PopupService // حقن خدمة الباوباب
   ) {}
 
   ngOnInit(): void {
@@ -96,184 +45,116 @@ export class AddProjectComponent implements OnInit {
     this.projectForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      grade: [null, [Validators.min(0), Validators.max(100)]],
-      technologies: this.fb.array([], this.minOneCheckboxSelectedValidator('technologies')),
-      toolsUsed: this.fb.array([], this.minOneCheckboxSelectedValidator('toolsUsed')),
+      score: [null, [Validators.min(0), Validators.max(100)]],
+      technologies: this.buildCheckboxArray(this.availableTechnologies),
+      toolsUsed: this.buildCheckboxArray(this.availableTools),
       problemStatement: ['', Validators.required],
-      // تم حذف teamLeaderId بناءً على الطلب
+      patentNumber: [null, [Validators.pattern("^[0-9]*$")]],
+      patentDate: [null],
       categoryId: [null, Validators.required],
-      departmentId: [null, Validators.required],
-      facultyId: [null, Validators.required],
-      members: this.fb.array([this.newMember()]),
-      supervisors: this.fb.array([this.newSupervisor()]) // Supervisor ID validation handled within newSupervisor
+      departments: this.fb.array([], this.minOneCheckboxSelectedValidator()),
+      members: this.fb.array([this.newMember()], Validators.required),
+      supervisors: this.fb.array([this.newSupervisor()], Validators.required),
+      evaluators: this.fb.array([this.newEvaluator()], Validators.required)
     });
-
-    this.addTechnologyCheckboxes();
-    this.addToolsCheckboxes();
   }
 
-  private addTechnologyCheckboxes(): void {
-    this.availableTechnologies.forEach(() => (this.projectForm.get('technologies') as FormArray).push(this.fb.control(false)));
-  }
-
-  private addToolsCheckboxes(): void {
-    this.availableTools.forEach(() => (this.projectForm.get('toolsUsed') as FormArray).push(this.fb.control(false)));
-  }
-
-  minOneCheckboxSelectedValidator(controlName: string): ValidatorFn {
-    return (formArray: AbstractControl): { [key: string]: any } | null => {
-      if (!(formArray instanceof FormArray)) {
-        return null;
-      }
-      const selected = formArray.controls
-        .map(control => control.value)
-        .some(value => value === true);
-      return selected ? null : { [`${controlName}Required`]: true };
-    };
+  buildCheckboxArray(items: string[]): FormArray {
+    const arr = items.map(() => this.fb.control(false));
+    return this.fb.array(arr, this.minOneCheckboxSelectedValidator());
   }
 
   loadDropdownData(): void {
-    this.categoryService.getAllCategories().subscribe({
-        next: (data) => this.categories = data,
-        error: (err) => console.error('Failed to load categories', err)
+    this.categoryService.getAllCategories().subscribe(data => this.categories = data);
+    this.departmentService.getAllDepartments().subscribe(data => {
+      this.departments = data;
+      this.addDepartmentCheckboxes();
     });
-    this.departmentService.getAllDepartments().subscribe({
-        next: (data) => this.departments = data,
-        error: (err) => console.error('Failed to load departments', err)
-    });
+  }
+
+  addDepartmentCheckboxes(): void {
+    const departmentsFormArray = this.projectForm.get('departments') as FormArray;
+    departmentsFormArray.clear();
+    this.departments.forEach(() => departmentsFormArray.push(this.fb.control(false)));
+  }
+
+  minOneCheckboxSelectedValidator(): ValidatorFn {
+    return (formArray: AbstractControl): { [key: string]: any } | null => {
+      if (formArray instanceof FormArray) {
+        return formArray.controls.some(c => c.value) ? null : { required: true };
+      }
+      return null;
+    };
   }
 
   get f() { return this.projectForm.controls; }
   get members() { return this.projectForm.get('members') as FormArray; }
+  get supervisors() { return this.projectForm.get('supervisors') as FormArray; }
+  get evaluators() { return this.projectForm.get('evaluators') as FormArray; }
+  get departmentsArray() { return this.projectForm.get('departments') as FormArray; }
   get technologiesArray() { return this.projectForm.get('technologies') as FormArray; }
   get toolsUsedArray() { return this.projectForm.get('toolsUsed') as FormArray; }
-  get supervisorsArray() { return this.projectForm.get('supervisors') as FormArray; }
 
-  newMember(name: string = '', academicId: number | null = null): FormGroup {
-    return this.fb.group({
-      name: [name, Validators.required],
-      academicId: [academicId, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]]
-    });
+  getSelectedItems(items: string[], formArray: FormArray): string[] {
+    return items.filter((_, i) => formArray.at(i).value);
+  }
+  removeItem(index: number, formArray: FormArray): void {
+    formArray.at(index).setValue(false);
   }
 
-  addMember(): void {
-    this.members.push(this.newMember());
-  }
+  newMember(): FormGroup { return this.fb.group({ name: ['', Validators.required], academicId: [null, [Validators.required, Validators.pattern("^[0-9]+$")]], academicDegree: [0, Validators.required] }); }
+  addMember(): void { this.members.push(this.newMember()); }
+  removeMember(index: number): void { this.members.removeAt(index); }
 
-  removeMember(index: number): void {
-    this.members.removeAt(index);
-  }
+  newSupervisor(): FormGroup { return this.fb.group({ id: [null, [Validators.required, Validators.pattern("^[0-9]+$")]] }); }
+  addSupervisor(): void { this.supervisors.push(this.newSupervisor()); }
+  removeSupervisor(index: number): void { this.supervisors.removeAt(index); }
 
-  newSupervisor(id: number | null = null): FormGroup {
-    // التحقق من وجود المشرف يتم على مستوى الـ Backend
-    // هنا يتم فقط التحقق من صحة تنسيق الـ ID
-    return this.fb.group({
-      id: [id, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]]
-    });
-  }
-
-  addSupervisor(): void {
-    this.supervisorsArray.push(this.newSupervisor());
-  }
-
-  removeSupervisor(index: number): void {
-    this.supervisorsArray.removeAt(index);
-  }
-
-  // New methods to toggle visibility
-  toggleTechnologiesVisibility(): void {
-    this.showTechnologiesCheckboxes = !this.showTechnologiesCheckboxes;
-    // Optionally, mark as touched when shown to trigger validation feedback immediately
-    if (this.showTechnologiesCheckboxes) {
-      this.technologiesArray.markAsTouched();
-    }
-  }
-
-  toggleToolsUsedVisibility(): void {
-    this.showToolsUsedCheckboxes = !this.showToolsUsedCheckboxes;
-    // Optionally, mark as touched when shown to trigger validation feedback immediately
-    if (this.showToolsUsedCheckboxes) {
-      this.toolsUsedArray.markAsTouched();
-    }
-  }
+  newEvaluator(): FormGroup { return this.fb.group({ name: ['', Validators.required], academicDegree: [0, Validators.required], score: [null, [Validators.required, Validators.min(0), Validators.max(100)]] }); }
+  addEvaluator(): void { this.evaluators.push(this.newEvaluator()); }
+  removeEvaluator(index: number): void { this.evaluators.removeAt(index); }
 
   onSubmit(): void {
     if (this.projectForm.invalid) {
       this.projectForm.markAllAsTouched();
-      this.members.controls.forEach(control => {
-        if (control instanceof FormGroup) {
-          Object.values(control.controls).forEach(c => c.markAsTouched());
-        }
-      });
-      this.supervisorsArray.controls.forEach(control => {
-        if (control instanceof FormGroup) {
-          Object.values(control.controls).forEach(c => c.markAsTouched());
-        }
-      });
-      // Ensure hidden FormArrays are also marked as touched on submit
-      this.technologiesArray.markAsTouched();
-      this.toolsUsedArray.markAsTouched();
+      this.popupService.showError('Validation Error', 'Please fill all required fields correctly.');
       return;
     }
     this.isSubmitting = true;
-
-    const formValue = this.projectForm.value;
-
-    const selectedTechnologies = this.availableTechnologies
-      .filter((tech, i) => this.technologiesArray.controls[i].value)
-      .join(', ');
-
-    const selectedToolsUsed = this.availableTools
-      .filter((tool, i) => this.toolsUsedArray.controls[i].value)
-      .join(', ');
-
-    const supervisorIds = formValue.supervisors.map((s: any) => Number(s.id));
+    const formValue = this.projectForm.getRawValue();
 
     const payload = {
       title: formValue.title,
       description: formValue.description,
-      grade: formValue.grade,
-      technologies: selectedTechnologies,
-      toolsUsed: selectedToolsUsed,
+      score: formValue.score ? Number(formValue.score) : 0,
+      technologies: this.getSelectedItems(this.availableTechnologies, this.technologiesArray).join(', '),
+      toolsUsed: this.getSelectedItems(this.availableTools, this.toolsUsedArray).join(', '),
       problemStatement: formValue.problemStatement,
-      // تم حذف teamLeaderId من الـ payload
-      categoryId: formValue.categoryId,
-      departmentId: formValue.departmentId,
-      facultyId: formValue.facultyId,
-      members: formValue.members.map((m: any) => ({
-        name: m.name,
-        academicId: Number(m.academicId)
-      })),
-      supervisors: supervisorIds
+      patentNumber: formValue.patentNumber ? Number(formValue.patentNumber) : 0,
+      patentDate: formValue.patentDate || null,
+      categoryId: Number(formValue.categoryId),
+      departments: this.departments.filter((_, i) => formValue.departments[i]).map(d => d.id),
+      members: formValue.members,
+      supervisors: formValue.supervisors.map((s: { id: number }) => s.id),
+      evaluators: formValue.evaluators
     };
 
     this.projectService.createProject(payload).pipe(
       finalize(() => this.isSubmitting = false)
     ).subscribe({
-      next: (response) => {
-        if (typeof response === 'string' && response.trim() !== '') {
-            alert(response);
-            this.router.navigate(['/Home']);
-        } else {
-            this.popupTitle = 'Project Created!';
-            this.popupMessage = 'Your project has been successfully created. Find it in the project list to edit it and upload images.';
-            this.showSuccessPopup = true;
-        }
+      next: () => {
+        this.popupService.showSuccess(
+          'Project Created!',
+          'Your project has been successfully created.',
+          () => this.router.navigate(['/my-projects'])
+        );
       },
       error: (err) => {
-        console.error('An error occurred during project creation:', err);
-        const errorMessage = err.error?.message || err.message || 'Failed to create the project. Please try again.';
-        alert(errorMessage);
+        const errorMessage = err.error || err.message || 'Failed to create project. Please try again.';
+        this.popupService.showError('Creation Failed', errorMessage);
       }
     });
   }
 
-  onCancel(): void {
-    this.router.navigate(['/Home']);
-  }
-
-  closePopup(): void {
-    this.showSuccessPopup = false;
-    this.router.navigate(['/Home']);
-  }
+  onCancel(): void { this.router.navigate(['/Home']); }
 }

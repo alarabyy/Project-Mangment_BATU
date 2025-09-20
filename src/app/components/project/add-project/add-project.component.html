@@ -1,196 +1,163 @@
-<!-- src/app/components/add-project/add-project.component.html -->
-<app-success-popup
-  *ngIf="showSuccessPopup"
-  [title]="popupTitle"
-  [message]="popupMessage"
-  [confirmButtonText]="'Go to Home'"
-  [cancelButtonText]="'Close'"
-  (close)="closePopup()"
-  [confirmNavigationPath]="'/Home'"
-  [cancelNavigationPath]="'/Home'"
-></app-success-popup>
-
-<main class="container" [class.blurred]="showSuccessPopup">
-  <header class="header">
-    <div class="header-content"><i class="fas fa-plus-circle header-icon"></i><h1 class="header-title">Create New Project</h1></div>
+<!-- src/app/components/project/add-project/add-project.component.html -->
+<main class="container">
+  <header class="page-header">
+    <div class="header-icon"><i class="fas fa-plus-circle"></i></div>
+    <div class="header-content"><h1>Create New Project</h1><p>Fill out the form below to add a new project.</p></div>
   </header>
-  <div class="form-container">
-    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
-      <!-- Project Details Section -->
-      <h2 class="section-title"><i class="fas fa-info-circle"></i> Project Details</h2>
-      <div class="form-group">
-        <label for="title">Project Title <span class="required-indicator">*</span></label>
-        <input type="text" id="title" formControlName="title" class="form-control" [class.is-invalid]="f['title'].invalid && f['title'].touched">
-        <div *ngIf="f['title'].touched && f['title'].errors" class="error-message">
-          <small *ngIf="f['title'].errors?.['required']">Project title is required.</small>
-          <small *ngIf="f['title'].errors?.['minlength']">Project title must be at least 3 characters long.</small>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="description">Description <span class="required-indicator">*</span></label>
-        <textarea id="description" formControlName="description" class="form-control" rows="3" [class.is-invalid]="f['description'].invalid && f['description'].touched"></textarea>
-        <div *ngIf="f['description'].touched && f['description'].errors" class="error-message">
-          <small *ngIf="f['description'].errors?.['required']">Description is required.</small>
-          <small *ngIf="f['description'].errors?.['minlength']">Description must be at least 10 characters long.</small>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="problemStatement">Problem Statement <span class="required-indicator">*</span></label>
-        <textarea id="problemStatement" formControlName="problemStatement" class="form-control" rows="3" [class.is-invalid]="f['problemStatement'].invalid && f['problemStatement'].touched"></textarea>
-        <div *ngIf="f['problemStatement'].touched && f['problemStatement'].errors" class="error-message">
-          <small *ngIf="f['problemStatement'].errors?.['required']">Problem statement is required.</small>
-        </div>
-      </div>
 
-      <!-- Technologies Checkboxes (Now Toggable) -->
-      <div class="form-group">
-          <div class="checkbox-toggle-header">
-              <label>Technologies <span class="required-indicator">*</span></label>
-              <button type="button" class="btn btn-toggle-checkboxes" (click)="toggleTechnologiesVisibility()">
-                  <i class="fas" [class.fa-chevron-down]="!showTechnologiesCheckboxes" [class.fa-chevron-up]="showTechnologiesCheckboxes"></i>
-                  {{ showTechnologiesCheckboxes ? 'Hide Technologies' : 'Show Technologies' }}
-              </button>
+  <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" novalidate>
+    <!-- Project Details Card -->
+    <div class="form-card">
+      <h2 class="card-title">Project Details</h2>
+      <div class="form-grid">
+        <div class="form-group span-2">
+          <label for="title">Project Title</label>
+          <input id="title" formControlName="title" class="form-control" [class.is-invalid]="f['title'].invalid && f['title'].touched">
+          <div *ngIf="f['title'].invalid && f['title'].touched" class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span *ngIf="f['title'].errors?.['required']">Project title is required.</span>
+            <span *ngIf="f['title'].errors?.['minlength']">Title must be at least 3 characters.</span>
           </div>
-          <div *ngIf="showTechnologiesCheckboxes" class="checkbox-group" formArrayName="technologies" [class.is-invalid]="technologiesArray.invalid && technologiesArray.touched">
-              <div *ngFor="let control of technologiesArray.controls; let i = index" class="checkbox-item">
-                  <input type="checkbox" [id]="'tech' + i" [formControlName]="i">
-                  <label [for]="'tech' + i">{{ availableTechnologies[i] }}</label>
+        </div>
+        <div class="form-group span-2"><label for="description">Description</label><textarea id="description" formControlName="description" rows="4" class="form-control" [class.is-invalid]="f['description'].invalid && f['description'].touched"></textarea>
+          <div *ngIf="f['description'].invalid && f['description'].touched" class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span *ngIf="f['description'].errors?.['required']">Description is required.</span>
+            <span *ngIf="f['description'].errors?.['minlength']">Must be at least 10 characters.</span>
+          </div>
+        </div>
+        <div class="form-group span-2"><label for="problemStatement">Problem Statement</label><textarea id="problemStatement" formControlName="problemStatement" rows="4" class="form-control" [class.is-invalid]="f['problemStatement'].invalid && f['problemStatement'].touched"></textarea>
+          <div *ngIf="f['problemStatement'].invalid && f['problemStatement'].touched" class="error-message">
+            <i class="fas fa-exclamation-circle"></i> Problem statement is required.
+          </div>
+        </div>
+
+        <div class="form-group dropdown-group span-2">
+          <label>Technologies</label>
+          <div class="dropdown">
+            <button type="button" class="dropdown-toggle" [class.is-invalid]="technologiesArray.invalid && technologiesArray.touched">Select Technologies</button>
+            <div class="dropdown-menu" formArrayName="technologies">
+              <div *ngFor="let tech of availableTechnologies; let i = index" class="dropdown-item">
+                <input type="checkbox" [id]="'tech' + i" [formControlName]="i"><label [for]="'tech' + i">{{ tech }}</label>
               </div>
-          </div>
-          <div *ngIf="technologiesArray.errors?.['technologiesRequired'] && technologiesArray.touched && !showTechnologiesCheckboxes" class="error-message">
-              <small>At least one technology must be selected. Click "Show Technologies" to select.</small>
-          </div>
-          <div *ngIf="technologiesArray.errors?.['technologiesRequired'] && technologiesArray.touched && showTechnologiesCheckboxes" class="error-message">
-              <small>At least one technology must be selected.</small>
-          </div>
-      </div>
-
-      <!-- Tools Used Checkboxes (Now Toggable) -->
-      <div class="form-group">
-        <div class="checkbox-toggle-header">
-            <label>Tools Used / Other Technologies <span class="required-indicator">*</span></label>
-            <button type="button" class="btn btn-toggle-checkboxes" (click)="toggleToolsUsedVisibility()">
-                <i class="fas" [class.fa-chevron-down]="!showToolsUsedCheckboxes" [class.fa-chevron-up]="showToolsUsedCheckboxes"></i>
-                {{ showToolsUsedCheckboxes ? 'Hide Tools' : 'Show Tools' }}
-            </button>
-        </div>
-        <div *ngIf="showToolsUsedCheckboxes" class="checkbox-group" formArrayName="toolsUsed" [class.is-invalid]="toolsUsedArray.invalid && toolsUsedArray.touched">
-            <div *ngFor="let control of toolsUsedArray.controls; let i = index" class="checkbox-item">
-                <input type="checkbox" [id]="'tool' + i" [formControlName]="i">
-                <label [for]="'tool' + i">{{ availableTools[i] }}</label>
             </div>
+          </div>
+          <div class="selected-items">
+            <span *ngFor="let item of getSelectedItems(availableTechnologies, technologiesArray)" class="item-badge">
+              {{ item }} <button type="button" (click)="removeItem(availableTechnologies.indexOf(item), technologiesArray)">&times;</button>
+            </span>
+          </div>
+           <div *ngIf="technologiesArray.invalid && technologiesArray.touched" class="error-message">
+            <i class="fas fa-exclamation-circle"></i> At least one technology must be selected.
+          </div>
         </div>
-        <div *ngIf="toolsUsedArray.errors?.['toolsUsedRequired'] && toolsUsedArray.touched && !showToolsUsedCheckboxes" class="error-message">
-            <small>At least one tool/technology must be selected. Click "Show Tools" to select.</small>
-        </div>
-        <div *ngIf="toolsUsedArray.errors?.['toolsUsedRequired'] && toolsUsedArray.touched && showToolsUsedCheckboxes" class="error-message">
-            <small>At least one tool/technology must be selected.</small>
-        </div>
-      </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="categoryId">Category <span class="required-indicator">*</span></label>
+        <div class="form-group dropdown-group span-2">
+          <label>Tools Used</label>
+          <div class="dropdown">
+            <button type="button" class="dropdown-toggle" [class.is-invalid]="toolsUsedArray.invalid && toolsUsedArray.touched">Select Tools</button>
+            <div class="dropdown-menu" formArrayName="toolsUsed">
+              <div *ngFor="let tool of availableTools; let i = index" class="dropdown-item">
+                <input type="checkbox" [id]="'tool' + i" [formControlName]="i"><label [for]="'tool' + i">{{ tool }}</label>
+              </div>
+            </div>
+          </div>
+          <div class="selected-items">
+            <span *ngFor="let item of getSelectedItems(availableTools, toolsUsedArray)" class="item-badge">
+              {{ item }} <button type="button" (click)="removeItem(availableTools.indexOf(item), toolsUsedArray)">&times;</button>
+            </span>
+          </div>
+          <div *ngIf="toolsUsedArray.invalid && toolsUsedArray.touched" class="error-message">
+            <i class="fas fa-exclamation-circle"></i> At least one tool must be selected.
+          </div>
+        </div>
+
+        <div class="form-group"><label for="categoryId">Category</label>
           <select id="categoryId" formControlName="categoryId" class="form-control" [class.is-invalid]="f['categoryId'].invalid && f['categoryId'].touched">
             <option [ngValue]="null" disabled>Select a Category</option>
-            <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">{{cat.name}}</option>
           </select>
-          <div *ngIf="f['categoryId'].touched && f['categoryId'].errors" class="error-message"><small *ngIf="f['categoryId'].errors?.['required']">Category is required.</small></div>
+          <div *ngIf="f['categoryId'].invalid && f['categoryId'].touched" class="error-message"><i class="fas fa-exclamation-circle"></i> Category is required.</div>
         </div>
-        <div class="form-group">
-          <label for="departmentId">Department <span class="required-indicator">*</span></label>
-          <select id="departmentId" formControlName="departmentId" class="form-control" [class.is-invalid]="f['departmentId'].invalid && f['departmentId'].touched">
-            <option [ngValue]="null" disabled>Select a Department</option>
-            <option *ngFor="let department of departments" [value]="department.id">{{ department.name }}</option>
-          </select>
-          <div *ngIf="f['departmentId'].touched && f['departmentId'].errors" class="error-message"><small *ngIf="f['departmentId'].errors?.['required']">Department is required.</small></div>
+        <div class="form-group"><label for="score">Final Score (Optional)</label><input id="score" type="number" formControlName="score" class="form-control" [class.is-invalid]="f['score'].invalid && f['score'].touched">
+          <div *ngIf="f['score'].invalid && f['score'].touched" class="error-message"><i class="fas fa-exclamation-circle"></i> Score must be between 0 and 100.</div>
         </div>
       </div>
-      <!-- Faculty Dropdown (using hardcoded list) -->
-      <div class="form-group">
-        <label for="facultyId">Faculty <span class="required-indicator">*</span></label>
-        <select id="facultyId" formControlName="facultyId" class="form-control" [class.is-invalid]="f['facultyId'].invalid && f['facultyId'].touched">
-          <option [ngValue]="null" disabled>Select a Faculty</option>
-          <option *ngFor="let faculty of faculties" [value]="faculty.id">{{ faculty.name }}</option>
-        </select>
-        <div *ngIf="f['facultyId'].touched && f['facultyId'].errors" class="error-message">
-          <small *ngIf="f['facultyId'].errors?.['required']">Faculty is required.</small>
-        </div>
-      </div>
+    </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="grade">Grade (Optional)</label>
-          <input type="number" id="grade" formControlName="grade" class="form-control" [class.is-invalid]="f['grade'].invalid && f['grade'].touched">
-          <div *ngIf="f['grade'].touched && f['grade'].errors" class="error-message">
-            <small *ngIf="f['grade'].errors?.['min'] || f['grade'].errors?.['max']">Grade must be between 0 and 100.</small>
+    <div class="form-card">
+        <h2 class="card-title">Departments</h2>
+        <div class="checkbox-group" formArrayName="departments" [class.is-invalid]="departmentsArray.invalid && departmentsArray.touched">
+          <div *ngFor="let dept of departments; let i = index" class="checkbox-item">
+            <input type="checkbox" [id]="'dept' + i" [formControlName]="i"><label [for]="'dept' + i">{{ dept.name }}</label>
           </div>
         </div>
-        <!-- تم حذف حقل Leader ID بناءً على الطلب -->
-      </div>
+        <div *ngIf="departmentsArray.invalid && departmentsArray.touched" class="error-message"><i class="fas fa-exclamation-circle"></i> At least one department must be selected.</div>
+    </div>
 
-      <!-- Team Members Section -->
-      <h2 class="section-title mt-4"><i class="fas fa-users"></i> Team Members</h2>
-      <div formArrayName="members" class="array-section">
-        <div *ngFor="let memberGroup of members.controls; let i = index" [formGroupName]="i" class="array-group">
-          <div class="form-row">
-            <div class="form-group">
-              <label [for]="'memberName' + i">Member Name <span class="required-indicator">*</span></label>
-              <input [id]="'memberName' + i" type="text" formControlName="name" class="form-control"
-                     [class.is-invalid]="memberGroup.get('name')?.invalid && memberGroup.get('name')?.touched">
-              <div *ngIf="memberGroup.get('name')?.touched && memberGroup.get('name')?.errors" class="error-message">
-                <small *ngIf="memberGroup.get('name')?.errors?.['required']">Name is required.</small>
-              </div>
-            </div>
-            <div class="form-group">
-              <label [for]="'academicId' + i">Academic ID <span class="required-indicator">*</span></label>
-              <input [id]="'academicId' + i" type="text" formControlName="academicId" class="form-control"
-                     [class.is-invalid]="memberGroup.get('academicId')?.invalid && memberGroup.get('academicId')?.touched">
-              <div *ngIf="memberGroup.get('academicId')?.touched && memberGroup.get('academicId')?.errors" class="error-message">
-                <small *ngIf="memberGroup.get('academicId')?.errors?.['required']">Academic ID is required.</small>
-                <small *ngIf="memberGroup.get('academicId')?.errors?.['min'] || memberGroup.get('academicId')?.errors?.['pattern']">Must be a valid ID.</small>
-              </div>
-            </div>
+    <div class="form-card">
+      <h2 class="card-title">Patent Information (Optional)</h2>
+      <div class="form-grid">
+        <div class="form-group"><label for="patentNumber">Patent Number</label><input id="patentNumber" type="number" formControlName="patentNumber" class="form-control"></div>
+        <div class="form-group"><label for="patentDate">Patent Date</label><input id="patentDate" type="date" formControlName="patentDate" class="form-control"></div>
+      </div>
+    </div>
+
+    <div class="form-card" formArrayName="members">
+      <h2 class="card-title">Team Members</h2>
+      <div *ngFor="let memberGroup of members.controls; let i = index" [formGroupName]="i" class="array-group">
+        <div class="form-grid-3">
+          <div class="form-group"><label [for]="'memberName' + i">Member Name</label><input [id]="'memberName' + i" formControlName="name" class="form-control" [class.is-invalid]="memberGroup.get('name')?.invalid && memberGroup.get('name')?.touched">
+            <div *ngIf="memberGroup.get('name')?.invalid && memberGroup.get('name')?.touched" class="error-message"><i class="fas fa-exclamation-circle"></i> Name is required.</div>
           </div>
-          <button type="button" (click)="removeMember(i)" class="btn remove-item-btn" title="Remove Member">
-            <i class="fas fa-user-minus"></i>
-          </button>
-        </div>
-        <button type="button" (click)="addMember()" class="btn btn-add-item">
-          <i class="fas fa-user-plus"></i> Add Another Member
-        </button>
-      </div>
-
-      <!-- Team Supervisors Section -->
-      <h2 class="section-title mt-4"><i class="fas fa-user-tie"></i> Project Supervisors</h2>
-      <div formArrayName="supervisors" class="array-section">
-        <div *ngFor="let supervisorGroup of supervisorsArray.controls; let i = index" [formGroupName]="i" class="array-group">
-          <div class="form-group">
-            <label [for]="'supervisorId' + i">Supervisor ID <span class="required-indicator">*</span></label>
-            <input [id]="'supervisorId' + i" type="text" formControlName="id" class="form-control"
-                   [class.is-invalid]="supervisorGroup.get('id')?.invalid && supervisorGroup.get('id')?.touched">
-            <div *ngIf="supervisorGroup.get('id')?.touched && supervisorGroup.get('id')?.errors" class="error-message">
-              <small *ngIf="supervisorGroup.get('id')?.errors?.['required']">Supervisor ID is required.</small>
-              <small *ngIf="supervisorGroup.get('id')?.errors?.['min'] || supervisorGroup.get('id')?.errors?.['pattern']">Must be a valid ID.</small>
-              <!-- ملاحظة: التحقق من وجود المشرف الفعلي في قاعدة البيانات يتم في الـ Backend -->
-            </div>
+          <div class="form-group"><label [for]="'academicId' + i">Academic ID</label><input [id]="'academicId' + i" type="number" formControlName="academicId" class="form-control" [class.is-invalid]="memberGroup.get('academicId')?.invalid && memberGroup.get('academicId')?.touched">
+            <div *ngIf="memberGroup.get('academicId')?.invalid && memberGroup.get('academicId')?.touched" class="error-message"><i class="fas fa-exclamation-circle"></i> A valid numeric ID is required.</div>
           </div>
-          <button type="button" (click)="removeSupervisor(i)" class="btn remove-item-btn" title="Remove Supervisor">
-            <i class="fas fa-user-minus"></i>
-          </button>
+          <div class="form-group"><label [for]="'academicDegree' + i">Academic Degree</label>
+            <select [id]="'academicDegree' + i" formControlName="academicDegree" class="form-control"><option [value]="0">Student</option><option [value]="1">Graduate</option></select>
+          </div>
         </div>
-        <button type="button" (click)="addSupervisor()" class="btn btn-add-item">
-          <i class="fas fa-user-plus"></i> Add Another Supervisor
-        </button>
+        <button type="button" (click)="removeMember(i)" class="remove-item-btn" *ngIf="members.length > 1">&times;</button>
       </div>
+      <button type="button" (click)="addMember()" class="btn-add-item"><i class="fas fa-plus"></i> Add Member</button>
+    </div>
 
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="projectForm.invalid || isSubmitting">
-          <span *ngIf="!isSubmitting"><i class="fas fa-plus"></i> Create Project</span>
-          <span *ngIf="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Creating...</span>
-        </button>
+    <div class="form-card" formArrayName="supervisors">
+      <h2 class="card-title">Supervisors</h2>
+      <div *ngFor="let supervisorGroup of supervisors.controls; let i = index" [formGroupName]="i" class="array-group">
+        <div class="form-group"><label [for]="'supervisorId' + i">Supervisor ID</label><input [id]="'supervisorId' + i" type="number" formControlName="id" class="form-control" [class.is-invalid]="supervisorGroup.get('id')?.invalid && supervisorGroup.get('id')?.touched">
+           <div *ngIf="supervisorGroup.get('id')?.invalid && supervisorGroup.get('id')?.touched" class="error-message"><i class="fas fa-exclamation-circle"></i> A valid numeric ID is required.</div>
+        </div>
+        <button type="button" (click)="removeSupervisor(i)" class="remove-item-btn" *ngIf="supervisors.length > 1">&times;</button>
       </div>
-    </form>
-  </div>
+      <button type="button" (click)="addSupervisor()" class="btn-add-item"><i class="fas fa-plus"></i> Add Supervisor</button>
+    </div>
+
+    <div class="form-card" formArrayName="evaluators">
+      <h2 class="card-title">Evaluators</h2>
+      <div *ngFor="let evaluatorGroup of evaluators.controls; let i = index" [formGroupName]="i" class="array-group">
+        <div class="form-grid-3">
+          <div class="form-group"><label [for]="'evaluatorName' + i">Evaluator Name</label><input [id]="'evaluatorName' + i" formControlName="name" class="form-control" [class.is-invalid]="evaluatorGroup.get('name')?.invalid && evaluatorGroup.get('name')?.touched">
+            <div *ngIf="evaluatorGroup.get('name')?.invalid && evaluatorGroup.get('name')?.touched" class="error-message"><i class="fas fa-exclamation-circle"></i> Name is required.</div>
+          </div>
+          <div class="form-group"><label [for]="'evaluatorDegree' + i">Academic Degree</label>
+            <select [id]="'evaluatorDegree' + i" formControlName="academicDegree" class="form-control"><option [value]="0">Lecturer</option><option [value]="1">Professor</option></select>
+          </div>
+          <div class="form-group"><label [for]="'evaluatorScore' + i">Score</label><input [id]="'evaluatorScore' + i" type="number" formControlName="score" class="form-control" [class.is-invalid]="evaluatorGroup.get('score')?.invalid && evaluatorGroup.get('score')?.touched">
+            <div *ngIf="evaluatorGroup.get('score')?.invalid && evaluatorGroup.get('score')?.touched" class="error-message"><i class="fas fa-exclamation-circle"></i> A valid score (0-100) is required.</div>
+          </div>
+        </div>
+        <button type="button" (click)="removeEvaluator(i)" class="remove-item-btn" *ngIf="evaluators.length > 1">&times;</button>
+      </div>
+      <button type="button" (click)="addEvaluator()" class="btn-add-item"><i class="fas fa-plus"></i> Add Evaluator</button>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn-primary" [disabled]="projectForm.invalid || isSubmitting">
+        <span *ngIf="!isSubmitting"><i class="fas fa-plus"></i> Create Project</span>
+        <span *ngIf="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Creating...</span>
+      </button>
+    </div>
+  </form>
 </main>
