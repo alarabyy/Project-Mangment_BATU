@@ -1,64 +1,54 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { RoleGuard } from './guards/role.guard'; // تأكد من المسار الصحيح للحارس
+import { RoleGuard } from './guards/role.guard';
 
-// --- General Public Components ---
+// --- Import all your components ---
 import { HomeComponent } from './components/home/home.component';
 import { PrivacyPolicyComponent } from './components/Components/privacy/privacy.component';
 import { documentaionComponent } from './components/Components/documentaion/documentaion.component';
 import { UnauthorizedComponent } from './components/Components/unauthorized/unauthorized.component';
-
-
-// --- User-Specific Protected Components ---
+import { LoginComponent } from './components/auth/login/login.component';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
+import { DetailsBlogComponent } from './components/blogs/detail-blog/details-blog.component';
+import { AllBlogsUserComponent } from './components/blogs/all-blogs-user/all-blogs-user.component';
+import { AllStaffComponent } from './components/staff/all-staff/all-staff.component';
 import { MyProfileComponent } from './components/User/my-profile/my-profile.component';
-import { ChatComponent } from './components/chat-AI/chat.component'; // هذا شات الـ AI، مختلف عن الشات العادي
+import { ChatComponent } from './components/chat-AI/chat.component';
 import { UserProfileComponent } from './components/User/user-profile/user-profile.component';
-
-// --- Project Management Components ---
-import { ProjectListComponent } from './components/project/project-list/project-list.component';
+import { MyProjectsComponent } from './components/project/my-projects/my-projects.component';
+import { ProjectDetailsComponent } from './components/project/project-details/project-details.component';
 import { AddProjectComponent } from './components/project/add-project/add-project.component';
 import { EditProjectComponent } from './components/project/edit-project/edit-project.component';
-import { ProjectDetailsComponent } from './components/project/project-details/project-details.component';
-
-// --- Admin Dashboard Components ---
+import { ProjectListComponent } from './components/project/project-list/project-list.component';
+import { ProjectAnalysisComponent } from './components/project/project-analysis/project-analysis.component';
+import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
 import { NotificationsPageComponent } from './components/Components/notifications-page/notifications-page.component';
-// import { UserManagementComponent } from './components/User/user-management/user-management.component';
+import { UserManagementComponent } from './components/User/user-management/user-management.component';
 import { UserAnalyticsComponent } from './components/User/user-analytics/user-analytics.component';
-import { DepartmentCreateComponent } from './components/Departments/department-create/department-create.component';
-import { DepartmentEditComponent } from './components/Departments/department-edit/department-edit.component';
-import { FacultyListComponent } from './components/faculty/faculty-list/faculty-list.component';
+import { RoleListComponent } from './components/Roles/role-list/role-list.component';
+import { AddRoleComponent } from './components/Roles/add-role/add-role.component';
+import { EditRoleComponent } from './components/Roles/edit-role/edit-role.component';
+import { RoleDetailsComponent } from './components/Roles/role-details/role-details.component';
+import { MailListComponent } from './components/Mails/mail-list/mail-list.component';
+import { MailReplyComponent } from './components/Mails/mail-reply/mail-reply.component';
 import { AddFacultyComponent } from './components/faculty/add-faculty/add-faculty.component';
 import { FacultyEditComponent } from './components/faculty/faculty-edit/faculty-edit.component';
+import { FacultyListComponent } from './components/faculty/faculty-list/faculty-list.component';
+import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
+import { DepartmentCreateComponent } from './components/Departments/department-create/department-create.component';
+import { DepartmentEditComponent } from './components/Departments/department-edit/department-edit.component';
 import { CategoryListComponent } from './components/category/category-list/category-list.component';
 import { AddCategoryComponent } from './components/category/add-category/add-category.component';
 import { EditCategoryComponent } from './components/category/edit-category/edit-category.component';
-import { AddblogsComponent } from './components/blogs/addblogs/addblogs.component';
-import { DetailsBlogComponent } from './components/blogs/detail-blog/details-blog.component';
 import { AllblogsComponent } from './components/blogs/allblogs/allblogs.component';
+import { AddblogsComponent } from './components/blogs/addblogs/addblogs.component';
 import { EditBlogComponent } from './components/blogs/edit-blog/edit-blog.component';
-import { MyProjectsComponent } from './components/project/my-projects/my-projects.component';
-import { AllBlogsUserComponent } from './components/blogs/all-blogs-user/all-blogs-user.component';
-import { AllStaffComponent } from './components/staff/all-staff/all-staff.component';
 import { AllStaffAdminComponent } from './components/staff/all-staff-admin/all-staff-admin.component';
 import { AddStaffComponent } from './components/staff/add-staff/add-staff.component';
-import { LoginComponent } from './components/auth/login/login.component';
-import { SignUpComponent } from './components/auth/sign-up/sign-up.component';
-import { ProjectAnalysisComponent } from './components/project/project-analysis/project-analysis.component';
-import { DepartmentListComponent } from './components/Departments/department-list/department-list.component';
-import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
-
-// NEW: Correct paths for Mail Components
-import { MailListComponent } from './components/Mails/mail-list/mail-list.component';
-import { MailReplyComponent } from './components/Mails/mail-reply/mail-reply.component';
 import { PrivateChatComponent } from './components/Chats/private-chat/private-chat.component';
 import { AllChatsComponent } from './components/Chats/all-chats/all-chats.component';
-import { UserManagementComponent } from './components/User/user-management/user-management.component';
 
-// =================================================================
-//                 ROUTES CONFIGURATION
-// =================================================================
 export const routes: Routes = [
-
   // ------------------------- PUBLIC ROUTES -------------------------
   { path: 'Home', component: HomeComponent },
   { path: 'documentaion', component: documentaionComponent },
@@ -70,63 +60,60 @@ export const routes: Routes = [
   { path: 'staff', component: AllStaffComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
 
-  // --- SignUp is now an Admin-only route ---
-  { path: 'SignUp', component: SignUpComponent  , canActivate: [RoleGuard], data: { roles: ['admin']}},
+  // ---------------------- PROTECTED USER ROUTES (Just login required) --------------------
+  { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard] },
+  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard] },
+  { path: 'user/profile/:id', component: UserProfileComponent, canActivate: [RoleGuard] },
+  { path: 'my-projects', component: MyProjectsComponent, canActivate: [RoleGuard] },
+  { path: 'ProjectDetails/:id', component: ProjectDetailsComponent, canActivate: [RoleGuard] },
+  { path: 'chats', component: AllChatsComponent, canActivate: [RoleGuard] },
+  { path: 'chat/:id', component: PrivateChatComponent, canActivate: [RoleGuard] },
 
-  // ---------------------- MAIL ROUTES (Protected by RoleGuard) --------------------
-  { path: 'allMails', component: MailListComponent , canActivate: [RoleGuard], data: { roles: ['admin']} },
-  { path: 'replayMails/:id', component: MailReplyComponent , canActivate: [RoleGuard], data: { roles: ['admin']} },
+  // ------------------------ PERMISSION-BASED ROUTES ----------------------
+  { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.User.Create' } },
+  { path: 'users', component: UserManagementComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.User.View' } },
+  { path: 'user-analytics', component: UserAnalyticsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.User.View' } },
 
+  { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.Create' } },
+  { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.Edit' } },
+  { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
+  { path: 'ProjectAnalysis', component: ProjectAnalysisComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
 
-  // ---------------------- CHATS ROUTES (Managed by ChatLayoutComponent) --------------------
-  // ---------------------- CHATS ROUTES --------------------
-  { path: 'chats', component: AllChatsComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
-  { path: 'chat/:id', component: PrivateChatComponent , canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
+  { path: 'allMails', component: MailListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Mail.View' } },
+  { path: 'replayMails/:id', component: MailReplyComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Mail.Reply' } },
 
-
-  // ---------------------- PROTECTED USER ROUTES --------------------
-  { path: 'MyProfile', component: MyProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
-  { path: 'Chat', component: ChatComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } }, // هذا شات الـ AI
-  { path: 'user/profile/:id', component: UserProfileComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'doctor', 'student'] } },
-
-
-  // -------------------- PROJECT MANAGEMENT ROUTES ------------------
-  { path: 'ProjectDetails/:id', component: ProjectDetailsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
-  { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
-  { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor' ] } },
-  { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'my-projects', component: MyProjectsComponent, canActivate: [RoleGuard], data: { roles: ['admin', 'student', 'doctor'] } },
-  { path: 'ProjectAnalysis', component: ProjectAnalysisComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  // ------------------------ ADMIN-ONLY ROUTES ----------------------
-  // General Admin
-  { path: 'notifications', component: NotificationsPageComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'users', component: UserManagementComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'user-analytics', component: UserAnalyticsComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  // Role Management
+  { path: 'roles', component: RoleListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.View' } },
+  { path: 'roles/add', component: AddRoleComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.Create' } },
+  { path: 'roles/edit/:id', component: EditRoleComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.Edit' } },
+  { path: 'roles/details/:id', component: RoleDetailsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.View' } },
 
   // Faculty Management
-  { path: 'FacultyList', component: FacultyListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'add-faculty', component: AddFacultyComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'facultyEdit/:id', component: FacultyEditComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'FacultyList', component: FacultyListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Faculty.View' } },
+  { path: 'add-faculty', component: AddFacultyComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Faculty.Create' } },
+  { path: 'facultyEdit/:id', component: FacultyEditComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Faculty.Edit' } },
 
   // Department Management
-  { path: 'Departments', component: DepartmentCreateComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'DepartmentsList', component: DepartmentListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'departmentEdit/:id', component: DepartmentEditComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'DepartmentsList', component: DepartmentListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Department.View' } },
+  { path: 'Departments', component: DepartmentCreateComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Department.Create' } },
+  { path: 'departmentEdit/:id', component: DepartmentEditComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Department.Edit' } },
 
   // Category Management
-  { path: 'CategoryList', component: CategoryListComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'add-category', component: AddCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'categoryEdit/:id', component: EditCategoryComponent, canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  { path: 'CategoryList', component: CategoryListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Category.View' } },
+  { path: 'add-category', component: AddCategoryComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Category.Create' } },
+  { path: 'categoryEdit/:id', component: EditCategoryComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Category.Edit' } },
 
+  // Blogs Management
+  { path: 'blogs', component: AllblogsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Blog.View' } },
+  { path: 'add-blog', component: AddblogsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Blog.Create' } },
+  { path: 'edit-blog/:id', component: EditBlogComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Blog.Edit' } },
 
-  // blogs  Management
-  { path: 'blogs', component: AllblogsComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'add-blog', component: AddblogsComponent , canActivate: [RoleGuard], data: { roles: ['admin'] }},
-  { path: 'edit-blog/:id', component: EditBlogComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  // Staff Management
+  { path: 'admin/staff', component: AllStaffAdminComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Staff.View' } },
+  { path: 'admin/staff/add', component: AddStaffComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Staff.Create' } },
 
-  // staff  Management
-  { path: 'admin/staff', component: AllStaffAdminComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
-  { path: 'admin/staff/add', component: AddStaffComponent , canActivate: [RoleGuard], data: { roles: ['admin'] } },
+  // Notifications
+  { path: 'notifications', component: NotificationsPageComponent, canActivate: [RoleGuard] },
 
   // --------------------- REDIRECTS & WILDCARD --------------------
   { path: '', redirectTo: 'Home', pathMatch: 'full' },

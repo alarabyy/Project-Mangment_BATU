@@ -1,101 +1,48 @@
+<!-- src/app/components/auth/sign-up/sign-up.component.html -->
 <div class="auth-form-container">
   <div class="form-header">
-    <div class="header-icon-wrapper">
-      <i class="fas fa-user-plus header-icon"></i>
-    </div>
-    <h2>Create Your Account</h2>
-    <p>Join our community by signing up.</p>
+    <div class="header-icon-wrapper"><i class="fas fa-user-plus header-icon"></i></div>
+    <h2>Create New User Account</h2>
+    <p>Register a new user in the system.</p>
   </div>
 
   <form [formGroup]="signupForm" (ngSubmit)="submitSignup()" class="auth-form" novalidate>
     <div class="form-row three-columns">
+      <div class="input-field-wrapper"><input id="firstName" type="text" class="form-control" placeholder=" " formControlName="firstName" [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched"><label for="firstName">First Name</label><div *ngIf="f['firstName'].invalid && f['firstName'].touched" class="input-hint"><div *ngIf="f['firstName'].errors?.['required']">First Name is required.</div></div></div>
+      <div class="input-field-wrapper"><input id="middleName" type="text" class="form-control" placeholder=" " formControlName="middleName"><label for="middleName">Middle Name</label></div>
+      <div class="input-field-wrapper"><input id="lastName" type="text" class="form-control" placeholder=" " formControlName="lastName" [class.is-invalid]="f['lastName'].invalid && f['lastName'].touched"><label for="lastName">Last Name</label><div *ngIf="f['lastName'].invalid && f['lastName'].touched" class="input-hint"><div *ngIf="f['lastName'].errors?.['required']">Last Name is required.</div></div></div>
+    </div>
+    <div class="input-field-wrapper"><input id="email" type="email" class="form-control" placeholder=" " formControlName="email" [class.is-invalid]="f['email'].invalid && f['email'].touched"><label for="email">University Email</label><div *ngIf="f['email'].invalid && f['email'].touched" class="input-hint"><div *ngIf="f['email'].errors?.['required']">Email is required.</div><div *ngIf="f['email'].errors?.['email']">Enter a valid email.</div></div></div>
+    <div class="input-field-wrapper"><input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" " formControlName="password" [class.is-invalid]="f['password'].invalid && f['password'].touched"><label for="password">Password</label><div *ngIf="f['password'].invalid && f['password'].touched" class="input-hint"><div *ngIf="f['password'].errors?.['required']">Password is required.</div><div *ngIf="f['password'].errors?.['pattern']">Min 8 chars, 1 letter, 1 number.</div></div></div>
+    <div class="options-wrapper"><label class="toggle-switch"><input type="checkbox" (click)="togglePassword()"><span class="slider"></span></label><span>Show Password</span></div>
+
+    <div class="form-row two-columns">
       <div class="input-field-wrapper">
-        <input id="firstName" type="text" class="form-control" placeholder=" " formControlName="firstName"
-          [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched" />
-        <label for="firstName">First Name</label>
-        <div *ngIf="f['firstName'].invalid && f['firstName'].touched" class="input-hint">
-          <div *ngIf="f['firstName'].errors?.['required']">First Name is required.</div>
-          <div *ngIf="f['firstName'].errors?.['minlength']">Must be at least 2 characters.</div>
-        </div>
+        <select id="gender" formControlName="gender" class="form-control" [class.is-invalid]="f['gender'].invalid && f['gender'].touched">
+          <option value="0">Male</option>
+          <option value="1">Female</option>
+        </select>
+        <label for="gender">Gender</label>
       </div>
+
       <div class="input-field-wrapper">
-        <input id="middleName" type="text" class="form-control" placeholder=" " formControlName="middleName" />
-        <label for="middleName">Middle Name (Optional)</label>
-      </div>
-      <div class="input-field-wrapper">
-        <input id="lastName" type="text" class="form-control" placeholder=" " formControlName="lastName"
-          [class.is-invalid]="f['lastName'].invalid && f['lastName'].touched" />
-        <label for="lastName">Last Name</label>
-        <div *ngIf="f['lastName'].invalid && f['lastName'].touched" class="input-hint">
-          <div *ngIf="f['lastName'].errors?.['required']">Last Name is required.</div>
-          <div *ngIf="f['lastName'].errors?.['minlength']">Must be at least 2 characters.</div>
-        </div>
+        <select id="roleId" formControlName="roleId" class="form-control" [class.is-invalid]="f['roleId'].invalid && f['roleId'].touched">
+          <option [ngValue]="null" disabled>Select a Role</option>
+          <option *ngFor="let role of roles" [value]="role.id">{{ role.name }}</option>
+        </select>
+        <label for="roleId">Assign Role</label>
+        <div *ngIf="f['roleId'].invalid && f['roleId'].touched" class="input-hint">Role is required.</div>
       </div>
     </div>
+
     <div class="input-field-wrapper">
-      <input id="email" type="email" class="form-control" placeholder=" " formControlName="email"
-        [class.is-invalid]="f['email'].invalid && f['email'].touched" />
-      <label for="email">University Email</label>
-      <div *ngIf="f['email'].invalid && f['email'].touched" class="input-hint">
-        <div *ngIf="f['email'].errors?.['required']">Email is required.</div>
-        <div *ngIf="f['email'].errors?.['email']">Please enter a valid email address.</div>
-      </div>
+      <input id="graduationDate" type="date" class="form-control" placeholder=" " formControlName="graduationDate">
+      <label for="graduationDate">Graduation Date (for Students)</label>
     </div>
-    <div class="input-field-wrapper">
-      <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder=" "
-        formControlName="password"
-        [class.is-invalid]="f['password'].invalid && f['password'].touched" />
-      <label for="password">Password</label>
-      <div *ngIf="f['password'].invalid && f['password'].touched" class="input-hint">
-        <div *ngIf="f['password'].errors?.['required']">Password is required.</div>
-        <div *ngIf="f['password'].errors?.['pattern']">At least 8 chars, 1 letter, & 1 number.</div>
-      </div>
-    </div>
-    <div class="options-wrapper">
-      <label class="toggle-switch">
-        <input type="checkbox" (click)="togglePassword()">
-        <span class="slider"></span>
-      </label>
-      <span>Show Password</span>
-    </div>
-    <div class="radio-group-wrapper">
-      <label class="radio-group-label">Gender</label>
-      <div class="radio-group">
-        <label class="radio-option">
-          <input type="radio" value="0" formControlName="gender"><span>Male</span>
-        </label>
-        <label class="radio-option">
-          <input type="radio" value="1" formControlName="gender"><span>Female</span>
-        </label>
-      </div>
-    </div>
-    <div class="radio-group-wrapper">
-      <label class="radio-group-label">I am a</label>
-      <div class="radio-group role-group">
-        <label class="radio-option">
-          <input type="radio" value="0" formControlName="role"><span>Student</span>
-        </label>
-        <label class="radio-option">
-          <input type="radio" value="1" formControlName="role"><span>Doctor</span>
-        </label>
-        <label class="radio-option">
-          <input type="radio" value="2" formControlName="role"><span>Admin</span>
-        </label>
-      </div>
-    </div>
-    <div *ngIf="f['role'].value === '0'" class="input-field-wrapper">
-      <input id="graduationDate" type="date" class="form-control" placeholder=" " formControlName="graduationDate"
-        [class.is-invalid]="f['graduationDate'].invalid && f['graduationDate'].touched" />
-      <label for="graduationDate">Graduation Date</label>
-      <div *ngIf="f['graduationDate'].invalid && f['graduationDate'].touched" class="input-hint">
-        <div *ngIf="f['graduationDate'].errors?.['required']">Graduation Date is required for students.</div>
-      </div>
-    </div>
-    <button type="submit" class="btn-submit-glow" [disabled]="isSubmitting">
+
+    <button type="submit" class="btn-submit-glow" [disabled]="signupForm.invalid || isSubmitting">
       <span *ngIf="!isSubmitting">Create Account</span>
-      <span *ngIf="isSubmitting">Creating Account...</span>
+      <span *ngIf="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Creating...</span>
     </button>
   </form>
 </div>
-<div class="aurora-background"></div>
-<div class="animated-grid-background"></div>

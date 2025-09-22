@@ -1,50 +1,110 @@
-// File: src/app/guards/role.guard.ts
-
+// src/app/guards/role.guard.ts
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../Services/auth.service';
+import { PopupService } from '../Services/popup.service';
+import { RoleService } from '../Services/role.service';
+import { Observable, of } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
+import { RoleDetails } from '../models/role';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoleGuard implements CanActivate {
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private popupService: PopupService,
+    private roleService: RoleService
+  ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    // الخطوة 1: التحقق مما إذا كان المستخدم مسجلاً دخوله أساسًا
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (!this.authService.isLoggedIn()) {
-      console.log(`[RoleGuard] DENIED (${state.url}): User is not logged in. Redirecting to /Login...`);
-      this.router.navigate(['/Login']); // التوجيه لصفحة تسجيل الدخول
+      console.log(`[RoleGuard] DENIED (${state.url}): User not logged in.`);
+      this.router.navigate(['/Login']);
       return false;
     }
 
-    // الخطوة 2: الحصول على الصلاحيات المطلوبة من بيانات المسار (route data)
-    const requiredRoles = route.data['roles'] as Array<string>;
+    const requiredPermission = route.data['permission'] as string;
 
-    // إذا كان المسار لا يتطلب صلاحيات معينة، اسمح للجميع بالمرور (طالما هم مسجلون)
-    if (!requiredRoles || requiredRoles.length === 0) {
-      console.log(`[RoleGuard] GRANTED (${state.url}): Route does not require specific roles.`);
+    // If the route doesn't require a specific permission, allow any logged-in user
+    if (!requiredPermission) {
+      console.log(`[RoleGuard] GRANTED (${state.url}): No specific permission required.`);
       return true;
     }
 
-    // الخطوة 3: الحصول على صلاحية المستخدم الحالي
-    const userRole = this.authService.getUserRole();
-
-    // طباعة معلومات التشخيص للمساعدة في تتبع المشاكل
     console.log(`[RoleGuard] Checking access for: ${state.url}`);
-    console.log(`[RoleGuard] Required Roles: [${requiredRoles.join(', ')}]`);
-    console.log(`[RoleGuard] User's Role (from AuthService): '${userRole}'`); // طباعة الدور المستخرج
+    console.log(`[RoleGuard] Required Permission: '${requiredPermission}'`);
 
-    // الخطوة 4: التحقق مما إذا كانت صلاحية المستخدم ضمن الصلاحيات المطلوبة
-    if (userRole && requiredRoles.includes(userRole)) {
-      console.log(`[RoleGuard] GRANTED (${state.url}): User has the required role '${userRole}'.`);
+    // If we already have the permission in the token -> allow
+    if (this.authService.hasPermission(requiredPermission)) {
+      console.log(`[RoleGuard] GRANTED (${state.url}): User has the required permission (cached).`);
       return true;
-    } else {
-      // إذا كان مسجلاً ولكن دوره خطأ أو غير كافٍ، سيتم توجيهه هنا
-      console.log(`[RoleGuard] DENIED (${state.url}): User role '${userRole}' is not sufficient for required roles [${requiredRoles.join(', ')}]. Redirecting to /unauthorized...`);
-      this.router.navigate(['/unauthorized']);
+    }
+
+    // Otherwise: try to populate permissions from role info via API, then re-check
+    const decoded = this.authService.getDecodedToken();
+    if (!decoded) {
+      // token invalid or missing
+      console.log(`[RoleGuard] DENIED (${state.url}): decoded token missing.`);
+      this.router.navigate(['/Login']);
       return false;
     }
+
+    // Try to find a role identifier/name in the token
+    const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+      || decoded.role || decoded.roleId || decoded.Role || decoded.roles || decoded.Roles;
+
+    if (!roleClaim) {
+      // nothing to fetch from server
+      return this.denyWithPopup(state.url);
+    }
+
+    // If numeric roleId, fetch that role directly; else try to find by name
+    let fetch$: Observable<RoleDetails>;
+
+    if (typeof roleClaim === 'number' || (!isNaN(Number(roleClaim)))) {
+      fetch$ = this.roleService.getRoleById(Number(roleClaim));
+    } else {
+      const roleName = String(roleClaim);
+      // getRoles to map name -> id, then getRoleById
+      fetch$ = this.roleService.getRoles().pipe(
+        switchMap(roles => {
+          const found = roles.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+          if (!found) throw new Error('Role not found by name');
+          return this.roleService.getRoleById(found.id);
+        })
+      );
+    }
+
+    return fetch$.pipe(
+      map(roleDetails => {
+        const perms = roleDetails?.permissions ?? [];
+        // attach into authService decoded token so subsequent checks pass
+        this.authService.attachPermissions(perms);
+
+        if (this.authService.hasPermission(requiredPermission)) {
+          console.log(`[RoleGuard] GRANTED (${state.url}): permission found after fetching role.`);
+          return true;
+        } else {
+          console.log(`[RoleGuard] DENIED (${state.url}): permission NOT present even after fetching role.`);
+          this.popupService.showError('Access Denied', 'You do not have the necessary permissions to access this page.');
+          this.router.navigate(['/unauthorized']);
+          return false;
+        }
+      }),
+      catchError(err => {
+        console.error('[RoleGuard] error while fetching role permissions', err);
+        return this.denyWithPopup(state.url);
+      })
+    );
+  }
+
+  private denyWithPopup(url: string): Observable<boolean> {
+    this.popupService.showError('Access Denied', 'You do not have the necessary permissions to access this page.');
+    this.router.navigate(['/unauthorized']);
+    return of(false);
   }
 }

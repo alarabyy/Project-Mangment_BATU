@@ -1,0 +1,17 @@
+/* src/app/components/roles/role-list/role-list.component.css */
+:host { display: block; padding: 2rem; }
+.container { max-width: 900px; margin: auto; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.header-content { display: flex; align-items: center; gap: 1rem; }
+.header-icon { font-size: 2.5rem; color: var(--primary-accent); }
+.header-content h1 { font-size: 2rem; font-weight: var(--font-weight-bold); }
+.loading-container, .empty-state { text-align: center; padding: 4rem 0; color: var(--subtle-text-color); }
+.table-responsive { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+.table th { background-color: var(--surface-color); }
+.actions-cell { display: flex; gap: 0.5rem; }
+.btn-action { background: none; border: 1px solid var(--border-color); color: var(--subtle-text-color); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: all 0.2s; }
+.btn-action.view:hover { color: var(--info-color); border-color: var(--info-color); }
+.btn-action.edit:hover { color: var(--warning-color); border-color: var(--warning-color); }
+.btn-action.delete:hover { color: var(--error-color); border-color: var(--error-color); }

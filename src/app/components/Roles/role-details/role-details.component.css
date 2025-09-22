@@ -1,0 +1,14 @@
+/* src/app/components/roles/role-details/role-details.component.css */
+:host { display: block; padding: 2rem; }
+.container { max-width: 1200px; margin: auto; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.header-content { display: flex; align-items: center; gap: 1rem; }
+.header-icon { font-size: 2.5rem; color: var(--primary-accent); }
+.header-content h1 { font-size: 2rem; font-weight: var(--font-weight-bold); }
+.details-card { background-color: var(--surface-color); padding: 2rem; border-radius: var(--border-radius-large); }
+.card-title { margin: 0 0 1.5rem; }
+.permissions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+.permission-group h3 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; font-size: 1.1rem; }
+.permission-group ul { list-style: none; padding: 0; margin-top: 1rem; }
+.permission-group li { padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; }
+.permission-group li i { color: var(--success-color); }

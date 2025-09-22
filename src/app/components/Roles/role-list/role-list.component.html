@@ -1,0 +1,38 @@
+<!-- src/app/components/roles/role-list/role-list.component.html -->
+<div class="container">
+  <header class="page-header">
+    <div class="header-content">
+      <i class="fas fa-user-shield header-icon"></i>
+      <h1>Role Management</h1>
+    </div>
+    <a routerLink="/roles/add" class="btn btn-primary">
+      <i class="fas fa-plus"></i> Add New Role
+    </a>
+  </header>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loader"></div> <p>Loading Roles...</p>
+  </div>
+
+  <div *ngIf="!isLoading && roles.length > 0" class="table-responsive">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Role Name</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let role of roles">
+          <td data-label="ID">{{ role.id }}</td>
+          <td data-label="Role Name">{{ role.name }}</td>
+          <td data-label="Actions" class="actions-cell">
+            <button class="btn-action view" (click)="viewDetails(role.id)" title="View Details"><i class="fas fa-eye"></i></button>
+            <button class="btn-action edit" (click)="editRole(role.id)" title="Edit Role"><i class="fas fa-edit"></i></button>
+            <button class="btn-action delete" (click)="deleteRole(role)" title="Delete Role"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!isLoading && roles.length === 0" class="empty-state">
+    <i class="fas fa-box-open"></i>
+    <p>No roles found. Start by adding a new one!</p>
+  </div>
+</div>

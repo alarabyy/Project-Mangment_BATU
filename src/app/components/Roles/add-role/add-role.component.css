@@ -1,0 +1,18 @@
+/* src/app/components/roles/add-role/add-role.component.css */
+:host { display: block; padding: 2rem; }
+.container { max-width: 1200px; margin: auto; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.header-content { display: flex; align-items: center; gap: 1rem; }
+.header-icon { font-size: 2.5rem; color: var(--primary-accent); }
+.header-content h1 { font-size: 2rem; font-weight: var(--font-weight-bold); }
+.form-card { background-color: var(--surface-color); padding: 2rem; border-radius: var(--border-radius-large); }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: var(--font-weight-semibold); }
+.form-control { width: 100%; padding: 0.8rem; }
+.permissions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.permission-group { background-color: var(--bg-color); padding: 1rem; border-radius: var(--border-radius-base); }
+.permission-group h3 { margin: 0 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+.checkbox-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.checkbox-item { display: flex; align-items: center; gap: 0.5rem; }
+.form-actions { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+.error-message { color: var(--error-color); font-size: 0.8rem; margin-top: 0.25rem; }
