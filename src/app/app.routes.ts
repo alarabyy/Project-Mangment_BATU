@@ -47,6 +47,7 @@ import { AllStaffAdminComponent } from './components/staff/all-staff-admin/all-s
 import { AddStaffComponent } from './components/staff/add-staff/add-staff.component';
 import { PrivateChatComponent } from './components/Chats/private-chat/private-chat.component';
 import { AllChatsComponent } from './components/Chats/all-chats/all-chats.component';
+import { ReportGeneratorComponent } from './components/project/report-generator/report-generator.component';
 
 export const routes: Routes = [
   // ------------------------- PUBLIC ROUTES -------------------------
@@ -78,6 +79,8 @@ export const routes: Routes = [
   { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.Edit' } },
   { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
   { path: 'ProjectAnalysis', component: ProjectAnalysisComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
+  { path: 'report-generator', component: ReportGeneratorComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
+
 
   { path: 'allMails', component: MailListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Mail.View' } },
   { path: 'replayMails/:id', component: MailReplyComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Mail.Reply' } },

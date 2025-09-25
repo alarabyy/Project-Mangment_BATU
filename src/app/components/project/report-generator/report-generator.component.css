@@ -1,0 +1,22 @@
+:host { display: block; background-color: var(--bg-color); min-height: 100vh; padding: 2rem; font-family: var(--font-family-base); color: var(--text-color); }
+.report-generator-container { max-width: 1200px; margin: auto; }
+.page-header { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; background-color: var(--surface-color); padding: 1.5rem; border-radius: var(--border-radius-large); }
+@media (min-width: 768px) { .page-header { flex-direction: row; align-items: center; } }
+.header-content { display: flex; align-items: center; gap: 1rem; }
+.header-icon { font-size: 2.5rem; color: var(--primary-accent); }
+.header-content h1 { font-size: 2rem; margin: 0; }
+.search-container { display: flex; gap: 0.5rem; flex-grow: 1; width: 100%; }
+@media (min-width: 768px) { .search-container { width: auto; } }
+.search-input { width: 100%; padding: 0.8rem 1rem; font-size: 1rem; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-base); color: var(--text-color); }
+.report-page-wrapper { background-color: #3e3e3e; padding: 2rem; border-radius: var(--border-radius-base); }
+.report-content { width: 210mm; min-height: 297mm; padding: 20mm; background: white; color: #333; box-shadow: 0 0 15px rgba(0,0,0,0.15); font-family: 'Times New Roman', Times, serif; margin: auto; box-sizing: border-box; }
+.report-header { text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 1rem; margin-bottom: 2rem; }
+.report-project-item { margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; page-break-inside: avoid; }
+.details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.5rem; }
+.report-footer { text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #ccc; font-size: 9pt; color: #777; }
+.status-container { text-align: center; padding: 4rem; color: var(--subtle-text-color); }
+.status-container i { font-size: 3rem; margin-bottom: 1rem; }
+.download-fab { position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; }
+.btn-download { background-color: var(--success-color); color: white; padding: 1rem 1.5rem; border-radius: 30px; box-shadow: var(--box-shadow-lg); }
+.no-results { text-align: center; padding: 2rem; }
+.btn { /* ... your button styles ... */ }

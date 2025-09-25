@@ -15,6 +15,17 @@ export class ProjectService {
     private authService: AuthService
   ) {}
 
+
+    // ✅ NEW: Search function that calls the API
+  searchProjects(term: string): Observable<Project[]> {
+    const headers = this.getAuthHeaders();
+    if (!term.trim()) {
+      return this.getProjects(); // Return all projects if search is empty
+    }
+    return this.http.get<Project[]>(`${this.apiUrl}/search/${term}`, { headers });
+  }
+
+
   getProjects(): Observable<Project[]> {
     const headers = this.getAuthHeaders();
     return this.http.get<Project[]>(`${this.apiUrl}/get/all`, { headers });
