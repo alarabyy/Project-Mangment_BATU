@@ -59,15 +59,14 @@ export class AuthService {
 
   // ---------- Permission helpers ----------
   // Returns true if token has the permission
-  public hasPermission(permission: string): boolean {
+  public hasPermission(category: string): boolean {
     const decoded = this.getDecodedToken();
     if (!decoded) return false;
-
+  
     const perms = this.getPermissionsFromDecoded(decoded);
     if (!perms || perms.length === 0) return false;
-
-    if (perms.includes('Permissions.*')) return true;
-    return perms.includes(permission);
+    
+    return perms.some(p => p.startsWith(`Permissions.${category}.`));
   }
 
   // Pulls possible permission arrays/strings from decoded token and normalizes to string[]
