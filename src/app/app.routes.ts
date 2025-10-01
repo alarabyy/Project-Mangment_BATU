@@ -71,49 +71,49 @@ export const routes: Routes = [
   { path: 'chat/:id', component: PrivateChatComponent, canActivate: [RoleGuard] },
 
   // ------------------------ PERMISSION-BASED ROUTES ----------------------
-  { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.User.Create' } },
-  { path: 'users', component: UserManagementComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.User.View' } },
-  { path: 'user-analytics', component: UserAnalyticsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.User.View' } },
+  { path: 'SignUp', component: SignUpComponent, canActivate: [RoleGuard], data: { permission: 'User.Create' } },
+  { path: 'users', component: UserManagementComponent, canActivate: [RoleGuard], data: { permission: 'User' } },
+  { path: 'user-analytics', component: UserAnalyticsComponent, canActivate: [RoleGuard], data: { permission: 'User.View' } },
 
-  { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.Create' } },
-  { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.Edit' } },
-  { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
-  { path: 'ProjectAnalysis', component: ProjectAnalysisComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
-  { path: 'report-generator', component: ReportGeneratorComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Project.View' } },
+  { path: 'AddProject', component: AddProjectComponent, canActivate: [RoleGuard], data: { permission: 'Project.Create' } },
+  { path: 'EditProject/:id', component: EditProjectComponent, canActivate: [RoleGuard], data: { permission: 'Project.Edit' } },
+  { path: 'ProjectList', component: ProjectListComponent, canActivate: [RoleGuard], data: { permission: 'Project' } },
+  { path: 'ProjectAnalysis', component: ProjectAnalysisComponent, canActivate: [RoleGuard], data: { permission: 'Project.View' } },
+  { path: 'report-generator', component: ReportGeneratorComponent, canActivate: [RoleGuard], data: { permission: 'Project.View' } },
 
 
-  { path: 'allMails', component: MailListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Mail.View' } },
-  { path: 'replayMails/:id', component: MailReplyComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Mail.Reply' } },
+  { path: 'allMails', component: MailListComponent, canActivate: [RoleGuard], data: { permission: 'Mail' } },
+  { path: 'replayMails/:id', component: MailReplyComponent, canActivate: [RoleGuard], data: { permission: 'Mail.Reply' } },
 
   // Role Management
-  { path: 'roles', component: RoleListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.View' } },
-  { path: 'roles/add', component: AddRoleComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.Create' } },
-  { path: 'roles/edit/:id', component: EditRoleComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.Edit' } },
-  { path: 'roles/details/:id', component: RoleDetailsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Role.View' } },
+  { path: 'roles', component: RoleListComponent, canActivate: [RoleGuard], data: { permission: 'Role' } },
+  { path: 'roles/add', component: AddRoleComponent, canActivate: [RoleGuard], data: { permission: 'Role.Create' } },
+  { path: 'roles/edit/:id', component: EditRoleComponent, canActivate: [RoleGuard], data: { permission: 'Role.Edit' } },
+  { path: 'roles/details/:id', component: RoleDetailsComponent, canActivate: [RoleGuard], data: { permission: 'Role.View' } },
 
   // Faculty Management
-  { path: 'FacultyList', component: FacultyListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Faculty.View' } },
-  { path: 'add-faculty', component: AddFacultyComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Faculty.Create' } },
-  { path: 'facultyEdit/:id', component: FacultyEditComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Faculty.Edit' } },
+  { path: 'FacultyList', component: FacultyListComponent, canActivate: [RoleGuard], data: { permission: 'Faculty' } },
+  { path: 'add-faculty', component: AddFacultyComponent, canActivate: [RoleGuard], data: { permission: 'Faculty.Create' } },
+  { path: 'facultyEdit/:id', component: FacultyEditComponent, canActivate: [RoleGuard], data: { permission: 'Faculty.Edit' } },
 
   // Department Management
-  { path: 'DepartmentsList', component: DepartmentListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Department.View' } },
-  { path: 'Departments', component: DepartmentCreateComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Department.Create' } },
-  { path: 'departmentEdit/:id', component: DepartmentEditComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Department.Edit' } },
+  { path: 'DepartmentsList', component: DepartmentListComponent, canActivate: [RoleGuard], data: { permission: 'Department' } },
+  { path: 'Departments', component: DepartmentCreateComponent, canActivate: [RoleGuard], data: { permission: 'Department.Create' } },
+  { path: 'departmentEdit/:id', component: DepartmentEditComponent, canActivate: [RoleGuard], data: { permission: 'Department.Edit' } },
 
   // Category Management
-  { path: 'CategoryList', component: CategoryListComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Category.View' } },
-  { path: 'add-category', component: AddCategoryComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Category.Create' } },
-  { path: 'categoryEdit/:id', component: EditCategoryComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Category.Edit' } },
+  { path: 'CategoryList', component: CategoryListComponent, canActivate: [RoleGuard], data: { permission: 'Category' } },
+  { path: 'add-category', component: AddCategoryComponent, canActivate: [RoleGuard], data: { permission: 'Category.Create' } },
+  { path: 'categoryEdit/:id', component: EditCategoryComponent, canActivate: [RoleGuard], data: { permission: 'Category.Edit' } },
 
   // Blogs Management
-  { path: 'blogs', component: AllblogsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Blog.View' } },
-  { path: 'add-blog', component: AddblogsComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Blog.Create' } },
-  { path: 'edit-blog/:id', component: EditBlogComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Blog.Edit' } },
+  { path: 'blogs', component: AllblogsComponent, canActivate: [RoleGuard], data: { permission: 'Blog' } },
+  { path: 'add-blog', component: AddblogsComponent, canActivate: [RoleGuard], data: { permission: 'Blog.Create' } },
+  { path: 'edit-blog/:id', component: EditBlogComponent, canActivate: [RoleGuard], data: { permission: 'Blog.Edit' } },
 
   // Staff Management
-  { path: 'admin/staff', component: AllStaffAdminComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Staff.View' } },
-  { path: 'admin/staff/add', component: AddStaffComponent, canActivate: [RoleGuard], data: { permission: 'Permissions.Staff.Create' } },
+  { path: 'admin/staff', component: AllStaffAdminComponent, canActivate: [RoleGuard], data: { permission: 'Staff' } },
+  { path: 'admin/staff/add', component: AddStaffComponent, canActivate: [RoleGuard], data: { permission: 'Staff.Create' } },
 
   // Notifications
   { path: 'notifications', component: NotificationsPageComponent, canActivate: [RoleGuard] },
