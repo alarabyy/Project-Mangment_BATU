@@ -49,6 +49,9 @@ export class AuthService {
   // Cache decoded token here (we will attach permissions into this object when needed)
   private decodedToken: any | null = null;
 
+  private _permissions = new BehaviorSubject<string[]>([]);
+  public permissions$ = this._permissions.asObservable();
+
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -59,14 +62,27 @@ export class AuthService {
 
   // ---------- Permission helpers ----------
   // Returns true if token has the permission
-  public hasPermission(category: string): boolean {
+  public hasPermission(categoryOrOperation: string, perms?: string[]): boolean {
+    const checkPermission = (permission: string): boolean => {
+      // If caller passed "Faculty" -> check any Faculty.*
+      if (!categoryOrOperation.includes('.')) {
+        return permission.startsWith(`Permissions.${categoryOrOperation}.`);
+      }
+      // If caller passed "Faculty.Create" -> check exact
+      return permission === `Permissions.${categoryOrOperation}`;
+    };
+  
+    // Check against provided perms[] (e.g., async pipe from observable)
+    if (perms) {
+      return perms.some(p => checkPermission(p));
+    }
+  
+    // Otherwise, fallback to decoded JWT
     const decoded = this.getDecodedToken();
     if (!decoded) return false;
   
-    const perms = this.getPermissionsFromDecoded(decoded);
-    if (!perms || perms.length === 0) return false;
-    
-    return perms.some(p => p.startsWith(`Permissions.${category}.`));
+    const userPerms = this.getPermissionsFromDecoded(decoded);
+    return userPerms.some(p => checkPermission(p));
   }
 
   // Pulls possible permission arrays/strings from decoded token and normalizes to string[]
@@ -145,6 +161,8 @@ export class AuthService {
           localStorage.setItem(this.authTokenKey, response.token);
           try {
             this.decodedToken = jwtDecode(response.token);
+            const perms = this.getPermissionsFromDecoded(this.decodedToken);
+            this._permissions.next(perms);
           } catch (err) {
             console.error('Failed to decode token on login', err);
             this.decodedToken = null;
@@ -162,6 +180,7 @@ export class AuthService {
     localStorage.removeItem(this.authTokenKey);
     this.decodedToken = null;
     this._isAuthenticated.next(false);
+    this._permissions.next([]);
     this.notificationService.showInfo('You have been logged out.');
     this.router.navigate(['/Login']);
   }
@@ -184,6 +203,8 @@ export class AuthService {
       try {
         this.decodedToken = jwtDecode(token);
         this._isAuthenticated.next(true);
+        const perms = this.getPermissionsFromDecoded(this.decodedToken);
+        this._permissions.next(perms);
       } catch (error) {
         console.error("Failed to decode token", error);
         this.logout();

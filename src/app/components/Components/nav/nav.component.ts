@@ -22,6 +22,7 @@ export class NavComponent implements OnInit, OnDestroy {
   currentYear: number = new Date().getFullYear();
   unreadCount$!: Observable<number>;
 
+  permissions$!: Observable<string[]>;
   private subscriptions = new Subscription();
 
   constructor(
@@ -53,6 +54,9 @@ export class NavComponent implements OnInit, OnDestroy {
     // Get observable for unread notification count
     this.unreadCount$ = this.notificationService.unreadCount$;
 
+    // 👇 attach observable from AuthService
+    this.permissions$ = this.authService.permissions$;
+    
     // Add subscriptions to manage them on component destruction
     this.subscriptions.add(themeSub);
     this.subscriptions.add(routerSub);
