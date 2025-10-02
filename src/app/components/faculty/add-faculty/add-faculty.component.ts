@@ -120,7 +120,11 @@ export class AddFacultyComponent implements OnInit, OnDestroy {
     this.facultyService.createFaculty(this.newFaculty).pipe(
       finalize(() => this.isSaving = false),
       catchError(err => {
-        this.errorMessage = err.error?.message || 'Failed to create faculty. Please try again.';
+        const msg = err.message as string;
+        this.errorMessage = msg.includes('Details: ')
+          ? msg.split('Details: ')[1]
+          : msg;
+      
         return of(null);
       })
     ).subscribe(response => {
